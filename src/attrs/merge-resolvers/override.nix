@@ -1,0 +1,1 @@
+{...}: {override = lhs: rhs: rhs;}

@@ -26,17 +26,17 @@
         }
         {
           name = "B";
-          deps = ["A"];
+          depends-on = ["A"];
           attrs = prev: {b = prev.a * 2;};
         }
         {
           name = "C";
-          deps = ["A"];
+          depends-on = ["A"];
           attrs = prev: {c = prev.a * 3;};
         }
         {
           name = "D";
-          deps = ["B" "C"];
+          depends-on = ["B" "C"];
           attrs = prev: {d = prev.b + prev.c;};
         }
       ])
