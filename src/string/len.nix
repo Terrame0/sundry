@@ -1,0 +1,1 @@
+{lib, ...}: {len = lib.stringLength;}
