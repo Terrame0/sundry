@@ -41,7 +41,6 @@ in
   {
     attrs = {
       merge-with = merge-attrs;
-      merge-recursive-no-override = merge-attrs-recursive;
     };
   }
   module-files

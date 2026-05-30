@@ -5,7 +5,7 @@
 }: let
   find-after-base = step: init-id: seq: str: let
     result =
-      utils.for [init-id step (i: true)]
+      utils.for [init-id step utils.true-fn]
       {pos = null;}
       (prev: i: let
         str-len = utils.string.len str;

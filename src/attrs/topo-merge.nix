@@ -10,9 +10,9 @@
   in
     lib.foldl (
       acc: layer:
-        utils.attrs.merge-recursive [
+        utils.attrs.merge.recursive.override [
           acc
-          (utils.attrs.merge-recursive-no-override
+          (utils.attrs.merge.recursive.no-override
             (map (transform: transform.attrs acc) layer))
         ]
     ) {}

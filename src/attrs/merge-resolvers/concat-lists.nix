@@ -1,6 +1,16 @@
-{lib, ...}: {
-  concat-lists = default: lhs: rhs:
+{
+  utils,
+  lib,
+  ...
+}: {
+  concat-lists = default: name: lhs: rhs:
     if lib.isList lhs && lib.isList rhs
     then lhs ++ rhs
-    else default lhs rhs;
+    else default name lhs rhs;
+  tests = [
+    [
+      (utils.attrs.merge.concat-lists.override [{a = [1 2];} {a = [3];}])
+      {a = [1 2 3];}
+    ]
+  ];
 }

@@ -16,7 +16,7 @@
         offset = 0;
       }
       (prev: i: let
-        entry = lib.elemAt insides i;
+        entry = utils.list.at i insides;
         substring = entry.substr;
         replacement = fn substring;
       in {

@@ -1,8 +1,8 @@
-{lib, ...}: rec {
+{utils, ...}: rec {
   for = args: init-state: op: let
-    init-id = lib.elemAt args 0;
-    step = lib.elemAt args 1;
-    cond = lib.elemAt args 2;
+    init-id = utils.list.at 0 args;
+    step = utils.list.at 1 args;
+    cond = utils.list.at 2 args;
     recurse = prev: i:
       if (cond i && !(prev ? break && prev.break))
       then recurse (prev // (op prev i)) (step i)
