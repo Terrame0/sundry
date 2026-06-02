@@ -3,23 +3,20 @@
   utils,
   ...
 }: rec {
-  topo-merge = transforms: let
-    sorted =
+  topo-transform = transforms: let
+    layers =
       utils.list.topo-stratify
       transforms;
   in
     lib.foldl (
       acc: layer:
-        utils.attrs.merge.recursive.override [
-          acc
-          (utils.attrs.merge.recursive.no-override
-            (map (transform: transform.attrs acc) layer))
-        ]
+        utils.attrs.merge.recursive.no-conflict
+        (map (transform: transform.attrs acc) layer)
     ) {}
-    sorted;
+    layers;
   tests = [
     [
-      (topo-merge [
+      (topo-transform [
         {
           name = "A";
           attrs = prev: {a = 1;};
@@ -27,17 +24,17 @@
         {
           name = "B";
           depends-on = ["A"];
-          attrs = prev: {b = prev.a * 2;};
+          attrs = prev: prev // {b = prev.a * 2;};
         }
         {
           name = "C";
           depends-on = ["A"];
-          attrs = prev: {c = prev.a * 3;};
+          attrs = prev: prev // {c = prev.a * 3;};
         }
         {
           name = "D";
           depends-on = ["B" "C"];
-          attrs = prev: {d = prev.b + prev.c;};
+          attrs = prev: prev // {d = prev.b + prev.c;};
         }
       ])
       {

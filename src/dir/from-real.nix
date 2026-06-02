@@ -12,7 +12,7 @@
         (utils.path.to-attrs fs-path).path)
       fs-path;
   in
-    utils.attrs.merge.recursive.no-override
+    utils.attrs.merge.recursive.no-collision
     (map path-to-file (lib.filesystem.listFilesRecursive dir-path));
   tests = [
     [

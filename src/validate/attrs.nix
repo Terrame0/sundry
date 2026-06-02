@@ -24,11 +24,11 @@
         comparison.missing);
 
     with-defaults =
-      utils.attrs.merge.recursive.no-override
+      utils.attrs.merge.recursive.no-collision
       [comparison.matched defaults];
 
     passed-tests =
-      utils.attrs.merge.recursive.no-override
+      utils.attrs.merge.recursive.no-collision
       (lib.mapAttrsToListRecursive (
           path: pair: let
             spec = eval-pair pair;

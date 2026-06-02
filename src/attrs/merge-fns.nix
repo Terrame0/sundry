@@ -23,6 +23,6 @@
       product;
   in
     utils.attrs.merge-with-resolvers
-    (with utils.attrs.merge-resolvers; [recursive no-override])
+    (with utils.attrs.merge-resolvers; [recursive no-collision])
     fns;
 }

@@ -2,10 +2,10 @@
   lib,
   utils,
   ...
-}: rec {
-  reform = fn: attrs:
-    utils.attrs.merge.recursive.no-override
-    (lib.mapAttrsToListRecursive (
+}: let
+  reform-base = base: fn: attrs:
+    utils.attrs.merge.recursive.no-collision
+    (base (
         path: value: let
           result =
             utils.validate.attrs
@@ -26,26 +26,29 @@
           else {}
       )
       attrs);
+in rec {
+  reform-cond = cond: reform-base (lib.mapAttrsToListRecursiveCond cond);
+  reform = reform-base lib.mapAttrsToListRecursive;
   tests = [
     [
-      (reform
+      (reform-cond (path: value: !(value ? e))
         (path: value: {
-          value = value + 1;
-          path = map (x: x + "-new") path;
+          value = value;
+          path = map (x: x + "-m") path;
         })
         {
           a = {
-            b = 10;
+            b = 1;
             c = 2;
-            g = {c = 10;};
+            d = {e = 3;};
           };
         })
       {
-        a-new = {
-          b-new = 11;
-          c-new = 3;
-          g-new = {
-            c-new = 11;
+        a-m = {
+          b-m = 1;
+          c-m = 2;
+          d-m = {
+            e = 3;
           };
         };
       }

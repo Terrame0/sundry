@@ -4,7 +4,7 @@
   ...
 }: rec {
   filter = fn: attrs:
-    utils.attrs.merge.recursive.no-override
+    utils.attrs.merge.recursive.no-collision
     (lib.mapAttrsToListRecursive (
         path: value:
           if fn path value
