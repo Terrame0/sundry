@@ -11,11 +11,11 @@
   in [
     (mlem.vfs.dir.path-strs filtered-dir)
     [
-      "filtering/a.txt"
-      "filtering/b.txt"
-      "filtering/nested/c.txt"
-      "filtering/nested/nested/e.ini"
-      "filtering/nested/nested/g.txt"
+      "a.txt"
+      "b.txt"
+      "nested/c.txt"
+      "nested/nested/e.ini"
+      "nested/nested/g.txt"
     ]
   ])
 ]

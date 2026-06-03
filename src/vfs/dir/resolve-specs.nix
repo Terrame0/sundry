@@ -28,35 +28,33 @@
         (mlem.vfs.dir.from-real
           "${flake-root}/tests/vfs-test-dir/specs"))
       {
-        specs = {
-          "a.txt" = {
+        "a.txt" = {
+          contents = "";
+          specs = {
+            "1" = null;
+            "2" = null;
+          };
+        };
+        b = {
+          contents = "";
+          specs = {
+            x = "1";
+            y = "2";
+          };
+        };
+        nested = {
+          c = {
             contents = "";
             specs = {
-              "1" = null;
-              "2" = null;
+              x = null;
+              y = "1";
             };
           };
-          b = {
+          d = {
             contents = "";
             specs = {
-              x = "1";
+              x = null;
               y = "2";
-            };
-          };
-          nested = {
-            c = {
-              contents = "";
-              specs = {
-                x = null;
-                y = "1";
-              };
-            };
-            d = {
-              contents = "";
-              specs = {
-                x = null;
-                y = "2";
-              };
             };
           };
         };

@@ -31,7 +31,7 @@
     [
       (builtins.readFile "${materialize
         (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files")
-        "test-dir"}/test-files/a.txt")
+        "test-dir"}/a.txt")
       "contents of a.txt"
     ]
   ];

@@ -8,7 +8,7 @@
     path-to-file = fs-path:
       mlem.vfs.file.from-real
       (lib.drop
-        (lib.length (mlem.vfs.path.from-str dir-path) - 1)
+        (lib.length (mlem.vfs.path.from-str dir-path))
         (mlem.vfs.path.from-str fs-path))
       fs-path;
   in
@@ -18,17 +18,15 @@
     [
       (from-real "${flake-root}/tests/vfs-test-dir/test-files")
       {
-        test-files = {
-          "a.txt" = {
-            contents = "contents of a.txt";
-          };
-          "b.txt" = {
-            contents = "contents of b.txt";
-          };
-          nested = {
-            "c.txt" = {
-              contents = "contents of c.txt";
-            };
+        "a.txt" = {
+          contents = "contents of a.txt";
+        };
+        "b.txt" = {
+          contents = "contents of b.txt";
+        };
+        nested = {
+          "c.txt" = {
+            contents = "contents of c.txt";
           };
         };
       }

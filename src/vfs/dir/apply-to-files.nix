@@ -15,17 +15,15 @@
         (path: attrs: {contents = "modified ${attrs.contents}";})
         (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
       {
-        test-files = {
-          "a.txt" = {
-            contents = "modified contents of a.txt";
-          };
-          "b.txt" = {
-            contents = "modified contents of b.txt";
-          };
-          nested = {
-            "c.txt" = {
-              contents = "modified contents of c.txt";
-            };
+        "a.txt" = {
+          contents = "modified contents of a.txt";
+        };
+        "b.txt" = {
+          contents = "modified contents of b.txt";
+        };
+        nested = {
+          "c.txt" = {
+            contents = "modified contents of c.txt";
           };
         };
       }
