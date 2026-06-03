@@ -6,10 +6,10 @@
 }: rec {
   from-real = dir-path: let
     path-to-file = fs-path:
-      mlem.file.from-real
+      mlem.vfs.file.from-real
       (lib.drop
-        (lib.length (mlem.path.to-attrs dir-path).path - 1)
-        (mlem.path.to-attrs fs-path).path)
+        (lib.length (mlem.vfs.path.from-str dir-path) - 1)
+        (mlem.vfs.path.from-str fs-path))
       fs-path;
   in
     mlem.attrs.merge.recursive.no-collision
@@ -25,7 +25,7 @@
           "b.txt" = {
             contents = "contents of b.txt";
           };
-          nested-dir = {
+          nested = {
             "c.txt" = {
               contents = "contents of c.txt";
             };

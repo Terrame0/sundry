@@ -6,15 +6,14 @@
   ...
 }: rec {
   materialize = dir: drv-name: let
-    files = lib.collect (attrs: attrs ? path && attrs ? contents) (
-      lib.mapAttrsRecursiveCond
-      (attrs: !(attrs ? contents))
+    files =
+      lib.mapAttrsToListRecursiveCond
+      (path: mlem.vfs.is-not-leaf)
       (path: attrs: {
         inherit path;
         inherit (attrs) contents;
       })
-      dir
-    );
+      dir;
     cmd =
       lib.foldl (
         cmd-acc: file-attrs: let
@@ -31,7 +30,7 @@
   tests = [
     [
       (builtins.readFile "${materialize
-        (mlem.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files")
+        (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files")
         "test-dir"}/test-files/a.txt")
       "contents of a.txt"
     ]

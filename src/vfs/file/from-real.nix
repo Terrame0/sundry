@@ -4,14 +4,14 @@
   ...
 }: rec {
   from-real = vfs-path: fs-path:
-    mlem.file.from-content vfs-path (builtins.readFile fs-path);
+    mlem.vfs.file.from-content vfs-path (builtins.readFile fs-path);
   tests = [
     [
-      (from-real ["abc" "def" "a-virtual.txt"] "${flake-root}/tests/vfs-test-dir/test-files/a.txt")
+      (from-real ["abc" "def" "a.txt"] "${flake-root}/tests/vfs-test-dir/test-files/a.txt")
       {
         abc = {
           def = {
-            "a-virtual.txt" = {
+            "a.txt" = {
               contents = "contents of a.txt";
             };
           };

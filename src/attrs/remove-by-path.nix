@@ -1,5 +1,5 @@
 {lib, ...}: rec {
-  remove-attr-by-path = path: attrs:
+  remove-by-path = path: attrs:
     if path == []
     then attrs
     else let
@@ -9,7 +9,7 @@
       if rest == []
       then removeAttrs attrs [key]
       else let
-        recursion-result = remove-attr-by-path rest attrs.${key};
+        recursion-result = remove-by-path rest attrs.${key};
       in
         if recursion-result != {}
         then attrs // {${key} = recursion-result;}
@@ -17,7 +17,7 @@
 
   tests = [
     [
-      (remove-attr-by-path ["a" "b" "c"] {
+      (remove-by-path ["a" "b" "c"] {
         a = {
           b = {
             c = 1;
@@ -28,7 +28,7 @@
       {a = {b = {d = 2;};};}
     ]
     [
-      (remove-attr-by-path ["a" "b" "c"] {a = {b = {c = 1;};};})
+      (remove-by-path ["a" "b" "c"] {a = {b = {c = 1;};};})
       {}
     ]
   ];

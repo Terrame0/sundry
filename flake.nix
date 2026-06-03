@@ -8,7 +8,7 @@
     self,
     ...
   }: {
-    evaluate = {system}: let
+    evaluate = {system, ...}: let
       pkgs = import nixpkgs {inherit system;};
       lib = pkgs.lib;
       args = {
