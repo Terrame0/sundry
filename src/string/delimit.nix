@@ -1,6 +1,6 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: rec {
   delimit = lsep: rsep: str: let
@@ -11,12 +11,12 @@
       outside-start ? 0,
       outside-substrs ? [],
     }: let
-      search = utils.string.find-after current-pos;
-      str-end = utils.string.len str;
-      lsep-current-pos = utils.if-null (search lsep str) str-end;
-      rsep-current-pos = utils.if-null (search rsep str) str-end;
-      lsep-offset = utils.string.len lsep;
-      rsep-offset = utils.string.len rsep;
+      search = mlem.string.find-after current-pos;
+      str-end = mlem.string.len str;
+      lsep-current-pos = mlem.if-null (search lsep str) str-end;
+      rsep-current-pos = mlem.if-null (search rsep str) str-end;
+      lsep-offset = mlem.string.len lsep;
+      rsep-offset = mlem.string.len rsep;
       depth = lib.length lsep-stack;
       get-substr = from: to: lib.substring from (to - from) str;
       on-lsep = recurse {
@@ -77,7 +77,7 @@
         }
         else throw "unmatched lsep"
       else
-        utils.best-by (l: r: l < r) [
+        mlem.best-by (l: r: l < r) [
           [lsep-current-pos on-lsep]
           [rsep-current-pos on-rsep]
         ];

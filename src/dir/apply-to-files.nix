@@ -1,6 +1,6 @@
 {
   lib,
-  utils,
+  mlem,
   flake-root,
   ...
 }: rec {
@@ -13,7 +13,7 @@
     [
       (apply-to-files
         (path: attrs: {contents = "modified ${attrs.contents}";})
-        (utils.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
+        (mlem.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
       {
         test-files = {
           "a.txt" = {

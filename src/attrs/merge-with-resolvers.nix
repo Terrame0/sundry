@@ -1,5 +1,5 @@
-{utils, ...}: {
+{mlem, ...}: {
   merge-with-resolvers = resolvers:
-    utils.attrs.merge-with
-    (utils.compose resolvers);
+    mlem.attrs.merge-with
+    (mlem.compose resolvers);
 }

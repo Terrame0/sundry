@@ -1,8 +1,8 @@
-{utils, ...}: rec {
+{mlem, ...}: rec {
   for = args: init-state: op: let
-    init-id = utils.list.at 0 args;
-    step = utils.list.at 1 args;
-    cond = utils.list.at 2 args;
+    init-id = mlem.list.at 0 args;
+    step = mlem.list.at 1 args;
+    cond = mlem.list.at 2 args;
     recurse = prev: i:
       if (cond i && !(prev ? break && prev.break))
       then recurse (prev // (op prev i)) (step i)

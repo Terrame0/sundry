@@ -1,18 +1,18 @@
 {
-  utils,
+  mlem,
   lib,
   flake-root,
   ...
 }: rec {
   from-real = dir-path: let
     path-to-file = fs-path:
-      utils.file.from-real
+      mlem.file.from-real
       (lib.drop
-        (lib.length (utils.path.to-attrs dir-path).path - 1)
-        (utils.path.to-attrs fs-path).path)
+        (lib.length (mlem.path.to-attrs dir-path).path - 1)
+        (mlem.path.to-attrs fs-path).path)
       fs-path;
   in
-    utils.attrs.merge.recursive.no-collision
+    mlem.attrs.merge.recursive.no-collision
     (map path-to-file (lib.filesystem.listFilesRecursive dir-path));
   tests = [
     [

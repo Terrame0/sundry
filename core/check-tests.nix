@@ -1,7 +1,7 @@
 args @ {
   pkgs,
   lib,
-  utils,
+  mlem,
   ...
 }: let
   parse-test = module-path: dir-path: id: result: let
@@ -80,20 +80,20 @@ args @ {
 
     table-width =
       lib.foldl
-      (max: line: lib.max max (utils.string.len line))
+      (max: line: lib.max max (mlem.string.len line))
       0
       (lib.concatLists (lib.attrValues blocks));
 
     pad = char: offset:
-      (utils.for
+      (mlem.for
         [offset (i: i + 1) (i: i < table-width)]
         {str = "";}
         (state: i: {str = state.str + char;})).str;
 
     pad-right = name: line:
       if lib.hasPrefix "+" line
-      then "${line}${pad "-" (utils.string.len line - 3)}+"
-      else "| ${line}${pad " " (utils.string.len line)} |";
+      then "${line}${pad "-" (mlem.string.len line - 3)}+"
+      else "| ${line}${pad " " (mlem.string.len line)} |";
 
     padded-blocks = block-line-map pad-right;
 

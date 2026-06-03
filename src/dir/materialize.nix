@@ -1,6 +1,6 @@
 {
   lib,
-  utils,
+  mlem,
   flake-root,
   pkgs,
   ...
@@ -31,7 +31,7 @@
   tests = [
     [
       (builtins.readFile "${materialize
-        (utils.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files")
+        (mlem.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files")
         "test-dir"}/test-files/a.txt")
       "contents of a.txt"
     ]

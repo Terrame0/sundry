@@ -1,14 +1,14 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: let
   reform-base = base: fn: attrs:
-    utils.attrs.merge.recursive.no-collision
+    mlem.attrs.merge.recursive.no-collision
     (base (
         path: value: let
           result =
-            utils.validate.attrs
+            mlem.validate.attrs
             (fn path value)
             {
               path = arg: {

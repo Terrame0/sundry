@@ -1,13 +1,13 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: rec {
   compare = lhs: rhs:
-    utils.attrs.merge-with-resolvers (with utils.attrs.merge-resolvers; [
+    mlem.attrs.merge-with-resolvers (with mlem.attrs.merge-resolvers; [
       (default: name: lhs: rhs:
         if name == "missing"
-        then utils.attrs.remove-attr-by-path rhs lhs
+        then mlem.attrs.remove-attr-by-path rhs lhs
         else default name lhs rhs)
       recursive
       base.no-collision

@@ -1,16 +1,16 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: rec {
   topo-transform = transforms: let
     layers =
-      utils.list.topo-stratify
+      mlem.list.topo-stratify
       transforms;
   in
     lib.foldl (
       acc: layer:
-        utils.attrs.merge.recursive.no-conflict
+        mlem.attrs.merge.recursive.no-conflict
         (map (transform: transform.attrs acc) layer)
     ) {}
     layers;

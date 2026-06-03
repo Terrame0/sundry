@@ -1,11 +1,11 @@
 {
-  utils,
+  mlem,
   lib,
   ...
 }: rec {
   replace-at = pos: len: replacement: str: let
     before = lib.substring 0 pos str;
-    after = lib.substring (pos + len) (utils.string.len str) str;
+    after = lib.substring (pos + len) (mlem.string.len str) str;
   in
     before + replacement + after;
   tests = [

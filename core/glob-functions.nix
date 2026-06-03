@@ -2,7 +2,7 @@ args @ {
   lib,
   flake-root,
   pkgs,
-  utils,
+  mlem,
 }: let
   merge-attrs = merge-fn: attrs:
     lib.zipAttrsWith (

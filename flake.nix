@@ -7,21 +7,21 @@
     nixpkgs,
     self,
     ...
-  }: let
+  }: {
     evaluate = {system}: let
       pkgs = import nixpkgs {inherit system;};
       lib = pkgs.lib;
       args = {
         inherit lib;
         inherit pkgs;
-        inherit utils;
+        inherit mlem;
         flake-root = self.outPath;
       };
-      utils = import ./core/glob-functions.nix args;
+      mlem = import ./core/glob-functions.nix args;
       test-results = import ./core/check-tests.nix args;
     in {
-      functions = utils;
+      functions = mlem;
       meta = {inherit test-results;};
     };
-  in {result = evaluate {system = "x86_64-linux";};};
+  };
 }

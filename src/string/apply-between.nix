@@ -1,5 +1,5 @@
 {
-  utils,
+  mlem,
   lib,
   ...
 }: rec {
@@ -7,26 +7,26 @@
     insides =
       lib.filter
       (entry: entry.depth == 1)
-      (utils.string.delimit lsep rsep str).inside;
+      (mlem.string.delimit lsep rsep str).inside;
     result =
-      utils.for
+      mlem.for
       [0 (i: i + 1) (i: i < (lib.length insides))]
       {
         inherit str;
         offset = 0;
       }
       (prev: i: let
-        entry = utils.list.at i insides;
+        entry = mlem.list.at i insides;
         substring = entry.substr;
         replacement = fn substring;
       in {
         str =
-          utils.string.replace-at
+          mlem.string.replace-at
           (entry.pos + prev.offset)
-          (utils.string.len entry.substr)
+          (mlem.string.len entry.substr)
           replacement
           prev.str;
-        offset = prev.offset + utils.string.len replacement - utils.string.len substring;
+        offset = prev.offset + mlem.string.len replacement - mlem.string.len substring;
       });
   in
     result.str;

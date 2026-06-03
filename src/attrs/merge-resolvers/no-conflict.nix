@@ -1,4 +1,4 @@
-{utils, ...}: rec {
+{mlem, ...}: rec {
   base.no-conflict = name: lhs: rhs:
     if lhs != rhs
     then
@@ -7,9 +7,9 @@
 
         there is a conflict in attrset merge at '${name}'
           lhs:
-            ${utils.string.pretty lhs}
+            ${mlem.string.pretty lhs}
           rhs:
-            ${utils.string.pretty rhs}
+            ${mlem.string.pretty rhs}
       ''
     else rhs;
   tests = [

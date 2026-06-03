@@ -1,13 +1,13 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: {
   switch = value: cases: let
     recurse = left: let
       case = lib.head left;
-      expected = utils.list.at 0 case;
-      result = utils.list.at 1 case;
+      expected = mlem.list.at 0 case;
+      result = mlem.list.at 1 case;
     in
       if lib.length left == 1
       then lib.head left

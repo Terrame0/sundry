@@ -1,10 +1,10 @@
 {
-  utils,
+  mlem,
   flake-root,
   ...
 }: rec {
   from-real = vfs-path: fs-path:
-    utils.file.from-content vfs-path (builtins.readFile fs-path);
+    mlem.file.from-content vfs-path (builtins.readFile fs-path);
   tests = [
     [
       (from-real ["abc" "def" "a-virtual.txt"] "${flake-root}/tests/vfs-test-dir/test-files/a.txt")

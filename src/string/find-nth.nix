@@ -1,10 +1,10 @@
-{utils, ...}: let
+{mlem, ...}: let
   find-nth-base = fn: init-offset: step: n: seq: str:
     if n == 0
     then null
     else
       (
-        utils.for [0 (i: i + 1) (i: i < n)]
+        mlem.for [0 (i: i + 1) (i: i < n)]
         {offset = init-offset;}
         (prev: i: rec {
           offset = fn (step prev.offset) seq str;
@@ -14,7 +14,7 @@
 in rec {
   find-nth = n: seq: str:
     find-nth-base
-    utils.string.find-after
+    mlem.string.find-after
     (-1)
     (offset: offset + 1)
     n
@@ -22,8 +22,8 @@ in rec {
     str;
   rfind-nth = n: seq: str:
     find-nth-base
-    utils.string.rfind-after
-    (utils.string.len str - utils.string.len seq + 1)
+    mlem.string.rfind-after
+    (mlem.string.len str - mlem.string.len seq + 1)
     (offset: offset - 1)
     n
     seq

@@ -1,5 +1,5 @@
 {
-  utils,
+  mlem,
   lib,
   ...
 }: {
@@ -9,7 +9,7 @@
     else default name lhs rhs;
   tests = [
     [
-      (utils.attrs.merge.concat-lists.override [{a = [1 2];} {a = [3];}])
+      (mlem.attrs.merge.concat-lists.override [{a = [1 2];} {a = [3];}])
       {a = [1 2 3];}
     ]
   ];

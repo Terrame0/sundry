@@ -1,11 +1,11 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: rec {
   concat-str = paths:
     lib.foldl (
-      path-acc: path: "${utils.string.trim-right "/" path-acc}/${utils.string.trim-left "/" path}"
+      path-acc: path: "${mlem.string.trim-right "/" path-acc}/${mlem.string.trim-left "/" path}"
     ) (lib.head paths)
     (lib.tail paths);
   tests = [

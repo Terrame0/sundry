@@ -1,12 +1,12 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: rec {
   to-attrs = path-str: rec {
     path =
       lib.splitString "/"
-      (utils.string.trim-left "/"
+      (mlem.string.trim-left "/"
         (builtins.unsafeDiscardStringContext (toString path-str)));
     leaf = let
       leaf = lib.last path;
@@ -15,8 +15,8 @@
       full = leaf;
       stem =
         lib.concatStringsSep "."
-        (utils.list.incl-init leaf-parts);
-      ext = utils.if-null (utils.list.excl-last leaf-parts) "";
+        (mlem.list.incl-init leaf-parts);
+      ext = mlem.if-null (mlem.list.excl-last leaf-parts) "";
     };
   };
   tests = [

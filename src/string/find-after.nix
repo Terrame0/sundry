@@ -1,15 +1,15 @@
 {
   lib,
-  utils,
+  mlem,
   ...
 }: let
   find-after-base = step: init-id: seq: str: let
     result =
-      utils.for [init-id step utils.true-fn]
+      mlem.for [init-id step mlem.true-fn]
       {pos = null;}
       (prev: i: let
-        str-len = utils.string.len str;
-        seq-len = utils.string.len seq;
+        str-len = mlem.string.len str;
+        seq-len = mlem.string.len seq;
         within-bounds = 0 <= i && i <= (str-len - seq-len);
       in {
         pos =
