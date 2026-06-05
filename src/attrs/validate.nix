@@ -39,7 +39,7 @@
                 then
                   assert builtins.isBool spec.check;
                     spec.check
-                else throw "attribute spec that has the 'check' attribute must also have the 'error-msg' attribute"
+                else throw "attribute spec that has a 'check' attribute must also have an 'error-msg' attribute"
               else true;
           in
             if passed

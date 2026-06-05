@@ -13,8 +13,8 @@
     }: let
       search = mlem.string.find-after current-pos;
       str-end = mlem.string.len str;
-      lsep-current-pos = mlem.if-null (search lsep str) str-end;
-      rsep-current-pos = mlem.if-null (search rsep str) str-end;
+      lsep-current-pos = mlem.is-null (search lsep str) str-end;
+      rsep-current-pos = mlem.is-null (search rsep str) str-end;
       lsep-offset = mlem.string.len lsep;
       rsep-offset = mlem.string.len rsep;
       depth = lib.length lsep-stack;

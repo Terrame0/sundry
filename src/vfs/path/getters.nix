@@ -12,7 +12,7 @@
       lib.concatStringsSep "."
       (mlem.list.incl-init (name-split path));
     ext = path:
-      mlem.if-null
+      mlem.is-null
       (mlem.list.excl-last (name-split path)) "";
     str = path:
       lib.foldl (
