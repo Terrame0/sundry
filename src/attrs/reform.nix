@@ -7,7 +7,7 @@
     mlem.attrs.merge.recursive.no-collision
     (base (path: value: let
       result =
-        mlem.validate.attrs
+        mlem.attrs.validate
         (fn path value)
         {
           path = arg: {

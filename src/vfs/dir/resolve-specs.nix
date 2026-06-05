@@ -3,12 +3,23 @@
   mlem,
   flake-root,
   ...
-}: {
-  resolve-specs = dir:
+}: rec {
+  resolve-specs = args-in: let
+    args = mlem.attrs.validate args-in {
+      strip = value: {
+        default = false;
+        check = lib.isBool value;
+        error-msg = "must be either 'true' or 'false'";
+      };
+    };
+  in
     mlem.attrs.reform-until
     (path: mlem.vfs.is-leaf)
     (path: value: {
-      path = map (path: "${lib.concatStrings (mlem.string.outside "[" "]" path)}") path;
+      path =
+        if args.strip
+        then map (path: "${lib.concatStrings (mlem.string.outside "[" "]" path)}") path
+        else path;
       value =
         value
         // {
@@ -20,11 +31,10 @@
             (mlem.string.between "[" "]" dir)))
           path);
         };
-    })
-    dir;
+    });
   tests = [
     [
-      (mlem.vfs.dir.resolve-specs
+      (resolve-specs {strip = true;}
         (mlem.vfs.dir.from-real
           "${flake-root}/tests/vfs-test-dir/specs"))
       {

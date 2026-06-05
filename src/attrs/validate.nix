@@ -3,7 +3,7 @@
   mlem,
   ...
 }: rec {
-  attrs = attrs: template: let
+  validate = attrs: template: let
     fmt-leaves = lib.mapAttrsRecursive (_: value: "(...)");
     eval-pair = pair:
       (mlem.list.at 1 pair)
@@ -48,7 +48,7 @@
         )
         with-defaults);
   in
-    lib.foldl mlem.validate.success passed-tests [
+    lib.foldl mlem.check-success passed-tests [
       # -- unexpected attributes check
       {
         success = comparison.extra == {};
@@ -64,17 +64,21 @@
       # -- passed tests check
       (let
         result = mlem.attrs.compare passed-tests with-defaults;
-        resolved = lib.mapAttrsRecursive (_: pair: (eval-pair pair).error-msg) result.missing;
+        resolved-str = lib.pipe result.missing [
+          (lib.mapAttrsToListRecursive
+            (path: pair: "  ${lib.concatStringsSep "." path}: ${(eval-pair pair).error-msg}"))
+          (lib.concatStringsSep "\n")
+        ];
       in {
         success = result.missing == {};
-        error-msg = "incorrect attribute values:\n${fmt resolved}";
+        error-msg = "incorrect attribute values:\n${resolved-str}";
       })
     ];
 
   tests = [
     [
       (
-        attrs
+        validate
         {
           a = 2;
         }
@@ -106,7 +110,7 @@
     ]
     [
       (builtins.tryEval (
-        attrs
+        validate
         {
           a = 1;
         }
@@ -119,7 +123,7 @@
     ]
     [
       (builtins.tryEval (
-        attrs
+        validate
         {
           a = 1;
         }

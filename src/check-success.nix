@@ -1,5 +1,5 @@
 {...}: {
-  success = value: attrs:
+  check-success = value: attrs:
     if !(attrs ? success)
     then throw "success validation attrset must have the 'success' attribute"
     else if !(attrs ? error-msg)
