@@ -27,7 +27,8 @@
   in
     lib.foldl (
       acc: layer:
-        lib.pipe layer [
+        acc
+        // lib.pipe layer [
           (map (entry: {
             ${entry.name} =
               entry.transform
@@ -62,7 +63,12 @@
           transform = prev: prev.second + prev.third;
         };
       })
-      {fourth = 5;}
+      {
+        first = 1;
+        second = 2;
+        third = 3;
+        fourth = 5;
+      }
     ]
   ];
 }
