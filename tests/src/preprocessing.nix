@@ -9,12 +9,12 @@
   #    {
   #      name = "import-stage";
   #      attrs = prev:
-  #        mlem.vfs.dir.from-real
+  #        mlem.vfs.dir.from-src
   #        "${flake-root}/tests/vfs-test-dir/preprocessing";
   #    }
   #    {
   #      name = "spec-resolution-stage";
-  #      depends-on = ["import-stage"];
+  #      deps = ["import-stage"];
   #      attrs = prev:
   #        mlem.vfs.dir.resolve-specs prev;
   #    }

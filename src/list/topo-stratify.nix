@@ -11,7 +11,7 @@
           (entry:
             lib.all
             (dependency: lib.elem dependency done)
-            (entry.depends-on or []))
+            (entry.deps or []))
           left;
       in
         if current-level != []
@@ -33,32 +33,32 @@
     A = {name = "A";};
     B = {
       name = "B";
-      depends-on = ["A"];
+      deps = ["A"];
     };
     C = {
       name = "C";
-      depends-on = ["A"];
+      deps = ["A"];
     };
     D = {
       name = "D";
-      depends-on = ["B" "C"];
+      deps = ["B" "C"];
     };
     E = {
       name = "E";
-      depends-on = ["A" "C"];
+      deps = ["A" "C"];
     };
     F = {
       name = "F";
-      depends-on = ["D" "E"];
+      deps = ["D" "E"];
     };
     G = {name = "G";};
     H = {
       name = "H";
-      depends-on = ["G" "F"];
+      deps = ["G" "F"];
     };
     I = {
       name = "I";
-      depends-on = ["B"];
+      deps = ["B"];
     };
   in [
     [(topo-stratify [A B C D]) [[A] [B C] [D]]]
@@ -71,11 +71,11 @@
       (builtins.tryEval (topo-stratify [
         {
           name = "X";
-          depends-on = ["Y"];
+          deps = ["Y"];
         }
         {
           name = "Y";
-          depends-on = ["X"];
+          deps = ["X"];
         }
       ])).success
       false
@@ -84,7 +84,7 @@
       (builtins.tryEval (topo-stratify [
         {
           name = "X";
-          depends-on = ["missing"];
+          deps = ["missing"];
         }
       ])).success
       false

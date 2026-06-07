@@ -4,9 +4,9 @@
   flake-root,
   ...
 }: rec {
-  from-real = dir-path: let
+  from-src = dir-path: let
     path-to-file = fs-path:
-      mlem.vfs.file.from-real
+      mlem.vfs.file.from-src
       (lib.drop
         (lib.length (mlem.vfs.path.from-str dir-path))
         (mlem.vfs.path.from-str fs-path))
@@ -16,7 +16,7 @@
     (map path-to-file (lib.filesystem.listFilesRecursive dir-path));
   tests = [
     [
-      (from-real "${flake-root}/tests/vfs-test-dir/test-files")
+      (from-src "${flake-root}/tests/vfs-test-dir/test-files")
       {
         "a.txt" = {
           contents = "contents of a.txt";

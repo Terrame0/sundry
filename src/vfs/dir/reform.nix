@@ -9,7 +9,7 @@
       (reform (path: file: {
         inherit path;
         value = file // {path = mlem.vfs.path.get.str path;};
-      }) (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
+      }) (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
       {
         "a.txt" = {
           contents = "contents of a.txt";

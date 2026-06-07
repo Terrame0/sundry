@@ -2,8 +2,8 @@
   lib,
   mlem,
   ...
-}: rec {
-  compare = lhs: rhs:
+}: let
+  compare-base = cond: lhs: rhs:
     mlem.attrs.merge-with-resolvers (with mlem.attrs.merge-resolvers; [
       (default: name: lhs: rhs:
         if name == "missing"
@@ -23,7 +23,12 @@
       ++ (lib.mapAttrsToListRecursiveCond
         # -- only recurse when rhs also has an attrset here
         # otherwise treat lhs subtree as a leaf
-        (path: _: lib.hasAttrByPath path rhs && lib.isAttrs (lib.getAttrFromPath path rhs))
+        (path: _: let
+          rhs-value = lib.getAttrFromPath path rhs;
+        in
+          lib.hasAttrByPath path rhs
+          && lib.isAttrs rhs-value
+          && cond rhs-value)
         (path: value:
           if lib.hasAttrByPath path rhs
           then {
@@ -33,6 +38,9 @@
           else {extra = lib.setAttrByPath path value;})
         lhs)
     );
+in rec {
+  compare = compare-base lib.isAttrs;
+  compare-until = compare-base;
 
   tests = [
     [

@@ -13,7 +13,7 @@
     [
       (apply-to-files
         (path: attrs: {contents = "modified ${attrs.contents}";})
-        (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
+        (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
       {
         "a.txt" = {
           contents = "modified contents of a.txt";

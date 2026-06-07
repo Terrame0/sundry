@@ -7,7 +7,7 @@
     filtered-dir =
       mlem.vfs.dir.filter
       (path: file: mlem.vfs.path.get.ext path == "txt" || file.contents == "override")
-      (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/filtering");
+      (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/filtering");
   in [
     (mlem.vfs.dir.path-strs filtered-dir)
     [

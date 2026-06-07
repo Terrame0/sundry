@@ -11,7 +11,7 @@
     dir;
   tests = [
     [
-      (path-strs (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
+      (path-strs (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
       [
         "a.txt"
         "b.txt"

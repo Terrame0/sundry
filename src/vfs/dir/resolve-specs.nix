@@ -6,18 +6,18 @@
 }: rec {
   resolve-specs = args-in: let
     args = mlem.attrs.validate args-in {
-      strip = value: {
+      strip = {
         default = false;
-        check = lib.isBool value;
-        error-msg = "must be either 'true' or 'false'";
+        check = value: lib.isBool value;
+        desc = "must be either 'true' or 'false'";
       };
-      separators = value: {
+      separators = {
         default = ["{" ":" "," "}"];
-        check =
+        check = value:
           lib.isList value
           && lib.length value == 4
           && (lib.all lib.isString value);
-        error-msg = "must be a list of the following format: [ left-sep key-value-sep value-sep right-sep ]";
+        desc = "must be a list of the following format: [ left-sep key-value-sep value-sep right-sep ]";
       };
     };
     lsep = mlem.list.at 0 args.separators;
@@ -54,7 +54,7 @@
   tests = [
     [
       (lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
-        mlem.vfs.dir.from-real
+        mlem.vfs.dir.from-src
         (resolve-specs {
           strip = true;
           separators = ["{" ":" "," "}"];

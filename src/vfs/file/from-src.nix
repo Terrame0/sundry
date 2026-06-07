@@ -3,11 +3,11 @@
   flake-root,
   ...
 }: rec {
-  from-real = vfs-path: fs-path:
-    mlem.vfs.file.from-content vfs-path (builtins.readFile fs-path);
+  from-src = vfs-path: fs-path:
+    mlem.vfs.file.from-contents vfs-path (builtins.readFile fs-path);
   tests = [
     [
-      (from-real ["abc" "def" "a.txt"] "${flake-root}/tests/vfs-test-dir/test-files/a.txt")
+      (from-src ["abc" "def" "a.txt"] "${flake-root}/tests/vfs-test-dir/test-files/a.txt")
       {
         abc = {
           def = {

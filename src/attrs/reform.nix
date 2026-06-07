@@ -10,17 +10,17 @@
         mlem.attrs.validate
         (fn path value)
         {
-          path = value: {
-            check =
+          path = {
+            check = value:
               lib.isList value
               && (lib.all (x: lib.isString x) value);
-            error-msg = "the path is not a list of strings";
+            desc = "the path is not a list of strings";
           };
-          value = _: {};
-          omit = value: {
+          value = {};
+          omit = {
             default = false;
-            check = lib.isBool value;
-            error-msg = "must be either 'true' or 'false'";
+            check = value: lib.isBool value;
+            desc = "must be either 'true' or 'false'";
           };
         };
     in

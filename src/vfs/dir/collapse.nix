@@ -10,7 +10,7 @@
       (collapse (path: file: {
         name = mlem.vfs.path.get.str path;
         value = file.contents;
-      }) (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files"))
+      }) (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
       [
         {
           name = "a.txt";

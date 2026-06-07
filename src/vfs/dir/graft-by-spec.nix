@@ -28,7 +28,7 @@
   tests = [
     [
       (lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
-        mlem.vfs.dir.from-real
+        mlem.vfs.dir.from-src
         (mlem.vfs.dir.resolve-specs {strip = true;})
         (graft-by-spec {
           y = "1";

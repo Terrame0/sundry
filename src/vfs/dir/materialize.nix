@@ -30,7 +30,7 @@
   tests = [
     [
       (builtins.readFile "${materialize
-        (mlem.vfs.dir.from-real "${flake-root}/tests/vfs-test-dir/test-files")
+        (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files")
         "test-dir"}/a.txt")
       "contents of a.txt"
     ]
