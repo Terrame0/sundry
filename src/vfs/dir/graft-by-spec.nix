@@ -11,7 +11,20 @@
           mlem.while
           (state:
             (lib.length state.path != 0)
-            && (lib.head state.specs != spec))
+            && !(
+              let
+                comparison = mlem.attrs.compare spec (lib.head state.specs);
+                is-subset = comparison.extra == {};
+                values-match = lib.pipe comparison.matched [
+                  (lib.mapAttrsToList
+                    (name: value:
+                      mlem.list.at 0 value
+                      == mlem.list.at 1 value))
+                  (lib.all lib.id)
+                ];
+              in
+                is-subset && values-match
+            ))
           {
             inherit path;
             inherit (file) specs;
@@ -25,16 +38,34 @@
         omit = res.path == [];
       }
     );
-  tests = [
+  tests = let
+    dir = lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
+      mlem.vfs.dir.from-src
+      (mlem.vfs.dir.resolve-specs {strip = true;})
+    ];
+  in [
     [
-      (lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
-        mlem.vfs.dir.from-src
-        (mlem.vfs.dir.resolve-specs {strip = true;})
-        (graft-by-spec {
+      (graft-by-spec {
+          x = "1";
           y = "1";
-        })
-      ])
+        }
+        dir)
+    ]
+    [
+      (graft-by-spec {
+          y = "1";
+        }
+        dir)
       {
+        c = {
+          contents = "";
+          specs = [
+            {
+              x = "1";
+              y = "1";
+            }
+          ];
+        };
         nested = {
           f = {
             contents = "";
