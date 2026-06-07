@@ -35,72 +35,71 @@
       value =
         value
         // {
-          specs = lib.pipe path [
-            (map (dir:
-              lib.pipe dir [
-                (mlem.string.between lsep rsep)
-                (map (spec-str: let
-                  spec-parts = lib.splitString kvsep spec-str;
-                  spec-key = lib.head spec-parts;
-                  spec-value = mlem.list.excl-last spec-parts;
-                  spec-values = mlem.not-null spec-value (lib.splitString vsep spec-value);
-                in {
-                  ${spec-key} =
-                    mlem.not-null spec-values
-                    (
-                      if lib.length spec-values == 1
-                      then mlem.list.at 0 spec-values
-                      else spec-values
-                    );
-                }))
-                mlem.attrs.merge.recursive.no-conflict
-              ]))
-            mlem.attrs.merge.recursive.no-collision
-          ];
+          specs = map (dir:
+            lib.pipe dir [
+              (mlem.string.between lsep rsep)
+              (map (spec-str: let
+                spec-parts = lib.splitString kvsep spec-str;
+                spec-key = lib.head spec-parts;
+                spec-value = mlem.is-null (mlem.list.excl-last spec-parts) "";
+                spec-list = lib.splitString vsep spec-value;
+              in {
+                ${spec-key} = mlem.list.un-singleton spec-list;
+              }))
+              mlem.attrs.merge.no-collision
+            ])
+          path;
         };
     });
   tests = [
     [
-      (resolve-specs {
+      (lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
+        mlem.vfs.dir.from-real
+        (resolve-specs {
           strip = true;
           separators = ["{" ":" "," "}"];
-        }
-        (mlem.vfs.dir.from-real
-          "${flake-root}/tests/vfs-test-dir/specs"))
+        })
+      ])
       {
-        "a.txt" = {
+        a = {
           contents = "";
-          specs = {
-            "1" = null;
-            "2" = null;
-          };
+          specs = [{x = "1";}];
         };
         b = {
           contents = "";
-          specs = {
-            x = "1";
-            y = [
-              "2"
-              "3"
-            ];
-          };
+          specs = [{x = ["2" "3"];}];
+        };
+        c = {
+          contents = "";
+          specs = [
+            {
+              x = "1";
+              y = "1";
+            }
+          ];
+        };
+        d = {
+          contents = "";
+          specs = [
+            {
+              x = "";
+              y = "";
+            }
+          ];
         };
         nested = {
-          c = {
+          e = {
             contents = "";
-            specs = {
-              x = null;
-              y = "1";
-            };
+            specs = [{x = "1";} {x = "2";}];
           };
-          d = {
+          g = {
             contents = "";
-            specs = {
-              x = null;
-              y = [
-                "2"
-                "3"
-              ];
+            specs = [{y = "1";} {z = "2";}];
+          };
+          nested = {
+            f = {
+              contents = "";
+              specs = [{x = "1";} {y = "1";} {y = "2";}];
             };
           };
         };

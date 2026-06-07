@@ -5,9 +5,6 @@
 }: rec {
   validate = attrs: template: let
     fmt-leaves = lib.mapAttrsRecursive (_: value: "(...)");
-    eval-pair = pair:
-      (mlem.list.at 1 pair)
-      (mlem.list.at 0 pair);
 
     fmt = value:
       mlem.string.apply-to-lines
@@ -31,16 +28,17 @@
       mlem.attrs.merge.recursive.no-collision
       (lib.mapAttrsToListRecursive (
           path: pair: let
-            spec = eval-pair pair;
+            value = mlem.list.at 0 pair;
+            validator = mlem.list.at 1 pair;
+            spec = validator value;
             passed =
-              if spec ? check
-              then
-                if spec ? error-msg
-                then
-                  assert builtins.isBool spec.check;
-                    spec.check
-                else throw "attribute spec that has a 'check' attribute must also have an 'error-msg' attribute"
-              else true;
+              if spec.nullable or false && value == null
+              then true
+              else if !(spec ? check)
+              then true
+              else if !(spec ? error-msg)
+              then throw "attribute spec that has a 'check' attribute must also have an 'error-msg' attribute"
+              else assert builtins.isBool spec.check; spec.check;
           in
             if passed
             then lib.setAttrByPath path (mlem.list.at 0 pair)
@@ -66,7 +64,10 @@
         result = mlem.attrs.compare passed-tests with-defaults;
         resolved-str = lib.pipe result.missing [
           (lib.mapAttrsToListRecursive
-            (path: pair: "  ${lib.concatStringsSep "." path}: ${(eval-pair pair).error-msg}"))
+            (path: pair: let
+              value = mlem.list.at 0 pair;
+              validator = mlem.list.at 1 pair;
+            in "  ${lib.concatStringsSep "." path}: ${(validator value).error-msg}"))
           (lib.concatStringsSep "\n")
         ];
       in {
@@ -79,9 +80,7 @@
     [
       (
         validate
-        {
-          a = 2;
-        }
+        {a = 2;}
         {
           a = value: {
             default = 2;
@@ -89,31 +88,24 @@
             error-msg = "${toString value} is not divisible by 2";
           };
           b = value: {
-            default = 3;
+            default = null;
+            nullable = true;
             check = lib.mod value 3 == 0;
             error-msg = "${toString value} is not divisible by 3";
           };
-          c = {
-            d = value: {
-              default = 4;
-            };
-          };
+          c = {d = value: {default = 4;};};
         }
       )
       {
         a = 2;
-        b = 3;
-        c = {
-          d = 4;
-        };
+        b = null;
+        c = {d = 4;};
       }
     ]
     [
       (builtins.tryEval (
         validate
-        {
-          a = 1;
-        }
+        {a = 1;}
         {
           a = value: {};
           b = value: {};
@@ -124,9 +116,7 @@
     [
       (builtins.tryEval (
         validate
-        {
-          a = 1;
-        }
+        {a = 1;}
         {
           a = value: {
             default = 2;
