@@ -5,7 +5,7 @@
   ...
 }: [
   #[
-  #  (mlem.attrs.topo-transform [
+  #  (mlem.attrs.topo-merge [
   #    {
   #      name = "import-stage";
   #      attrs = prev:

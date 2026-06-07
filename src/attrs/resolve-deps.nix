@@ -14,51 +14,55 @@
           };
           transform = {
             check = value: lib.isFunction value;
-            desc = "each stage must have a transformation function defined";
+            desc = "must be a transformation function";
           };
         };
       in {
         inherit name;
         inherit (value) deps;
-        attrs = value.transform;
+        inherit (value) transform;
       }))
       mlem.list.topo-stratify
     ];
   in
     lib.foldl (
       acc: layer:
-        mlem.attrs.merge.recursive.no-conflict
-        (map (transform: transform.attrs acc) layer)
+        lib.pipe layer [
+          (map (entry: {
+            ${entry.name} =
+              entry.transform
+              (lib.pipe entry.deps [
+                (map (dep: {
+                  name = dep;
+                  value = acc.${dep};
+                }))
+                lib.listToAttrs
+              ]);
+          }))
+          mlem.attrs.merge.no-collision
+        ]
     ) {}
     layers;
   tests = [
-    #[
-    #  (resolve-deps {
-    #    first = {
-    #      transform = prev: {a = 1;};
-    #    };
-    #  })
-    #  #[
-    #  #  {
-    #  #    name = "first";
-    #  #    attrs = prev: {a = 1;};
-    #  #  }
-    #  #  {
-    #  #    name = "B";
-    #  #    deps = ["first"];
-    #  #    attrs = prev: prev // {b = prev.a * 2;};
-    #  #  }
-    #  #  {
-    #  #    name = "C";
-    #  #    deps = ["first"];
-    #  #    attrs = prev: prev // {c = prev.a * 3;};
-    #  #  }
-    #  #  {
-    #  #    name = "D";
-    #  #    deps = ["B" "C"];
-    #  #    attrs = prev: prev // {d = prev.b + prev.c;};
-    #  #  }
-    #  #])
-    #]
+    [
+      (resolve-deps {
+        first = {
+          transform = _: 1;
+        };
+        second = {
+          deps = ["first"];
+          transform = prev: prev.first + 1;
+        };
+        third = {
+          deps = ["first"];
+          transform = prev: prev.first + 2;
+        };
+        fourth = {
+          deps = ["second" "third"];
+          transform = prev: prev.second + prev.third;
+        };
+      })
+      {fourth = 5;}
+    ]
   ];
 }
