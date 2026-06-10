@@ -88,18 +88,24 @@
           ];
         };
         nested = {
-          e = {
+          g = {
             contents = "";
             specs = [{x = "1";} {x = "2";}];
           };
-          g = {
+          h = {
             contents = "";
-            specs = [{y = "1";} {z = "2";}];
+            specs = [{y = "1";} {z = "1";}];
           };
           nested = {
             f = {
               contents = "";
               specs = [{x = "1";} {y = "1";} {y = "2";}];
+            };
+            nested = {
+              e = {
+                contents = "";
+                specs = [{x = "1";} {y = "1";} {z = "1";} {z = "2";}];
+              };
             };
           };
         };

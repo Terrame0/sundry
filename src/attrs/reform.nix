@@ -14,7 +14,7 @@
             check = value:
               lib.isList value
               && (lib.all (x: lib.isString x) value);
-            desc = "the path is not a list of strings";
+            desc = "must be a list of strings";
           };
           value = {};
           omit = {
