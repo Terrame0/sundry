@@ -1,9 +1,8 @@
 {...}: rec {
-  is-leaf = attrs: builtins.isString (attrs.contents or null);
-  is-not-leaf = attrs: !(is-leaf attrs);
+  is-leaf = _: attrs: builtins.isString (attrs.contents or null);
   tests = [
-    [(is-leaf {contents = "...";}) true]
-    [(is-leaf {file = {contents = "...";};}) false]
-    [(is-leaf {contents = {};}) false]
+    [(is-leaf "..." {contents = "...";}) true]
+    [(is-leaf "..." {file = {contents = "...";};}) false]
+    [(is-leaf "..." {contents = {};}) false]
   ];
 }

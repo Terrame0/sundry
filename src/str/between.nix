@@ -7,7 +7,7 @@
     insides =
       lib.filter
       (entry: entry.depth == 1)
-      (mlem.string.delimit lsep rsep str).inside;
+      (mlem.str.delimit lsep rsep str).inside;
   in
     map (attrs: attrs.substr) insides;
   tests = [

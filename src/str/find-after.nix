@@ -8,8 +8,8 @@
       mlem.for [init-id step mlem.true-fn]
       {pos = null;}
       (prev: i: let
-        str-len = mlem.string.len str;
-        seq-len = mlem.string.len seq;
+        str-len = mlem.str.len str;
+        seq-len = mlem.str.len seq;
         within-bounds = 0 <= i && i <= (str-len - seq-len);
       in {
         pos =

@@ -1,12 +1,11 @@
 {
-  lib,
   mlem,
   flake-root,
   ...
 }: rec {
   path-strs = dir:
-    lib.mapAttrsToListRecursiveCond
-    (path: mlem.vfs.is-not-leaf)
+    mlem.attrs.collapse-until
+    mlem.vfs.is-leaf
     (path: _: mlem.vfs.path.get.str path)
     dir;
   tests = [

@@ -7,7 +7,7 @@
     insides =
       lib.filter
       (entry: entry.depth == 1)
-      (mlem.string.delimit lsep rsep str).inside;
+      (mlem.str.delimit lsep rsep str).inside;
     result =
       mlem.for
       [0 (i: i + 1) (i: i < (lib.length insides))]
@@ -21,12 +21,12 @@
         replacement = fn substring;
       in {
         str =
-          mlem.string.replace-at
+          mlem.str.replace-at
           (entry.pos + prev.offset)
-          (mlem.string.len entry.substr)
+          (mlem.str.len entry.substr)
           replacement
           prev.str;
-        offset = prev.offset + mlem.string.len replacement - mlem.string.len substring;
+        offset = prev.offset + mlem.str.len replacement - mlem.str.len substring;
       });
   in
     result.str;

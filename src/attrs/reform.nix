@@ -30,10 +30,8 @@
     attrs);
 in rec {
   reform-until = cond:
-    reform-base
-    (lib.mapAttrsToListRecursiveCond
-      (path: value: !(cond path value)));
-  reform = reform-base lib.mapAttrsToListRecursive;
+    reform-base (mlem.attrs.collapse-until cond);
+  reform = reform-base mlem.attrs.collapse;
   tests = [
     [
       (reform-until

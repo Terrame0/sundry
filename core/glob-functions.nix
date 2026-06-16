@@ -1,8 +1,9 @@
 args @ {
   lib,
   flake-root,
-  pkgs,
   mlem,
+  pkgs,
+  ...
 }: let
   merge-attrs = merge-fn: attrs:
     lib.zipAttrsWith (
@@ -27,7 +28,7 @@ args @ {
     store-path = "${flake-root}/src/";
     no-store-path = lib.removePrefix store-path path-str;
     functions-path = lib.init (lib.splitString "/" no-store-path);
-    functions = removeAttrs (import path args) ["tests"];
+    functions = removeAttrs (import path (args // {})) ["tests"];
   in
     lib.setAttrByPath functions-path functions;
 

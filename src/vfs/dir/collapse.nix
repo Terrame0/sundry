@@ -4,27 +4,13 @@
   lib,
   ...
 }: rec {
-  collapse = lib.mapAttrsToListRecursiveCond (path: mlem.vfs.is-not-leaf);
+  collapse = lib.mapAttrsToListRecursiveCond (_: attrs: !(mlem.vfs.is-leaf _ attrs));
   tests = [
     [
-      (collapse (path: file: {
-        name = mlem.vfs.path.get.str path;
-        value = file.contents;
-      }) (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
-      [
-        {
-          name = "a.txt";
-          value = "contents of a.txt";
-        }
-        {
-          name = "b.txt";
-          value = "contents of b.txt";
-        }
-        {
-          name = "nested/c.txt";
-          value = "contents of c.txt";
-        }
-      ]
+      (collapse
+        (path: file: file.contents)
+        (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
+      ["contents of a.txt" "contents of b.txt" "contents of c.txt"]
     ]
   ];
 }

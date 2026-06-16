@@ -16,7 +16,7 @@
       (mlem.list.excl-last (name-split path)) "";
     str = path:
       lib.foldl (
-        str-acc: dir: "${mlem.string.trim-right "/" str-acc}/${mlem.string.trim-left "/" dir}"
+        str-acc: dir: "${mlem.str.trim-right "/" str-acc}/${mlem.str.trim-left "/" dir}"
       ) (lib.head path)
       (lib.tail path);
   };

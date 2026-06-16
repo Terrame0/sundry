@@ -7,9 +7,9 @@
 
         there is a conflict in attrset merge at '${name}'
           lhs:
-            ${mlem.string.pretty lhs}
+            ${mlem.str.pretty lhs}
           rhs:
-            ${mlem.string.pretty rhs}
+            ${mlem.str.pretty rhs}
       ''
     else rhs;
   tests = [

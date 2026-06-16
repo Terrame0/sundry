@@ -14,7 +14,7 @@
 in rec {
   find-nth = n: seq: str:
     find-nth-base
-    mlem.string.find-after
+    mlem.str.find-after
     (-1)
     (offset: offset + 1)
     n
@@ -22,8 +22,8 @@ in rec {
     str;
   rfind-nth = n: seq: str:
     find-nth-base
-    mlem.string.rfind-after
-    (mlem.string.len str - mlem.string.len seq + 1)
+    mlem.str.rfind-after
+    (mlem.str.len str - mlem.str.len seq + 1)
     (offset: offset - 1)
     n
     seq

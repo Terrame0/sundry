@@ -7,8 +7,8 @@
 }: rec {
   materialize = dir: drv-name: let
     files =
-      lib.mapAttrsToListRecursiveCond
-      (path: mlem.vfs.is-not-leaf)
+      mlem.attrs.collapse-until
+      mlem.vfs.is-leaf
       (path: attrs: {
         inherit path;
         inherit (attrs) contents;

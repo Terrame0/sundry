@@ -3,7 +3,7 @@
   flake-root,
   ...
 }: rec {
-  reform = mlem.attrs.reform-until (path: mlem.vfs.is-leaf);
+  reform = mlem.attrs.reform-until mlem.vfs.is-leaf;
   tests = [
     [
       (reform (path: file: {

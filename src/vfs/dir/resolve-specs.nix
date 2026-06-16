@@ -26,18 +26,18 @@
     rsep = mlem.list.at 3 args.separators;
   in
     mlem.attrs.reform-until
-    (path: mlem.vfs.is-leaf)
+    mlem.vfs.is-leaf
     (path: value: {
       path =
         if args.strip
-        then map (path: "${lib.concatStrings (mlem.string.outside lsep rsep path)}") path
+        then mlem.vfs.path.strip-between "{" "}" path
         else path;
       value =
         value
         // {
           specs = map (dir:
             lib.pipe dir [
-              (mlem.string.between lsep rsep)
+              (mlem.str.between lsep rsep)
               (map (spec-str: let
                 spec-parts = lib.splitString kvsep spec-str;
                 spec-key = lib.head spec-parts;

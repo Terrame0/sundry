@@ -3,13 +3,15 @@
   mlem,
   flake-root,
   ...
-}: rec {
+}: let
+  find-spec = file: null;
+in rec {
   reform-by-spec = spec: fn:
     mlem.vfs.dir.reform (path: file: let
       result =
         mlem.for
         [
-          (lib.length path - 1)
+          (lib.length file.specs - 1)
           (i: i - 1)
           (i: i >= -1)
         ]

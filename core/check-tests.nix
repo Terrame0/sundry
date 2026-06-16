@@ -80,7 +80,7 @@ args @ {
 
     table-width =
       lib.foldl
-      (max: line: lib.max max (mlem.string.len line))
+      (max: line: lib.max max (mlem.str.len line))
       0
       (lib.concatLists (lib.attrValues blocks));
 
@@ -92,8 +92,8 @@ args @ {
 
     pad-right = name: line:
       if lib.hasPrefix "+" line
-      then "${line}${pad "-" (mlem.string.len line - 3)}+"
-      else "| ${line}${pad " " (mlem.string.len line)} |";
+      then "${line}${pad "-" (mlem.str.len line - 3)}+"
+      else "| ${line}${pad " " (mlem.str.len line)} |";
 
     padded-blocks = block-line-map pad-right;
 
