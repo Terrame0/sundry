@@ -30,7 +30,7 @@
     (path: value: {
       path =
         if args.strip
-        then mlem.vfs.path.strip-between "{" "}" path
+        then mlem.vfs.path.strip-between lsep rsep path
         else path;
       value =
         value
