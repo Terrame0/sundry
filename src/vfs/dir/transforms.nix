@@ -16,6 +16,10 @@
     mlem.attrs.collapse-until
     mlem.vfs.is-leaf;
 
+  walk =
+    mlem.attrs.walk-until
+    mlem.vfs.is-leaf;
+
   tests = let
     test-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
     filter-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/filtering";
@@ -64,6 +68,14 @@
     [
       (collapse (path: file: file.contents) test-dir)
       ["contents of a.txt" "contents of b.txt" "contents of c.txt"]
+    ]
+    [
+      (walk (path: file: {contents = "walked ${file.contents}";}) test-dir)
+      {
+        "a.txt" = {contents = "walked contents of a.txt";};
+        "b.txt" = {contents = "walked contents of b.txt";};
+        nested = {"c.txt" = {contents = "walked contents of c.txt";};};
+      }
     ]
   ];
 }
