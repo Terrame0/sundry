@@ -62,15 +62,15 @@
       ])
       {
         a = {
-          contents = "";
+          contents = "contents of a";
           specs = [{x = "1";}];
         };
         b = {
-          contents = "";
+          contents = "contents of b";
           specs = [{x = ["2" "3"];}];
         };
         c = {
-          contents = "";
+          contents = "contents of c";
           specs = [
             {
               x = "1";
@@ -79,7 +79,7 @@
           ];
         };
         d = {
-          contents = "";
+          contents = "contents of d";
           specs = [
             {
               x = "";
@@ -89,21 +89,21 @@
         };
         nested = {
           g = {
-            contents = "";
+            contents = "contents of g";
             specs = [{x = "1";} {x = "2";}];
           };
           h = {
-            contents = "";
+            contents = "contents of h";
             specs = [{y = "1";} {z = "1";}];
           };
           nested = {
             f = {
-              contents = "";
+              contents = "contents of f";
               specs = [{x = "1";} {y = "1";} {y = "2";}];
             };
             nested = {
               e = {
-                contents = "";
+                contents = "contents of e";
                 specs = [{x = "1";} {y = "1";} {z = "1";} {z = "2";}];
               };
             };
