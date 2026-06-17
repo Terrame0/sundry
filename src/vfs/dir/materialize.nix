@@ -5,7 +5,7 @@
   pkgs,
   ...
 }: rec {
-  materialize = dir: drv-name: let
+  materialize = drv-name: dir: let
     files =
       mlem.attrs.collapse-until
       mlem.vfs.is-leaf
@@ -30,7 +30,7 @@
   tests = [
     [
       (builtins.readFile
-        "${materialize (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files") "test-dir"}/a.txt")
+        "${materialize "test-dir" (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files")}/a.txt")
       "contents of a.txt"
     ]
   ];

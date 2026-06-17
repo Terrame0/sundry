@@ -44,13 +44,15 @@
         };
       }
     ]
-    (let
-      filtered-dir =
-        mlem.vfs.dir.filter
-        (path: file: mlem.vfs.path.get.ext path == "txt" || file.contents == "override")
-        filter-dir;
-    in [
-      (mlem.vfs.dir.path-strs filtered-dir)
+    [
+      (lib.pipe filter-dir [
+        (mlem.vfs.dir.filter (path: file:
+          mlem.vfs.path.get.ext path
+          == "txt"
+          || file.contents
+          == "override"))
+        mlem.vfs.dir.path-strs
+      ])
       [
         "a.txt"
         "b.txt"
@@ -58,7 +60,7 @@
         "nested/nested/e.ini"
         "nested/nested/g.txt"
       ]
-    ])
+    ]
     [
       (collapse (path: file: file.contents) test-dir)
       ["contents of a.txt" "contents of b.txt" "contents of c.txt"]
