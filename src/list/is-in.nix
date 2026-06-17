@@ -5,9 +5,10 @@
     else requirements == value;
 
   tests = [
-    [(is-in "a" "a") true]
-    [(is-in "b" "a") false]
-    [(is-in ["a" "b" "c"] "a") true]
-    [(is-in ["b" "c" "d"] "a") false]
+    [(is-in "A" "A") true]
+    [(is-in "B" "A") false]
+    [(is-in ["A" "B" "C"] "A") true]
+    [(is-in ["B" "C" "D"] "A") false]
+    [(is-in [] "X") false]
   ];
 }

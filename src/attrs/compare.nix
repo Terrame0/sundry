@@ -45,25 +45,58 @@ in rec {
   tests = [
     [
       (compare {
-          a = "a";
-          b = {c = {d = "b.c.d";};};
-          e = "e";
+          A = "A";
+          B = {C = {D = "B.C.D";};};
+          E = "E";
         } {
-          a = "a";
-          b = {c = "b.c";};
-          d = "d";
+          A = "A";
+          B = {C = "B.C";};
+          D = "D";
         })
       {
         extra = {
-          e = "e";
+          E = "E";
         };
         matched = {
-          b = {c = [{d = "b.c.d";} "b.c"];};
-          a = ["a" "a"];
+          B = {C = [{D = "B.C.D";} "B.C"];};
+          A = ["A" "A"];
         };
         missing = {
-          d = "d";
+          D = "D";
         };
+      }
+    ]
+    [
+      (compare {
+          A = 1;
+          B = 2;
+        } {
+          A = 1;
+          B = 2;
+        })
+      {
+        extra = {};
+        matched = {
+          A = [1 1];
+          B = [2 2];
+        };
+        missing = {};
+      }
+    ]
+    [
+      (compare {A = 1;} {B = 2;})
+      {
+        extra = {A = 1;};
+        matched = {};
+        missing = {B = 2;};
+      }
+    ]
+    [
+      (compare {} {})
+      {
+        extra = {};
+        matched = {};
+        missing = {};
       }
     ]
   ];

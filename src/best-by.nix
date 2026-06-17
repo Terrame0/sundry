@@ -18,9 +18,9 @@
     result.value;
 
   tests = [
-    [(best-by (l: r: l < r) [[1 "a"] [2 "b"] [3 "c"]]) "a"]
-    [(best-by (l: r: l > r) [[1 "a"] [2 "b"] [3 "c"]]) "c"]
-    [(best-by (l: r: l > r) [[1 "a"] [1 "b"]]) "a"]
-    [(best-by (l: r: l >= r) [[1 "a"] [1 "b"]]) "b"]
+    [(best-by (l: r: l < r) [[1 "A"] [2 "B"] [3 "C"]]) "A"]
+    [(best-by (l: r: l > r) [[1 "A"] [2 "B"] [3 "C"]]) "C"]
+    [(best-by (l: r: l > r) [[1 "A"] [1 "B"]]) "A"]
+    [(best-by (l: r: l >= r) [[1 "A"] [1 "B"]]) "B"]
   ];
 }

@@ -9,8 +9,15 @@
     else default name lhs rhs;
   tests = [
     [
-      (mlem.attrs.merge.concat-lists.override [{a = [1 2];} {a = [3];}])
-      {a = [1 2 3];}
+      (mlem.attrs.merge.concat-lists.override [{A = [1 2];} {A = [3];}])
+      {A = [1 2 3];}
+    ]
+    [
+      (mlem.attrs.merge.concat-lists.override [{A = [1];} {B = [2];}])
+      {
+        A = [1];
+        B = [2];
+      }
     ]
   ];
 }

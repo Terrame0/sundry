@@ -15,8 +15,10 @@ in rec {
         (lib.removePrefix seq)
       ]);
   tests = [
-    [(trim "/" "////a//") "a"]
-    [(trim-left "/" "////a//") "a//"]
-    [(trim-right "/" "////a//") "////a"]
+    [(trim "/" "////A//") "A"]
+    [(trim-left "/" "////A//") "A//"]
+    [(trim-right "/" "////A//") "////A"]
+    [(trim "/" "") ""]
+    [(trim "/" "ABC") "ABC"]
   ];
 }

@@ -35,26 +35,52 @@ in rec {
   tests = [
     [
       (reform-until
-        (path: value: value ? e)
+        (path: value: value ? E)
         (path: value: {
           value = value;
-          path = map (x: x + "-m") path;
+          path = map (x: x + "-M") path;
           omit = lib.isInt value && value == 1;
         })
         {
-          a = {
-            b = 1;
-            c = 2;
-            d = {e = 3;};
+          A = {
+            B = 1;
+            C = 2;
+            D = {E = 3;};
           };
         })
       {
-        a-m = {
-          c-m = 2;
-          d-m = {
-            e = 3;
+        A-M = {
+          C-M = 2;
+          D-M = {
+            E = 3;
           };
         };
+      }
+    ]
+    [
+      (reform-until
+        (path: value: !lib.isAttrs value)
+        (path: value: {
+          inherit path value;
+          omit = true;
+        })
+        {
+          A = 1;
+          B = {C = 2;};
+        })
+      {}
+    ]
+    [
+      (reform-until
+        (path: value: !lib.isAttrs value)
+        (path: value: {inherit path value;})
+        {
+          A = 1;
+          B = {C = 2;};
+        })
+      {
+        A = 1;
+        B = {C = 2;};
       }
     ]
   ];

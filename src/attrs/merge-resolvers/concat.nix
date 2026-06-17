@@ -7,8 +7,15 @@
     lib.toList lhs ++ lib.toList rhs;
   tests = [
     [
-      (mlem.attrs.merge.concat [{a = [1 2];} {a = 3;}])
-      {a = [1 2 3];}
+      (mlem.attrs.merge.concat [{A = [1 2];} {A = 3;}])
+      {A = [1 2 3];}
+    ]
+    [
+      (mlem.attrs.merge.concat [{A = 1;} {B = 2;}])
+      {
+        A = 1;
+        B = 2;
+      }
     ]
   ];
 }

@@ -33,12 +33,13 @@
 
   tests = [
     [
-      (apply-between (str: "${str}-changed") "[" "]" "a[x]b[y]c[z]d")
-      "a[x-changed]b[y-changed]c[z-changed]d"
+      (apply-between (str: "${str}-changed") "[" "]" "A[X]B[Y]C[Z]D")
+      "A[X-changed]B[Y-changed]C[Z-changed]D"
     ]
     [
       (apply-between (str: "-") "[" "]" "[[][]][]")
       "[-][-]"
     ]
+    [(apply-between (str: "X") "[" "]" "ABC") "ABC"]
   ];
 }

@@ -1,0 +1,41 @@
+# Module layout
+
+How files under `src/` are organized and how that organization maps to the public `mlem.*` namespace.
+
+## File path = namespace path
+
+The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks every `.nix` file under `src/` and exposes its attributes (minus `tests`) at `mlem.<dirname>`, where `<dirname>` is the file's directory relative to `src/`. The filename itself is dropped.
+
+| File | Exports at | Function ends up at |
+|---|---|---|
+| `src/vfs/dir/reform.nix` | `mlem.vfs.dir` | `mlem.vfs.dir.reform` |
+| `src/vfs/dir/by-spec/walk.nix` | `mlem.vfs.dir.by-spec` | `mlem.vfs.dir.by-spec.walk` |
+| `src/vfs/file/get-spec-pos.nix` | `mlem.vfs.file` | `mlem.vfs.file.get-spec-pos` |
+| `src/list/permutations.nix` | `mlem.list` | `mlem.list.permutations` |
+
+Pick the filename to match what's inside: a single function gets the function's name; a cohesive cluster gets a name describing the cluster.
+
+## When to split, when to keep together
+
+The criterion is cohesion, not file count. Keep things together when they're uniform — same input shape, same return shape, same test fixture, same conceptual domain. Reading the file should require holding **one** mental model. Split when it requires two.
+
+Cohesive clusters that live in one file:
+
+- [src/vfs/path/getters.nix](../src/vfs/path/getters.nix) — `get.{name, stem, ext, str}`, facets of one object.
+- [src/str/find-after.nix](../src/str/find-after.nix) — `find-after` and `rfind-after`, mirror functions.
+- [src/str/trim.nix](../src/str/trim.nix) — `trim`, `trim-left`, `trim-right`, same shape.
+- [src/attrs/compare.nix](../src/attrs/compare.nix) — `compare` and `compare-until` (the latter is a generalization).
+
+Cases that earned a split:
+
+- `src/vfs/dir/transforms.nix` (since removed) bundled `reform`, `filter`, `collapse`, `walk` with four different test fixtures in one `tests` block. Now: [reform.nix](../src/vfs/dir/reform.nix), [filter.nix](../src/vfs/dir/filter.nix), [collapse.nix](../src/vfs/dir/collapse.nix), [walk.nix](../src/vfs/dir/walk.nix). Same pattern for the by-spec variants under [src/vfs/dir/by-spec/](../src/vfs/dir/by-spec/).
+
+The split usually pays off when the test block, not the function block, is what's making the file hard to read.
+
+## Where helpers live
+
+A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-spec-pos.nix](../src/vfs/file/get-spec-pos.nix) inspects `file.specs`, so it lives in `vfs/file/` — even though its only callers are in [src/vfs/dir/by-spec/](../src/vfs/dir/by-spec/). Co-locating with the data type beats co-locating with the consumer.
+
+## Renaming / restructuring
+
+A split or move usually shifts the public namespace. Check call sites with `grep -rn` first; internal-only callers update in the same commit, external consumers need a deprecation path.

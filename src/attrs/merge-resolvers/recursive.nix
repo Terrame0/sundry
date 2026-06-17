@@ -9,8 +9,17 @@
     else default name acc-value value;
   tests = [
     [
-      (mlem.attrs.merge.recursive.override [{a = {b = 1;};} {a = {b = 2;};}])
-      {a = {b = 2;};}
+      (mlem.attrs.merge.recursive.override [{A = {B = 1;};} {A = {B = 2;};}])
+      {A = {B = 2;};}
+    ]
+    [
+      (mlem.attrs.merge.recursive.override [{A = {B = 1;};} {A = {C = 2;};}])
+      {
+        A = {
+          B = 1;
+          C = 2;
+        };
+      }
     ]
   ];
 }

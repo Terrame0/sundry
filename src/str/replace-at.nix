@@ -9,8 +9,10 @@
   in
     before + replacement + after;
   tests = [
-    [(replace-at 2 2 "..." "abcdef") "ab...ef"]
-    [(replace-at 3 0 "." "abcdef") "abc.def"]
-    [(replace-at 2 2 "" "abcdef") "abef"]
+    [(replace-at 2 2 "..." "ABCDEF") "AB...EF"]
+    [(replace-at 3 0 "." "ABCDEF") "ABC.DEF"]
+    [(replace-at 2 2 "" "ABCDEF") "ABEF"]
+    [(replace-at 0 0 "X" "ABC") "XABC"]
+    [(replace-at 6 0 "X" "ABCDEF") "ABCDEFX"]
   ];
 }

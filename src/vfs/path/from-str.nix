@@ -9,8 +9,9 @@
       (builtins.unsafeDiscardStringContext (toString path-str)));
   tests = [
     [
-      (from-str "/abc/def/ghi.txt")
-      ["abc" "def" "ghi.txt"]
+      (from-str "/A/B/C.txt")
+      ["A" "B" "C.txt"]
     ]
+    [(from-str "A/B") ["A" "B"]]
   ];
 }

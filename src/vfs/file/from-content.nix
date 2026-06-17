@@ -3,10 +3,20 @@
     assert lib.isString contents; lib.setAttrByPath vfs-path {inherit contents;};
   tests = [
     [
-      (from-contents ["b.txt"] "contents of b.txt")
+      (from-contents ["B.txt"] "contents of B.txt")
       {
-        "b.txt" = {
-          contents = "contents of b.txt";
+        "B.txt" = {
+          contents = "contents of B.txt";
+        };
+      }
+    ]
+    [
+      (from-contents ["A" "B.txt"] "contents of B.txt")
+      {
+        A = {
+          "B.txt" = {
+            contents = "contents of B.txt";
+          };
         };
       }
     ]

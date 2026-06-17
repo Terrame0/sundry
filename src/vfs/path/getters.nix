@@ -21,13 +21,13 @@
       (lib.tail path);
   };
   tests = let
-    path = ["abc" "def" "ghi.txt"];
+    path = ["A" "B" "C.txt"];
   in [
-    [(get.name path) "ghi.txt"]
-    [(get.stem path) "ghi"]
+    [(get.name path) "C.txt"]
+    [(get.stem path) "C"]
     [(get.ext path) "txt"]
-    [(get.str ["abc" "def"]) "abc/def"]
-    [(get.str ["/abc/" "/def"]) "/abc/def"]
-    [(get.str ["//abc//" "//def//" "//ghi//"]) "//abc/def/ghi//"]
+    [(get.str ["A" "B"]) "A/B"]
+    [(get.str ["/A/" "/B"]) "/A/B"]
+    [(get.str ["//A//" "//B//" "//C//"]) "//A/B/C//"]
   ];
 }

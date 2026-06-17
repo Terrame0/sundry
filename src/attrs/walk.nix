@@ -15,14 +15,25 @@
   tests = [
     [
       (walk-until (path: value: lib.length path > 1) (path: value: 1) {
-        a = 2;
-        b = {
-          c = {d = 4;};
+        A = 2;
+        B = {
+          C = {D = 4;};
         };
       })
       {
-        a = 1;
-        b = {c = 1;};
+        A = 1;
+        B = {C = 1;};
+      }
+    ]
+    [(walk-until (path: value: true) (path: value: "X") {}) {}]
+    [
+      (walk-until (path: value: true) (path: value: "X") {
+        A = {B = 1;};
+        C = 2;
+      })
+      {
+        A = "X";
+        C = "X";
       }
     ]
   ];

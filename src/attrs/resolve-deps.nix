@@ -70,5 +70,19 @@
         fourth = 5;
       }
     ]
+    [(resolve-deps {}) {}]
+    [
+      (builtins.tryEval (resolve-deps {
+        A = {
+          deps = ["B"];
+          transform = _: 1;
+        };
+        B = {
+          deps = ["A"];
+          transform = _: 1;
+        };
+      })).success
+      false
+    ]
   ];
 }

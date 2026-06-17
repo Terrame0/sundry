@@ -12,8 +12,10 @@
     map (attrs: attrs.substr) insides;
   tests = [
     [
-      (between "[" "]" "[abc[def]][ghi]")
-      ["abc[def]" "ghi"]
+      (between "[" "]" "[ABC[DEF]][GHI]")
+      ["ABC[DEF]" "GHI"]
     ]
+    [(between "[" "]" "ABC") []]
+    [(between "[" "]" "") []]
   ];
 }

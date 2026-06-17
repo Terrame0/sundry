@@ -6,13 +6,14 @@
       (apply-to-lines
         (line: "${line}-modified")
         ''
-          a
-          b
-          c'')
+          A
+          B
+          C'')
       ''
-        a-modified
-        b-modified
-        c-modified''
+        A-modified
+        B-modified
+        C-modified''
     ]
+    [(apply-to-lines (line: "${line}-modified") "A") "A-modified"]
   ];
 }

@@ -35,5 +35,7 @@
       (permutations [1 2 3] 0)
       [[]]
     ]
+    [(permutations [] 0) [[]]]
+    [(builtins.tryEval (permutations [1 2] 3)).success false]
   ];
 }

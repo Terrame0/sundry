@@ -88,24 +88,24 @@
     ans = inside: outside: {inherit inside outside;};
   in [
     [
-      (delimit "[" "]" "[a][b][c]")
-      (ans [(s 1 "a" 1) (s 4 "b" 1) (s 7 "c" 1)] [(s 0 "" 0) (s 3 "" 0) (s 6 "" 0) (s 9 "" 0)])
+      (delimit "[" "]" "[A][B][C]")
+      (ans [(s 1 "A" 1) (s 4 "B" 1) (s 7 "C" 1)] [(s 0 "" 0) (s 3 "" 0) (s 6 "" 0) (s 9 "" 0)])
     ]
     [
-      (delimit "[" "]" "x[a]y[b]z")
-      (ans [(s 2 "a" 1) (s 6 "b" 1)] [(s 0 "x" 0) (s 4 "y" 0) (s 8 "z" 0)])
+      (delimit "[" "]" "X[A]Y[B]Z")
+      (ans [(s 2 "A" 1) (s 6 "B" 1)] [(s 0 "X" 0) (s 4 "Y" 0) (s 8 "Z" 0)])
     ]
     [
-      (delimit "[" "]" "abc")
-      (ans [] [(s 0 "abc" 0)])
+      (delimit "[" "]" "ABC")
+      (ans [] [(s 0 "ABC" 0)])
     ]
     [
       (delimit "[" "]" "")
       (ans [] [(s 0 "" 0)])
     ]
     [
-      (delimit "[" "]" "[a[b]a]")
-      (ans [(s 3 "b" 2) (s 1 "a[b]a" 1)] [(s 0 "" 0) (s 7 "" 0)])
+      (delimit "[" "]" "[A[B]A]")
+      (ans [(s 3 "B" 2) (s 1 "A[B]A" 1)] [(s 0 "" 0) (s 7 "" 0)])
     ]
   ];
 }

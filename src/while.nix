@@ -25,5 +25,12 @@
         }))
       {x = 1;}
     ]
+    [
+      (while
+        (state: false)
+        {x = 0;}
+        (prev: {x = prev.x + 1;}))
+      {x = 0;}
+    ]
   ];
 }

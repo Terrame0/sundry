@@ -140,20 +140,20 @@ in rec {
       (
         validate
         {
-          a = 1;
-          b = 2;
+          A = 1;
+          B = 2;
         }
         {
-          a = {
+          A = {
             check = value: lib.mod value 1 == 0;
             desc = "must be odd";
           };
-          b = {
+          B = {
             default = null;
             nullable = true;
           };
-          c = {
-            d = {
+          C = {
+            D = {
               default = 3;
               check = value: lib.mod value 3 == 0;
               desc = "must be divisible by 3";
@@ -162,20 +162,20 @@ in rec {
         }
       )
       {
-        a = 1;
-        b = 2;
-        c = {
-          d = 3;
+        A = 1;
+        B = 2;
+        C = {
+          D = 3;
         };
       }
     ]
     [
       (builtins.tryEval (
         validate
-        {a = 1;}
+        {A = 1;}
         {
-          a = {};
-          b = {};
+          A = {};
+          B = {};
         }
       )).success
       false
@@ -183,9 +183,9 @@ in rec {
     [
       (builtins.tryEval (
         validate
-        {a = 1;}
+        {A = 1;}
         {
-          a = {
+          A = {
             default = 2;
             check = value: lib.mod value 2 == 0;
             desc = "must be even";
@@ -198,11 +198,11 @@ in rec {
       (builtins.tryEval (
         validate
         {
-          a = 1;
-          b = 2;
+          A = 1;
+          B = 2;
         }
         {
-          a = {};
+          A = {};
         }
       )).success
       false

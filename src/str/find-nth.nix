@@ -29,18 +29,18 @@ in rec {
     seq
     str;
   tests = [
-    [(find-nth 1 "a" "abab") 0]
-    [(find-nth 2 "a" "abab") 2]
-    [(find-nth 1 "ab" "ababab") 0]
-    [(find-nth 2 "ab" "ababab") 2]
-    [(find-nth 3 "a" "abab") null]
-    [(find-nth 0 "a" "abab") null]
+    [(find-nth 1 "A" "ABAB") 0]
+    [(find-nth 2 "A" "ABAB") 2]
+    [(find-nth 1 "AB" "ABABAB") 0]
+    [(find-nth 2 "AB" "ABABAB") 2]
+    [(find-nth 3 "A" "ABAB") null]
+    [(find-nth 0 "A" "ABAB") null]
 
-    [(rfind-nth 1 "a" "abab") 2]
-    [(rfind-nth 2 "a" "abab") 0]
-    [(rfind-nth 1 "ab" "ababab") 4]
-    [(rfind-nth 2 "ab" "ababab") 2]
-    [(rfind-nth 3 "a" "abab") null]
-    [(rfind-nth 0 "a" "abab") null]
+    [(rfind-nth 1 "A" "ABAB") 2]
+    [(rfind-nth 2 "A" "ABAB") 0]
+    [(rfind-nth 1 "AB" "ABABAB") 4]
+    [(rfind-nth 2 "AB" "ABABAB") 2]
+    [(rfind-nth 3 "A" "ABAB") null]
+    [(rfind-nth 0 "A" "ABAB") null]
   ];
 }

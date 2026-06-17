@@ -17,19 +17,27 @@
 
   tests = [
     [
-      (remove-by-path ["a" "b" "c"] {
-        a = {
-          b = {
-            c = 1;
-            d = 2;
+      (remove-by-path ["A" "B" "C"] {
+        A = {
+          B = {
+            C = 1;
+            D = 2;
           };
         };
       })
-      {a = {b = {d = 2;};};}
+      {A = {B = {D = 2;};};}
     ]
     [
-      (remove-by-path ["a" "b" "c"] {a = {b = {c = 1;};};})
+      (remove-by-path ["A" "B" "C"] {A = {B = {C = 1;};};})
       {}
     ]
+    [
+      (remove-by-path ["A"] {
+        A = 1;
+        B = 2;
+      })
+      {B = 2;}
+    ]
+    [(remove-by-path [] {A = 1;}) {A = 1;}]
   ];
 }
