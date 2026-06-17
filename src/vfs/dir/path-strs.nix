@@ -12,9 +12,9 @@
     [
       (path-strs (mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
       [
-        "a.txt"
-        "b.txt"
-        "nested/c.txt"
+        "=/C.txt"
+        "A.txt"
+        "B.txt"
       ]
     ]
   ];

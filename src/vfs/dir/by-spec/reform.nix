@@ -23,16 +23,16 @@
     ];
   in [
     [
-      (mlem.vfs.dir.by-spec.reform {y = "1";} (path: spec-pos: file: {
+      (mlem.vfs.dir.by-spec.reform {b = "1";} (path: spec-pos: file: {
           path = [(lib.last path)];
           value = spec-pos;
         })
         dir)
       {
-        c = 0;
-        e = 1;
-        f = 1;
-        h = 0;
+        C = 0;
+        H = 1;
+        G = 1;
+        I = 0;
       }
     ]
   ];

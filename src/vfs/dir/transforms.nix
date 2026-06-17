@@ -34,17 +34,17 @@
         })
         test-dir)
       {
-        "a.txt" = {
-          contents = "reformed contents of a.txt";
-          path = "a.txt";
+        "A.txt" = {
+          contents = "reformed contents of A.txt";
+          path = "A.txt";
         };
-        "b.txt" = {
-          contents = "reformed contents of b.txt";
-          path = "b.txt";
+        "B.txt" = {
+          contents = "reformed contents of B.txt";
+          path = "B.txt";
         };
-        "c.txt" = {
-          contents = "reformed contents of c.txt";
-          path = "nested/c.txt";
+        "C.txt" = {
+          contents = "reformed contents of C.txt";
+          path = "=/C.txt";
         };
       }
     ]
@@ -58,23 +58,23 @@
         mlem.vfs.dir.path-strs
       ])
       [
-        "a.txt"
-        "b.txt"
-        "nested/c.txt"
-        "nested/nested/e.ini"
-        "nested/nested/g.txt"
+        "=/=/E.ini"
+        "=/=/G.txt"
+        "=/C.txt"
+        "A.txt"
+        "B.txt"
       ]
     ]
     [
       (collapse (path: file: file.contents) test-dir)
-      ["contents of a.txt" "contents of b.txt" "contents of c.txt"]
+      ["contents of C.txt" "contents of A.txt" "contents of B.txt"]
     ]
     [
       (walk (path: file: {contents = "walked ${file.contents}";}) test-dir)
       {
-        "a.txt" = {contents = "walked contents of a.txt";};
-        "b.txt" = {contents = "walked contents of b.txt";};
-        nested = {"c.txt" = {contents = "walked contents of c.txt";};};
+        "A.txt" = {contents = "walked contents of A.txt";};
+        "B.txt" = {contents = "walked contents of B.txt";};
+        "=" = {"C.txt" = {contents = "walked contents of C.txt";};};
       }
     ]
   ];

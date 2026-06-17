@@ -18,15 +18,15 @@
     [
       (from-src "${flake-root}/tests/vfs-test-dir/test-files")
       {
-        "a.txt" = {
-          contents = "contents of a.txt";
+        "A.txt" = {
+          contents = "contents of A.txt";
         };
-        "b.txt" = {
-          contents = "contents of b.txt";
+        "B.txt" = {
+          contents = "contents of B.txt";
         };
-        nested = {
-          "c.txt" = {
-            contents = "contents of c.txt";
+        "=" = {
+          "C.txt" = {
+            contents = "contents of C.txt";
           };
         };
       }

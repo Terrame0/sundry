@@ -7,12 +7,12 @@
     mlem.vfs.file.from-contents vfs-path (builtins.readFile fs-path);
   tests = [
     [
-      (from-src ["abc" "def" "a.txt"] "${flake-root}/tests/vfs-test-dir/test-files/a.txt")
+      (from-src ["abc" "def" "A.txt"] "${flake-root}/tests/vfs-test-dir/test-files/A.txt")
       {
         abc = {
           def = {
-            "a.txt" = {
-              contents = "contents of a.txt";
+            "A.txt" = {
+              contents = "contents of A.txt";
             };
           };
         };

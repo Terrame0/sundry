@@ -20,8 +20,8 @@
     ];
   in [
     [
-      (mlem.vfs.dir.by-spec.collapse {y = "1";} (path: spec-pos: file: spec-pos) dir)
-      [0 0 1 1]
+      (mlem.vfs.dir.by-spec.collapse {b = "1";} (path: spec-pos: file: spec-pos) dir)
+      [1 1 0 0]
     ]
   ];
 }

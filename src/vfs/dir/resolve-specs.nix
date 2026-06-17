@@ -61,50 +61,54 @@
         })
       ])
       {
-        a = {
-          contents = "contents of a";
-          specs = [{x = "1";}];
+        A = {
+          contents = "contents of A";
+          specs = [{a = "1";}];
         };
-        b = {
-          contents = "contents of b";
-          specs = [{x = ["2" "3"];}];
+        B = {
+          contents = "contents of B";
+          specs = [{a = ["2" "3"];}];
         };
-        c = {
-          contents = "contents of c";
+        C = {
+          contents = "contents of C";
           specs = [
             {
-              x = "1";
-              y = "1";
+              a = "1";
+              b = "1";
             }
           ];
         };
-        d = {
-          contents = "contents of d";
+        D = {
+          contents = "contents of D";
           specs = [
             {
-              x = "";
-              y = "";
+              a = "";
+              b = "";
             }
           ];
         };
-        nested = {
-          g = {
-            contents = "contents of g";
-            specs = [{x = "1";} {x = "2";}];
+        E = {
+          contents = "contents of E";
+          specs = [{}];
+        };
+        "=" = {
+          F = {
+            contents = "contents of F";
+            specs = [{a = "1";} {a = "2";}];
           };
-          h = {
-            contents = "contents of h";
-            specs = [{y = "1";} {z = "1";}];
+          I = {
+            contents = "contents of I";
+            specs = [{b = "1";} {c = "1";}];
           };
-          nested = {
-            f = {
-              contents = "contents of f";
-              specs = [{x = "1";} {y = "1";} {y = "2";}];
+          "=" = {
+            G = {
+              contents = "contents of G";
+              specs = [{a = "1";} {b = "1";} {b = "2";}];
             };
-            nested = {
-              e = {
-                contents = "contents of e";
-                specs = [{x = "1";} {y = "1";} {z = "1";} {z = "2";}];
+            "=" = {
+              H = {
+                contents = "contents of H";
+                specs = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
               };
             };
           };

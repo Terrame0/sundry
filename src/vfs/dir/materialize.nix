@@ -36,7 +36,7 @@
         lib.head
         builtins.readFile
       ])
-      "contents of a.txt"
+      "contents of C.txt"
     ]
   ];
 }

@@ -18,8 +18,8 @@
     ];
   in [
     [
-      (mlem.vfs.dir.collapse (path: file: file.contents) (mlem.vfs.dir.by-spec.filter {y = "1";} dir))
-      ["contents of c" "contents of h" "contents of f" "contents of e"]
+      (mlem.vfs.dir.collapse (path: file: file.contents) (mlem.vfs.dir.by-spec.filter {b = "1";} dir))
+      ["contents of H" "contents of G" "contents of I" "contents of C"]
     ]
   ];
 }
