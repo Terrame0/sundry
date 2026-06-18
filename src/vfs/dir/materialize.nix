@@ -28,7 +28,7 @@
     base-path = pkgs.runCommand drv-name {} cmd;
   in
     mlem.vfs.dir.walk
-    (path: file: (removeAttrs file ["contents"]) // rec {
+    (path: file: (removeAttrs file ["text"]) // rec {
       src = mlem.vfs.path.get.str [base rel];
       base = base-path;
       rel = mlem.vfs.path.get.str path;
