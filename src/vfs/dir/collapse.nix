@@ -11,7 +11,7 @@
     test-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
   in [
     [
-      (mlem.vfs.dir.collapse (path: file: file.contents) test-dir)
+      (mlem.vfs.dir.collapse (path: file: file.text) test-dir)
       ["contents of C.txt" "contents of A.txt" "contents of B.txt"]
     ]
   ];

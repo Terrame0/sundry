@@ -16,21 +16,21 @@
           path = [(lib.last path)];
           value = {
             path = mlem.vfs.path.get.str path;
-            contents = "reformed ${file.contents}";
+            text = "reformed ${file.text}";
           };
         })
         test-dir)
       {
         "A.txt" = {
-          contents = "reformed contents of A.txt";
+          text = "reformed contents of A.txt";
           path = "A.txt";
         };
         "B.txt" = {
-          contents = "reformed contents of B.txt";
+          text = "reformed contents of B.txt";
           path = "B.txt";
         };
         "C.txt" = {
-          contents = "reformed contents of C.txt";
+          text = "reformed contents of C.txt";
           path = "=/C.txt";
         };
       }

@@ -19,14 +19,14 @@
       (from-src "${flake-root}/tests/vfs-test-dir/test-files")
       {
         "A.txt" = {
-          contents = "contents of A.txt";
+          text = "contents of A.txt";
         };
         "B.txt" = {
-          contents = "contents of B.txt";
+          text = "contents of B.txt";
         };
         "=" = {
           "C.txt" = {
-            contents = "contents of C.txt";
+            text = "contents of C.txt";
           };
         };
       }

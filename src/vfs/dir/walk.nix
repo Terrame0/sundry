@@ -11,11 +11,11 @@
     test-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
   in [
     [
-      (mlem.vfs.dir.walk (path: file: {contents = "walked ${file.contents}";}) test-dir)
+      (mlem.vfs.dir.walk (path: file: {text = "walked ${file.text}";}) test-dir)
       {
-        "A.txt" = {contents = "walked contents of A.txt";};
-        "B.txt" = {contents = "walked contents of B.txt";};
-        "=" = {"C.txt" = {contents = "walked contents of C.txt";};};
+        "A.txt" = {text = "walked contents of A.txt";};
+        "B.txt" = {text = "walked contents of B.txt";};
+        "=" = {"C.txt" = {text = "walked contents of C.txt";};};
       }
     ]
   ];

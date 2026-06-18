@@ -19,11 +19,11 @@
     ];
   in [
     [
-      (mlem.vfs.dir.collapse (path: file: file.contents) (
+      (mlem.vfs.dir.collapse (path: file: file.text) (
         mlem.vfs.dir.by-spec.walk {b = "1";} (path: spec-pos: file:
           file
           // {
-            contents = "${file.contents} (pos ${toString spec-pos})";
+            text = "${file.text} (pos ${toString spec-pos})";
           })
         dir
       ))

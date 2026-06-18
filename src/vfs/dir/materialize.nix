@@ -11,7 +11,7 @@
       mlem.vfs.is-leaf
       (path: attrs: {
         inherit path;
-        inherit (attrs) contents;
+        inherit (attrs) text;
       })
       dir;
     cmd =
@@ -20,7 +20,7 @@
           dir = lib.concatStringsSep "/" (lib.init file-attrs.path);
           file-path = lib.concatStringsSep "/" file-attrs.path;
           mk-dir-cmd = "mkdir -p $out/${dir} \n";
-          cp-file-cmd = "printf '%s' '${builtins.replaceStrings ["'"] ["'\\''"] file-attrs.contents}' > $out/${file-path} \n";
+          cp-file-cmd = "printf '%s' '${builtins.replaceStrings ["'"] ["'\\''"] file-attrs.text}' > $out/${file-path} \n";
         in
           cmd-acc + mk-dir-cmd + cp-file-cmd
       ) ""

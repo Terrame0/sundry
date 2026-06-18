@@ -62,15 +62,15 @@
       ])
       {
         A = {
-          contents = "contents of A";
+          text = "contents of A";
           specs = [{a = "1";}];
         };
         B = {
-          contents = "contents of B";
+          text = "contents of B";
           specs = [{a = ["2" "3"];}];
         };
         C = {
-          contents = "contents of C";
+          text = "contents of C";
           specs = [
             {
               a = "1";
@@ -79,7 +79,7 @@
           ];
         };
         D = {
-          contents = "contents of D";
+          text = "contents of D";
           specs = [
             {
               a = "";
@@ -88,26 +88,26 @@
           ];
         };
         E = {
-          contents = "contents of E";
+          text = "contents of E";
           specs = [{}];
         };
         "=" = {
           F = {
-            contents = "contents of F";
+            text = "contents of F";
             specs = [{a = "1";} {a = "2";}];
           };
           I = {
-            contents = "contents of I";
+            text = "contents of I";
             specs = [{b = "1";} {c = "1";}];
           };
           "=" = {
             G = {
-              contents = "contents of G";
+              text = "contents of G";
               specs = [{a = "1";} {b = "1";} {b = "2";}];
             };
             "=" = {
               H = {
-                contents = "contents of H";
+                text = "contents of H";
                 specs = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
               };
             };

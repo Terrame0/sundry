@@ -16,7 +16,7 @@
         (mlem.vfs.dir.filter (path: file:
           mlem.vfs.path.get.ext path
           == "txt"
-          || file.contents
+          || file.text
           == "override"))
         mlem.vfs.dir.path-strs
       ])
