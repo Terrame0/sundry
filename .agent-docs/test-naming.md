@@ -8,8 +8,8 @@ A character-class scheme for test data — fixture paths, inline attrsets, strin
 |---|---|---|
 | Labels / file names / identifiers | uppercase letters from `A` | file `A.txt`, attrset key `A`, content placeholder `"ABC"` |
 | Structural separator (directory step) | `=` | nested directories: `=/=/E.ini` |
-| Annotation keys | lowercase letters from `a` | spec key `{a:1}` |
-| Annotation values | digits from `1` | spec value `{a:1}` |
+| Annotation keys | lowercase letters from `a` | tag key `{a:1}` |
+| Annotation values | digits from `1` | tag value `{a:1}` |
 | Semantic words (carry domain meaning) | unchanged | `"first"`, `"second"`, `name`, `deps` |
 | Numbers, literals outside the scheme | unchanged | `[1 2 3]`, `"/"`, `"["` |
 
@@ -17,7 +17,7 @@ Lambda parameters (`acc`, `i`, `x` in [src/for.nix](../src/for.nix), [src/while.
 
 ## VFS fixtures
 
-The on-disk fixture at [tests/vfs-test-dir/specs/](../tests/vfs-test-dir/specs/) is the canonical example:
+The on-disk fixture at [tests/vfs-test-dir/tags/](../tests/vfs-test-dir/tags/) is the canonical example:
 
 ```
 A{a:1}
@@ -31,7 +31,7 @@ E
 ={b:1}/I{c:1}
 ```
 
-Reading any path is mechanical: uppercase = file, `=` = directory step, lowercase-colon-digit = spec annotation.
+Reading any path is mechanical: uppercase = file, `=` = directory step, lowercase-colon-digit = tag annotation.
 
 File extensions (`.txt`, `.ini`, `.scss`) are allowed when a test needs to distinguish them — see [tests/vfs-test-dir/filtering/](../tests/vfs-test-dir/filtering/), where the filter predicate keys off `.txt` vs `.ini`. File contents are out of scope: usually `contents of <NAME>`, but tests that match against a specific value (e.g. `override` in `=/=/E.ini`) deviate freely.
 

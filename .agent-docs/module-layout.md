@@ -9,8 +9,8 @@ The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks ever
 | File | Exports at | Function ends up at |
 |---|---|---|
 | `src/vfs/dir/reform.nix` | `mlem.vfs.dir` | `mlem.vfs.dir.reform` |
-| `src/vfs/dir/by-spec/walk.nix` | `mlem.vfs.dir.by-spec` | `mlem.vfs.dir.by-spec.walk` |
-| `src/vfs/file/get-spec-pos.nix` | `mlem.vfs.file` | `mlem.vfs.file.get-spec-pos` |
+| `src/vfs/dir/by-tag/walk.nix` | `mlem.vfs.dir.by-tag` | `mlem.vfs.dir.by-tag.walk` |
+| `src/vfs/file/get-tag-pos.nix` | `mlem.vfs.file` | `mlem.vfs.file.get-tag-pos` |
 | `src/list/permutations.nix` | `mlem.list` | `mlem.list.permutations` |
 
 Pick the filename to match what's inside: a single function gets the function's name; a cohesive cluster gets a name describing the cluster.
@@ -30,13 +30,13 @@ Cohesive clusters that live in one file:
 
 Cases that earned a split:
 
-- `src/vfs/dir/transforms.nix` (since removed) bundled `reform`, `filter`, `collapse`, `walk` with four different test fixtures in one `tests` block. Now: [reform.nix](../src/vfs/dir/reform.nix), [filter.nix](../src/vfs/dir/filter.nix), [collapse.nix](../src/vfs/dir/collapse.nix), [walk.nix](../src/vfs/dir/walk.nix). Same pattern for the by-spec variants under [src/vfs/dir/by-spec/](../src/vfs/dir/by-spec/).
+- `src/vfs/dir/transforms.nix` (since removed) bundled `reform`, `filter`, `collapse`, `walk` with four different test fixtures in one `tests` block. Now: [reform.nix](../src/vfs/dir/reform.nix), [filter.nix](../src/vfs/dir/filter.nix), [collapse.nix](../src/vfs/dir/collapse.nix), [walk.nix](../src/vfs/dir/walk.nix). Same pattern for the by-tag variants under [src/vfs/dir/by-tag/](../src/vfs/dir/by-tag/).
 
 The split usually pays off when the test block, not the function block, is what's making the file hard to read.
 
 ## Where helpers live
 
-A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-spec-pos.nix](../src/vfs/file/get-spec-pos.nix) inspects `file.specs`, so it lives in `vfs/file/` — even though its only callers are in [src/vfs/dir/by-spec/](../src/vfs/dir/by-spec/). Co-locating with the data type beats co-locating with the consumer.
+A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) inspects `file.tags`, so it lives in `vfs/file/` — even though its only callers are in [src/vfs/dir/by-tag/](../src/vfs/dir/by-tag/). Co-locating with the data type beats co-locating with the consumer.
 
 ## Renaming / restructuring
 

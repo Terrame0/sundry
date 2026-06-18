@@ -4,26 +4,26 @@
   flake-root,
   ...
 }: {
-  walk = spec: fn:
+  walk = tag: fn:
     mlem.vfs.dir.walk (path: file: let
-      spec-pos = mlem.vfs.file.get-spec-pos spec file;
+      tag-pos = mlem.vfs.file.get-tag-pos tag file;
     in
-      if spec-pos == -1
+      if tag-pos == -1
       then file
-      else fn path spec-pos file);
+      else fn path tag-pos file);
 
   tests = let
-    dir = lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
+    dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
       mlem.vfs.dir.from-src
-      (mlem.vfs.dir.resolve-specs {strip = true;})
+      (mlem.vfs.dir.resolve-tags {strip = true;})
     ];
   in [
     [
       (mlem.vfs.dir.collapse (path: file: file.text) (
-        mlem.vfs.dir.by-spec.walk {b = "1";} (path: spec-pos: file:
+        mlem.vfs.dir.by-tag.walk {b = "1";} (path: tag-pos: file:
           file
           // {
-            text = "${file.text} (pos ${toString spec-pos})";
+            text = "${file.text} (pos ${toString tag-pos})";
           })
         dir
       ))

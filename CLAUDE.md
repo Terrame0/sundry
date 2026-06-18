@@ -4,7 +4,7 @@ A utility Nix library (`mlem.*`), assembled from files under `src/` (the file's 
 
 ## Before working, read the relevant doc in `.agent-docs/`
 
-- [data-model.md](.agent-docs/data-model.md) — the VFS node (leaf vs. directory, `text`/`src`/`specs`) and path (segment list) shapes.
+- [data-model.md](.agent-docs/data-model.md) — the VFS node (leaf vs. directory, `text`/`src`/`tags`) and path (segment list) shapes.
 - [module-layout.md](.agent-docs/module-layout.md) — where a file goes, how it maps to `mlem.*`, when to split vs. keep together.
 - [testing.md](.agent-docs/testing.md) — test format (`tests = [ [ actual expected ] ]`), run with `bash eval-result.sh`.
 - [test-naming.md](.agent-docs/test-naming.md) — naming conventions for test fixtures.

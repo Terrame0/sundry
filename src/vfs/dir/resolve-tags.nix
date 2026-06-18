@@ -4,7 +4,7 @@
   flake-root,
   ...
 }: rec {
-  resolve-specs = args-in: let
+  resolve-tags = args-in: let
     args = mlem.attrs.validate args-in {
       strip = {
         default = false;
@@ -35,16 +35,16 @@
       value =
         value
         // {
-          specs = map (dir:
+          tags = map (dir:
             lib.pipe dir [
               (mlem.str.between lsep rsep)
-              (map (spec-str: let
-                spec-parts = lib.splitString kvsep spec-str;
-                spec-key = lib.head spec-parts;
-                spec-value = mlem.is-null (mlem.list.excl-last spec-parts) "";
-                spec-list = lib.splitString vsep spec-value;
+              (map (tag-str: let
+                tag-parts = lib.splitString kvsep tag-str;
+                tag-key = lib.head tag-parts;
+                tag-value = mlem.is-null (mlem.list.excl-last tag-parts) "";
+                tag-list = lib.splitString vsep tag-value;
               in {
-                ${spec-key} = mlem.list.un-singleton spec-list;
+                ${tag-key} = mlem.list.un-singleton tag-list;
               }))
               mlem.attrs.merge.no-collision
             ])
@@ -53,9 +53,9 @@
     });
   tests = [
     [
-      (lib.pipe "${flake-root}/tests/vfs-test-dir/specs" [
+      (lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
         mlem.vfs.dir.from-src
-        (resolve-specs {
+        (resolve-tags {
           strip = true;
           separators = ["{" ":" "," "}"];
         })
@@ -63,15 +63,15 @@
       {
         A = {
           text = "contents of A";
-          specs = [{a = "1";}];
+          tags = [{a = "1";}];
         };
         B = {
           text = "contents of B";
-          specs = [{a = ["2" "3"];}];
+          tags = [{a = ["2" "3"];}];
         };
         C = {
           text = "contents of C";
-          specs = [
+          tags = [
             {
               a = "1";
               b = "1";
@@ -80,7 +80,7 @@
         };
         D = {
           text = "contents of D";
-          specs = [
+          tags = [
             {
               a = "";
               b = "";
@@ -89,26 +89,26 @@
         };
         E = {
           text = "contents of E";
-          specs = [{}];
+          tags = [{}];
         };
         "=" = {
           F = {
             text = "contents of F";
-            specs = [{a = "1";} {a = "2";}];
+            tags = [{a = "1";} {a = "2";}];
           };
           I = {
             text = "contents of I";
-            specs = [{b = "1";} {c = "1";}];
+            tags = [{b = "1";} {c = "1";}];
           };
           "=" = {
             G = {
               text = "contents of G";
-              specs = [{a = "1";} {b = "1";} {b = "2";}];
+              tags = [{a = "1";} {b = "1";} {b = "2";}];
             };
             "=" = {
               H = {
                 text = "contents of H";
-                specs = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
+                tags = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
               };
             };
           };

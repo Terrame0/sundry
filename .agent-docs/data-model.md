@@ -18,7 +18,7 @@ Leaf fields:
 |---|---|---|
 | `text` | string | file contents, in memory |
 | `src` | string \| derivation | location of the real file on disk |
-| `specs` | list of attrsets | tags parsed from the filename, present after `resolve-specs` (see [test-naming.md](test-naming.md)) |
+| `tags` | list of attrsets | tags parsed from the filename, present after `resolve-tags` (see [test-naming.md](test-naming.md)) |
 
 A directory maps a path segment to a child node:
 
