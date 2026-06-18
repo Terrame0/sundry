@@ -8,7 +8,7 @@
   materialize = drv-name: dir: let
     files =
       mlem.attrs.collapse-until
-      mlem.vfs.is-leaf
+      mlem.vfs.is-leaf-node
       (path: attrs: {
         inherit path;
         inherit (attrs) text;
@@ -28,11 +28,13 @@
     base-path = pkgs.runCommand drv-name {} cmd;
   in
     mlem.vfs.dir.walk
-    (path: file: (removeAttrs file ["text"]) // rec {
-      src = mlem.vfs.path.get.str [base rel];
-      base = base-path;
-      rel = mlem.vfs.path.get.str path;
-    })
+    (path: file:
+      (removeAttrs file ["text"])
+      // rec {
+        src = mlem.vfs.path.get.str [base rel];
+        base = base-path;
+        rel = mlem.vfs.path.get.str path;
+      })
     dir;
 
   tests = [

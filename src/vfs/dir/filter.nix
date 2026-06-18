@@ -6,7 +6,7 @@
 }: {
   filter =
     mlem.attrs.filter-until
-    mlem.vfs.is-leaf;
+    mlem.vfs.is-leaf-node;
 
   tests = let
     filter-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/filtering";

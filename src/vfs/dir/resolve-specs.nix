@@ -26,7 +26,7 @@
     rsep = mlem.list.at 3 args.separators;
   in
     mlem.attrs.reform-until
-    mlem.vfs.is-leaf
+    mlem.vfs.is-leaf-node
     (path: value: {
       path =
         if args.strip

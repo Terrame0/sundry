@@ -5,7 +5,7 @@
 }: rec {
   path-strs = dir:
     mlem.attrs.collapse-until
-    mlem.vfs.is-leaf
+    mlem.vfs.is-leaf-node
     (path: _: mlem.vfs.path.get.str path)
     dir;
   tests = [

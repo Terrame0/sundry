@@ -5,7 +5,7 @@
 }: {
   walk =
     mlem.attrs.walk-until
-    mlem.vfs.is-leaf;
+    mlem.vfs.is-leaf-node;
 
   tests = let
     test-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
