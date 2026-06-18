@@ -27,16 +27,22 @@
       files;
     base-path = pkgs.runCommand drv-name {} cmd;
   in
-    mlem.vfs.dir.collapse (path: file: mlem.vfs.path.get.str ([base-path] ++ path)) dir;
+    mlem.vfs.dir.walk
+    (path: file: rec {
+      src = mlem.vfs.path.get.str [base rel];
+      base = base-path;
+      rel = mlem.vfs.path.get.str path;
+    })
+    dir;
+
   tests = [
     [
-      (lib.pipe "${flake-root}/tests/vfs-test-dir/test-files" [
-        mlem.vfs.dir.from-src
-        (materialize "test-dir")
-        lib.head
-        builtins.readFile
-      ])
-      "contents of C.txt"
+      (builtins.readFile
+        (lib.pipe "${flake-root}/tests/vfs-test-dir/test-files" [
+          mlem.vfs.dir.from-src
+          (materialize "test-dir")
+        ])."A.txt".src)
+      "contents of A.txt"
     ]
   ];
 }
