@@ -22,6 +22,8 @@ The criterion is cohesion, not file count. Keep things together when they're uni
 Cohesive clusters that live in one file:
 
 - [src/vfs/path/getters.nix](../src/vfs/path/getters.nix) — `get.{name, stem, ext, str}`, facets of one object.
+- [src/vfs/path/setters.nix](../src/vfs/path/setters.nix) — `set.{name, stem, ext}`, the mirror of `get`; reuses the getters to round-trip a path's name.
+- [src/list/accessors.nix](../src/list/accessors.nix) — `at`, `incl-init`/`incl-tail`, `excl-last`/`excl-head`; list-edge accessors, same shape.
 - [src/str/find-after.nix](../src/str/find-after.nix) — `find-after` and `rfind-after`, mirror functions.
 - [src/str/trim.nix](../src/str/trim.nix) — `trim`, `trim-left`, `trim-right`, same shape.
 - [src/attrs/compare.nix](../src/attrs/compare.nix) — `compare` and `compare-until` (the latter is a generalization).

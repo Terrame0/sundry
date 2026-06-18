@@ -18,10 +18,10 @@ in rec {
     path = ["A" "B" "C.txt"];
   in [
     [(set.name "D.md" path) ["A" "B" "D.md"]]
-    [(set.stem "renamed" path) ["A" "B" "renamed.txt"]]
+    [(set.stem "C'" path) ["A" "B" "C'.txt"]]
     [(set.ext "md" path) ["A" "B" "C.md"]]
     [(set.ext "" path) ["A" "B" "C"]]
-    [(set.ext "css" ["x" "noext"]) ["x" "noext.css"]]
-    [(set.stem "only" ["A" "noext"]) ["A" "only"]]
+    [(set.ext "css" ["A" "B"]) ["A" "B.css"]]
+    [(set.stem "B'" ["A" "B"]) ["A" "B'"]]
   ];
 }

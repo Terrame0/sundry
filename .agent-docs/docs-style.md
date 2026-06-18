@@ -1,6 +1,6 @@
 # Writing docs
 
-Meta-rules for files under `docs/`.
+Meta-rules for files under `.agent-docs/`.
 
 ## One topic per file
 
@@ -30,7 +30,9 @@ Linked references (`[src/foo/bar.nix](../src/foo/bar.nix)`) are stronger than in
 
 ## Avoid drift between docs and code
 
-Cite files by linked path, never by name alone. A broken link rots loudly the first time someone navigates it; an unlinked name rots silently. When you rename or remove a file, grep `docs/` for references.
+**A code change is not finished until the docs it contradicts are fixed in the same change.** Whenever you rename, move, remove, or repurpose anything a doc describes — a file path, function name, namespace, field name, or documented behavior — update the affected docs alongside the code, never as a follow-up. Find what's affected by grepping `.agent-docs/` for the old name *and* by re-reading any doc that links into the files you touched.
+
+Cite files by linked path, never by name alone. A broken link rots loudly the first time someone navigates it; an unlinked name rots silently. When you rename or remove a file, grep `.agent-docs/` for references.
 
 ## Read it as a stranger
 
