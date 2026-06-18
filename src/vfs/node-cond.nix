@@ -22,11 +22,9 @@
     [(is-dir "..." {a = {};}) true]
     [(is-dir "..." {}) true]
     [(is-dir "..." {a = 10;}) false]
-
     [(is-leaf "..." {text = "...";}) true]
     [(is-leaf "..." {file = {text = "...";};}) false]
     [(is-leaf "..." {text = {};}) false]
-
     [(is-leaf-node "..." {text = "...";}) true]
     [(is-leaf-node "..." {a = {};}) false]
     [(builtins.tryEval (is-leaf-node ["x" "y" "z"] {a = 10;})).success false]
