@@ -1,5 +1,5 @@
 {
-  mlem,
+  sundry,
   lib,
   ...
 }: rec {
@@ -7,7 +7,7 @@
     if lib.isList list
     then
       if lib.length list == 1
-      then mlem.list.at 0 list
+      then sundry.list.at 0 list
       else list
     else throw "\nvalue must be a list";
   tests = [

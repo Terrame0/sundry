@@ -1,21 +1,21 @@
 {
-  mlem,
+  sundry,
   flake-root,
   lib,
   ...
 }: {
   reform =
-    mlem.attrs.reform-until
-    mlem.vfs.is-leaf-node;
+    sundry.attrs.reform-until
+    sundry.vfs.is-leaf-node;
 
   tests = let
-    test-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
+    test-dir = sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
   in [
     [
-      (mlem.vfs.dir.reform (path: file: {
+      (sundry.vfs.dir.reform (path: file: {
           path = [(lib.last path)];
           value = {
-            path = mlem.vfs.path.get.str path;
+            path = sundry.vfs.path.get.str path;
             text = "reformed ${file.text}";
           };
         })

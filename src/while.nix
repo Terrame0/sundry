@@ -1,4 +1,4 @@
-{mlem, ...}: rec {
+{sundry, ...}: rec {
   while = cond: init-state: op: let
     recurse = prev:
       if (cond prev && !(prev ? break && prev.break))
@@ -17,7 +17,7 @@
     ]
     [
       (while
-        mlem.true-fn
+        sundry.true-fn
         {x = 0;}
         (prev: {
           x = prev.x + 1;

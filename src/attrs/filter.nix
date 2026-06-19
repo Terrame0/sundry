@@ -1,6 +1,6 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: let
   filter-base = base: fn:
@@ -10,8 +10,8 @@
       omit = !(fn path value);
     });
 in rec {
-  filter = filter-base mlem.attrs.reform;
-  filter-until = cond: filter-base (mlem.attrs.reform-until cond);
+  filter = filter-base sundry.attrs.reform;
+  filter-until = cond: filter-base (sundry.attrs.reform-until cond);
   tests = [
     [
       (filter-until

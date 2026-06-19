@@ -1,8 +1,8 @@
-{mlem, ...}: rec {
+{sundry, ...}: rec {
   for = args: init-state: op: let
-    init-id = mlem.list.at 0 args;
-    step = mlem.list.at 1 args;
-    cond = mlem.list.at 2 args;
+    init-id = sundry.list.at 0 args;
+    step = sundry.list.at 1 args;
+    cond = sundry.list.at 2 args;
     recurse = prev: i:
       if (cond i && !(prev ? break && prev.break))
       then recurse (prev // (op prev i)) (step i)

@@ -1,11 +1,11 @@
 {
   lib,
-  mlem,
+  sundry,
   flake-root,
   ...
 }: rec {
   resolve-tags = args-in: let
-    args = mlem.attrs.validate args-in {
+    args = sundry.attrs.validate args-in {
       strip = {
         default = false;
         check = value: lib.isBool value;
@@ -20,33 +20,33 @@
         desc = "must be a list of the following format: [ left-sep key-value-sep value-sep right-sep ]";
       };
     };
-    lsep = mlem.list.at 0 args.separators;
-    kvsep = mlem.list.at 1 args.separators;
-    vsep = mlem.list.at 2 args.separators;
-    rsep = mlem.list.at 3 args.separators;
+    lsep = sundry.list.at 0 args.separators;
+    kvsep = sundry.list.at 1 args.separators;
+    vsep = sundry.list.at 2 args.separators;
+    rsep = sundry.list.at 3 args.separators;
   in
-    mlem.attrs.reform-until
-    mlem.vfs.is-leaf-node
+    sundry.attrs.reform-until
+    sundry.vfs.is-leaf-node
     (path: value: {
       path =
         if args.strip
-        then mlem.vfs.path.strip-between lsep rsep path
+        then sundry.vfs.path.strip-between lsep rsep path
         else path;
       value =
         value
         // {
           tags = map (dir:
             lib.pipe dir [
-              (mlem.str.between lsep rsep)
+              (sundry.str.between lsep rsep)
               (map (tag-str: let
                 tag-parts = lib.splitString kvsep tag-str;
                 tag-key = lib.head tag-parts;
-                tag-value = mlem.is-null (mlem.list.excl-last tag-parts) "";
+                tag-value = sundry.is-null (sundry.list.excl-last tag-parts) "";
                 tag-list = lib.splitString vsep tag-value;
               in {
-                ${tag-key} = mlem.list.un-singleton tag-list;
+                ${tag-key} = sundry.list.un-singleton tag-list;
               }))
-              mlem.attrs.merge.no-collision
+              sundry.attrs.merge.no-collision
             ])
           path;
         };
@@ -54,7 +54,7 @@
   tests = [
     [
       (lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
-        mlem.vfs.dir.from-src
+        sundry.vfs.dir.from-src
         (resolve-tags {
           strip = true;
           separators = ["{" ":" "," "}"];

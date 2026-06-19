@@ -1,12 +1,12 @@
 {
   lib,
-  mlem,
+  sundry,
   flake-root,
   ...
 }: {
   collapse = tag: fn: dir:
-    lib.concatLists (mlem.vfs.dir.collapse (path: file: let
-      tag-pos = mlem.vfs.file.get-tag-pos tag file;
+    lib.concatLists (sundry.vfs.dir.collapse (path: file: let
+      tag-pos = sundry.vfs.file.get-tag-pos tag file;
     in
       if tag-pos == -1
       then []
@@ -15,12 +15,12 @@
 
   tests = let
     dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
-      mlem.vfs.dir.from-src
-      (mlem.vfs.dir.resolve-tags {strip = true;})
+      sundry.vfs.dir.from-src
+      (sundry.vfs.dir.resolve-tags {strip = true;})
     ];
   in [
     [
-      (mlem.vfs.dir.by-tag.collapse {b = "1";} (path: tag-pos: file: tag-pos) dir)
+      (sundry.vfs.dir.by-tag.collapse {b = "1";} (path: tag-pos: file: tag-pos) dir)
       [1 1 0 0]
     ]
   ];

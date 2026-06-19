@@ -1,17 +1,17 @@
 # Module layout
 
-How files under `src/` are organized and how that organization maps to the public `mlem.*` namespace.
+How files under `src/` are organized and how that organization maps to the public `sundry.*` namespace.
 
 ## File path = namespace path
 
-The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks every `.nix` file under `src/` and exposes its attributes (minus `tests`) at `mlem.<dirname>`, where `<dirname>` is the file's directory relative to `src/`. The filename itself is dropped.
+The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks every `.nix` file under `src/` and exposes its attributes (minus `tests`) at `sundry.<dirname>`, where `<dirname>` is the file's directory relative to `src/`. The filename itself is dropped.
 
 | File | Exports at | Function ends up at |
 |---|---|---|
-| `src/vfs/dir/reform.nix` | `mlem.vfs.dir` | `mlem.vfs.dir.reform` |
-| `src/vfs/dir/by-tag/walk.nix` | `mlem.vfs.dir.by-tag` | `mlem.vfs.dir.by-tag.walk` |
-| `src/vfs/file/get-tag-pos.nix` | `mlem.vfs.file` | `mlem.vfs.file.get-tag-pos` |
-| `src/list/permutations.nix` | `mlem.list` | `mlem.list.permutations` |
+| `src/vfs/dir/reform.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.reform` |
+| `src/vfs/dir/by-tag/walk.nix` | `sundry.vfs.dir.by-tag` | `sundry.vfs.dir.by-tag.walk` |
+| `src/vfs/file/get-tag-pos.nix` | `sundry.vfs.file` | `sundry.vfs.file.get-tag-pos` |
+| `src/list/permutations.nix` | `sundry.list` | `sundry.list.permutations` |
 
 Pick the filename to match what's inside: a single function gets the function's name; a cohesive cluster gets a name describing the cluster.
 

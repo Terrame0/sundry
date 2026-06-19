@@ -1,7 +1,7 @@
 args @ {
   pkgs,
   lib,
-  mlem,
+  sundry,
   ...
 }: let
   parse-test = module-path: dir-path: id: result: let
@@ -80,20 +80,20 @@ args @ {
 
     table-width =
       lib.foldl
-      (max: line: lib.max max (mlem.str.len line))
+      (max: line: lib.max max (sundry.str.len line))
       0
       (lib.concatLists (lib.attrValues blocks));
 
     pad = char: offset:
-      (mlem.for
+      (sundry.for
         [offset (i: i + 1) (i: i < table-width)]
         {str = "";}
         (state: i: {str = state.str + char;})).str;
 
     pad-right = name: line:
       if lib.hasPrefix "+" line
-      then "${line}${pad "-" (mlem.str.len line - 3)}+"
-      else "| ${line}${pad " " (mlem.str.len line)} |";
+      then "${line}${pad "-" (sundry.str.len line - 3)}+"
+      else "| ${line}${pad " " (sundry.str.len line)} |";
 
     padded-blocks = block-line-map pad-right;
 

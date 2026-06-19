@@ -1,5 +1,5 @@
-{mlem, ...}: {
+{sundry, ...}: {
   merge-with-resolvers = resolvers:
-    mlem.attrs.merge-with
-    (mlem.compose resolvers);
+    sundry.attrs.merge-with
+    (sundry.compose resolvers);
 }

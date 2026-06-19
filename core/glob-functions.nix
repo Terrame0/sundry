@@ -1,7 +1,7 @@
 args @ {
   lib,
   flake-root,
-  mlem,
+  sundry,
   pkgs,
   ...
 }: let

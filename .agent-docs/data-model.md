@@ -1,6 +1,6 @@
 # VFS data model
 
-The two shapes everything under `mlem.vfs` operates on: the **node tree** and the **path**.
+The two shapes everything under `sundry.vfs` operates on: the **node tree** and the **path**.
 
 ## Node
 
@@ -54,4 +54,4 @@ Stem/ext split on `.` with the **last** component as the ext: `archive.tar.gz` â
 
 ## Traversals
 
-`mlem.vfs.dir.{walk, collapse, reform, filter, materialize, path-strs}` recurse while a node is a directory and stop at leaves, using `is-leaf-node` as the `cond`. A malformed node (neither leaf nor directory) throws with its path instead of overflowing the stack.
+`sundry.vfs.dir.{walk, collapse, reform, filter, materialize, path-strs}` recurse while a node is a directory and stop at leaves, using `is-leaf-node` as the `cond`. A malformed node (neither leaf nor directory) throws with its path instead of overflowing the stack.

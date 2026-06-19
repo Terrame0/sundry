@@ -1,10 +1,10 @@
 {
-  mlem,
+  sundry,
   lib,
   ...
 }: rec {
   strip-between = lsep: rsep:
-    map (path: "${lib.concatStrings (mlem.str.outside lsep rsep path)}");
+    map (path: "${lib.concatStrings (sundry.str.outside lsep rsep path)}");
   tests = [
     [(strip-between "<" ">" ["A<X>" "B<Y>" "C<Z>"]) ["A" "B" "C"]]
     [(strip-between "<" ">" ["NOMARKER" "A<X>"]) ["NOMARKER" "A"]]

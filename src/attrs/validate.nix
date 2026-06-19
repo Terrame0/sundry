@@ -1,6 +1,6 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: let
   not-leaf = attrs:
@@ -8,7 +8,7 @@
     && !(attrs ? check
       || attrs ? default
       || attrs == {});
-  compare-until-leaf = mlem.attrs.compare-until not-leaf;
+  compare-until-leaf = sundry.attrs.compare-until not-leaf;
   collapse-until =
     lib.mapAttrsToListRecursiveCond (path: not-leaf);
   filter-map = fn: attrs:
@@ -71,7 +71,7 @@ in rec {
       compared-with-template.missing;
 
     matched-with-defaults =
-      mlem.attrs.merge.recursive.no-collision
+      sundry.attrs.merge.recursive.no-collision
       [compared-with-template.matched defaults];
 
     missing =
@@ -95,8 +95,8 @@ in rec {
     did-not-pass = lib.pipe matched-with-defaults [
       (collapse-until (
         path: pair: let
-          value = mlem.list.at 0 pair;
-          spec = mlem.list.at 1 pair;
+          value = sundry.list.at 0 pair;
+          spec = sundry.list.at 1 pair;
           passed =
             if spec.nullable or false && value == null
             then true
@@ -115,11 +115,11 @@ in rec {
     ];
     values =
       lib.mapAttrsRecursive
-      (path: pair: mlem.list.at 0 pair)
+      (path: pair: sundry.list.at 0 pair)
       matched-with-defaults;
   in
     lib.foldl
-    mlem.check-success
+    sundry.check-success
     values [
       {
         success = did-not-pass == "";

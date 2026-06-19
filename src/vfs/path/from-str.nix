@@ -1,11 +1,11 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: rec {
   from-str = path-str:
     lib.splitString "/"
-    (mlem.str.trim-left "/"
+    (sundry.str.trim-left "/"
       (builtins.unsafeDiscardStringContext (toString path-str)));
   tests = [
     [

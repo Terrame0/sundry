@@ -1,15 +1,15 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: let
   find-after-base = step: init-id: seq: str: let
     result =
-      mlem.for [init-id step mlem.true-fn]
+      sundry.for [init-id step sundry.true-fn]
       {pos = null;}
       (prev: i: let
-        str-len = mlem.str.len str;
-        seq-len = mlem.str.len seq;
+        str-len = sundry.str.len str;
+        seq-len = sundry.str.len seq;
         within-bounds = 0 <= i && i <= (str-len - seq-len);
       in {
         pos =

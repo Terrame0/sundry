@@ -1,14 +1,14 @@
 {
   lib,
-  mlem,
+  sundry,
   flake-root,
   pkgs,
   ...
 }: rec {
   materialize = drv-name: dir: let
     files =
-      mlem.attrs.collapse-until
-      mlem.vfs.is-leaf-node
+      sundry.attrs.collapse-until
+      sundry.vfs.is-leaf-node
       (path: attrs: {
         inherit path;
         inherit (attrs) text;
@@ -27,13 +27,13 @@
       files;
     base-path = pkgs.runCommand drv-name {} cmd;
   in
-    mlem.vfs.dir.walk
+    sundry.vfs.dir.walk
     (path: file:
       (removeAttrs file ["text"])
       // rec {
-        src = mlem.vfs.path.get.str [base rel];
+        src = sundry.vfs.path.get.str [base rel];
         base = base-path;
-        rel = mlem.vfs.path.get.str path;
+        rel = sundry.vfs.path.get.str path;
       })
     dir;
 
@@ -41,7 +41,7 @@
     [
       (builtins.readFile
         (lib.pipe "${flake-root}/tests/vfs-test-dir/test-files" [
-          mlem.vfs.dir.from-src
+          sundry.vfs.dir.from-src
           (materialize "test-dir")
         ])."A.txt".src)
       "contents of A.txt"

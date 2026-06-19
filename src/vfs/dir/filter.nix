@@ -1,24 +1,24 @@
 {
-  mlem,
+  sundry,
   flake-root,
   lib,
   ...
 }: {
   filter =
-    mlem.attrs.filter-until
-    mlem.vfs.is-leaf-node;
+    sundry.attrs.filter-until
+    sundry.vfs.is-leaf-node;
 
   tests = let
-    filter-dir = mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/filtering";
+    filter-dir = sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/filtering";
   in [
     [
       (lib.pipe filter-dir [
-        (mlem.vfs.dir.filter (path: file:
-          mlem.vfs.path.get.ext path
+        (sundry.vfs.dir.filter (path: file:
+          sundry.vfs.path.get.ext path
           == "txt"
           || file.text
           == "override"))
-        mlem.vfs.dir.path-strs
+        sundry.vfs.dir.path-strs
       ])
       [
         "=/=/E.ini"

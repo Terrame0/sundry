@@ -1,18 +1,18 @@
 {
-  mlem,
+  sundry,
   lib,
   flake-root,
   ...
 }: rec {
   from-src = dir-path: let
     path-to-file = fs-path:
-      mlem.vfs.file.from-src
+      sundry.vfs.file.from-src
       (lib.drop
-        (lib.length (mlem.vfs.path.from-str dir-path))
-        (mlem.vfs.path.from-str fs-path))
+        (lib.length (sundry.vfs.path.from-str dir-path))
+        (sundry.vfs.path.from-str fs-path))
       fs-path;
   in
-    mlem.attrs.merge.recursive.no-collision
+    sundry.attrs.merge.recursive.no-collision
     (map path-to-file (lib.filesystem.listFilesRecursive dir-path));
   tests = [
     [

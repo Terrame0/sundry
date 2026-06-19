@@ -1,13 +1,13 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: let
   compare-base = cond: lhs: rhs:
-    mlem.attrs.merge-with-resolvers (with mlem.attrs.merge-resolvers; [
+    sundry.attrs.merge-with-resolvers (with sundry.attrs.merge-resolvers; [
       (default: name: lhs: rhs:
         if name == "missing"
-        then mlem.attrs.remove-by-path rhs lhs
+        then sundry.attrs.remove-by-path rhs lhs
         else default name lhs rhs)
       recursive
       base.no-collision

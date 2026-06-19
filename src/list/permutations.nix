@@ -1,6 +1,6 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: rec {
   permutations = list: k: let
@@ -11,8 +11,8 @@
       else
         lib.concatLists (map (i:
           recurse
-          (mlem.list.remove-at i left)
-          (result ++ [(mlem.list.at i left)]))
+          (sundry.list.remove-at i left)
+          (result ++ [(sundry.list.at i left)]))
         (lib.genList lib.id (lib.length left)));
   in
     if k >= 0 && k <= list-len

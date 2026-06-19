@@ -1,12 +1,12 @@
 {
   lib,
-  mlem,
+  sundry,
   flake-root,
   ...
 }: {
   reform = tag: fn:
-    mlem.vfs.dir.reform (path: file: let
-      tag-pos = mlem.vfs.file.get-tag-pos tag file;
+    sundry.vfs.dir.reform (path: file: let
+      tag-pos = sundry.vfs.file.get-tag-pos tag file;
     in
       if tag-pos == -1
       then {
@@ -18,12 +18,12 @@
 
   tests = let
     dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
-      mlem.vfs.dir.from-src
-      (mlem.vfs.dir.resolve-tags {strip = true;})
+      sundry.vfs.dir.from-src
+      (sundry.vfs.dir.resolve-tags {strip = true;})
     ];
   in [
     [
-      (mlem.vfs.dir.by-tag.reform {b = "1";} (path: tag-pos: file: {
+      (sundry.vfs.dir.by-tag.reform {b = "1";} (path: tag-pos: file: {
           path = [(lib.last path)];
           value = tag-pos;
         })

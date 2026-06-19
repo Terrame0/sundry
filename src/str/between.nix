@@ -1,5 +1,5 @@
 {
-  mlem,
+  sundry,
   lib,
   ...
 }: rec {
@@ -7,7 +7,7 @@
     insides =
       lib.filter
       (entry: entry.depth == 1)
-      (mlem.str.delimit lsep rsep str).inside;
+      (sundry.str.delimit lsep rsep str).inside;
   in
     map (attrs: attrs.substr) insides;
   tests = [

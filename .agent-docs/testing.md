@@ -13,7 +13,7 @@ tests = [
 ];
 ```
 
-Tests are evaluated by [core/check-tests.nix](../core/check-tests.nix). The framework strips `tests` from the module's public exports, so it never leaks into the `mlem.*` namespace.
+Tests are evaluated by [core/check-tests.nix](../core/check-tests.nix). The framework strips `tests` from the module's public exports, so it never leaks into the `sundry.*` namespace.
 
 A single-element list `[ <value> ]` instead of `[ actual expected ]` is treated as a **debug print** — the value is rendered and shown regardless of correctness. Useful when probing behavior.
 
@@ -21,7 +21,7 @@ A single-element list `[ <value> ]` instead of `[ actual expected ]` is treated 
 
 Inline `tests = [...]` blocks in the source file are the default. Use them whenever the test fixture is small and self-contained (an inline attrset, a string literal, a small list).
 
-When a test needs a multi-file on-disk fixture (the only current case is the VFS test suite), the fixture lives under [tests/vfs-test-dir/](../tests/vfs-test-dir/) and the test imports it via `mlem.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/..."`. The file-naming scheme inside the fixture is described in [test-naming.md](test-naming.md).
+When a test needs a multi-file on-disk fixture (the only current case is the VFS test suite), the fixture lives under [tests/vfs-test-dir/](../tests/vfs-test-dir/) and the test imports it via `sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/..."`. The file-naming scheme inside the fixture is described in [test-naming.md](test-naming.md).
 
 A separate test file (in `tests/src/`) is only justified when the same multi-file fixture needs to be exercised against a behavior that has no single owning `src/` file — see [tests/src/filtering.nix](../tests/src/filtering.nix) as the one current example.
 

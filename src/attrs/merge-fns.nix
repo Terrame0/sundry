@@ -1,28 +1,28 @@
 {
-  mlem,
+  sundry,
   lib,
   ...
 }: {
   merge = let
-    resolvers = lib.attrsToList (removeAttrs mlem.attrs.merge-resolvers ["base"]);
-    bases = lib.attrsToList mlem.attrs.merge-resolvers.base;
+    resolvers = lib.attrsToList (removeAttrs sundry.attrs.merge-resolvers ["base"]);
+    bases = lib.attrsToList sundry.attrs.merge-resolvers.base;
     resolver-permutations =
       lib.concatMap
-      (i: (mlem.list.permutations resolvers i))
+      (i: (sundry.list.permutations resolvers i))
       (lib.genList (i: i) (lib.length resolvers + 1));
     product =
       map
       (list: lib.flatten list)
-      (mlem.list.product resolver-permutations bases);
+      (sundry.list.product resolver-permutations bases);
     fns =
       map
       (list:
         lib.setAttrByPath
         (map (attrs: attrs.name) list)
-        (mlem.attrs.merge-with-resolvers (map (attrs: attrs.value) list)))
+        (sundry.attrs.merge-with-resolvers (map (attrs: attrs.value) list)))
       product;
   in
-    mlem.attrs.merge-with-resolvers
-    (with mlem.attrs.merge-resolvers; [recursive no-collision])
+    sundry.attrs.merge-with-resolvers
+    (with sundry.attrs.merge-resolvers; [recursive no-collision])
     fns;
 }

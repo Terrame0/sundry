@@ -1,12 +1,12 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: rec {
   resolve-deps = transforms: let
     layers = lib.pipe transforms [
       (lib.mapAttrsToList (name: value-in: let
-        value = mlem.attrs.validate value-in {
+        value = sundry.attrs.validate value-in {
           deps = {
             default = [];
             check = value: lib.isList value && lib.all lib.isString value;
@@ -22,7 +22,7 @@
         inherit (value) deps;
         inherit (value) transform;
       }))
-      mlem.list.topo-stratify
+      sundry.list.topo-stratify
     ];
   in
     lib.foldl (
@@ -40,7 +40,7 @@
                 lib.listToAttrs
               ]);
           }))
-          mlem.attrs.merge.no-collision
+          sundry.attrs.merge.no-collision
         ]
     ) {}
     layers;

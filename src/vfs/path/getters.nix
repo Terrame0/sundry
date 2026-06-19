@@ -1,6 +1,6 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: rec {
   get = rec {
@@ -10,13 +10,13 @@
       lib.splitString "." (name path);
     stem = path:
       lib.concatStringsSep "."
-      (mlem.list.incl-init (name-split path));
+      (sundry.list.incl-init (name-split path));
     ext = path:
-      mlem.is-null
-      (mlem.list.excl-last (name-split path)) "";
+      sundry.is-null
+      (sundry.list.excl-last (name-split path)) "";
     str = path:
       lib.foldl (
-        str-acc: dir: "${mlem.str.trim-right "/" str-acc}/${mlem.str.trim-left "/" dir}"
+        str-acc: dir: "${sundry.str.trim-right "/" str-acc}/${sundry.str.trim-left "/" dir}"
       ) (lib.head path)
       (lib.tail path);
   };

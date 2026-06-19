@@ -1,13 +1,13 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: let
   reform-base = base: fn: attrs:
-    mlem.attrs.merge.recursive.no-collision
+    sundry.attrs.merge.recursive.no-collision
     (base (path: value: let
       result =
-        mlem.attrs.validate
+        sundry.attrs.validate
         (fn path value)
         {
           path = {
@@ -30,8 +30,8 @@
     attrs);
 in rec {
   reform-until = cond:
-    reform-base (mlem.attrs.collapse-until cond);
-  reform = reform-base mlem.attrs.collapse;
+    reform-base (sundry.attrs.collapse-until cond);
+  reform = reform-base sundry.attrs.collapse;
   tests = [
     [
       (reform-until

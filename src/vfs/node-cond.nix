@@ -1,5 +1,5 @@
 {
-  mlem,
+  sundry,
   lib,
   ...
 }: rec {
@@ -17,7 +17,7 @@
     then true
     else if is-dir path attrs
     then false
-    else throw "\nvfs directory node at '/${mlem.vfs.path.get.str path}' is neither a leaf nor a directory";
+    else throw "\nvfs directory node at '/${sundry.vfs.path.get.str path}' is neither a leaf nor a directory";
   tests = [
     [(is-dir "..." {a = {};}) true]
     [(is-dir "..." {}) true]

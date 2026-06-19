@@ -1,9 +1,9 @@
 {
   lib,
-  mlem,
+  sundry,
   ...
 }: let
-  get = mlem.vfs.path.get;
+  get = sundry.vfs.path.get;
   join-name = stem: ext:
     if ext == ""
     then stem

@@ -14,13 +14,13 @@
       args = {
         inherit lib;
         inherit pkgs;
-        inherit mlem;
+        inherit sundry;
         flake-root = self.outPath;
       };
-      mlem = import ./core/glob-functions.nix args;
+      sundry = import ./core/glob-functions.nix args;
       test-results = import ./core/check-tests.nix args;
     in {
-      functions = mlem;
+      functions = sundry;
       meta = {inherit test-results;};
     };
   };
