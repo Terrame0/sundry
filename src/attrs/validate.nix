@@ -28,7 +28,7 @@
   concat-path = strs: lib.concatStringsSep " -> " (map (str: "'${str}'") strs);
   format = lib.generators.toPretty {multiline = false;};
 in rec {
-  validate = attrs: template-in: let
+  validate = template-in: attrs: let
     template = lib.mapAttrsRecursiveCond not-leaf (path: value: let
       structure-msg = ''
         'check' - an attribute value validation function
@@ -140,10 +140,6 @@ in rec {
       (
         validate
         {
-          A = 1;
-          B = 2;
-        }
-        {
           A = {
             check = value: lib.mod value 1 == 0;
             desc = "must be odd";
@@ -160,6 +156,10 @@ in rec {
             };
           };
         }
+        {
+          A = 1;
+          B = 2;
+        }
       )
       {
         A = 1;
@@ -172,18 +172,17 @@ in rec {
     [
       (sundry.does-throw (
         validate
-        {A = 1;}
         {
           A = {};
           B = {};
         }
+        {A = 1;}
       ))
       true
     ]
     [
       (sundry.does-throw (
         validate
-        {A = 1;}
         {
           A = {
             default = 2;
@@ -191,6 +190,7 @@ in rec {
             desc = "must be even";
           };
         }
+        {A = 1;}
       ))
       true
     ]
@@ -198,11 +198,11 @@ in rec {
       (sundry.does-throw (
         validate
         {
-          A = 1;
-          B = 2;
+          A = {};
         }
         {
-          A = {};
+          A = 1;
+          B = 2;
         }
       ))
       true

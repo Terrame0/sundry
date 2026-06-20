@@ -5,21 +5,23 @@
   ...
 }: rec {
   resolve-tags = args-in: let
-    args = sundry.attrs.validate args-in {
-      strip = {
-        default = false;
-        check = value: lib.isBool value;
-        desc = "must be either 'true' or 'false'";
-      };
-      separators = {
-        default = ["{" ":" "," "}"];
-        check = value:
-          lib.isList value
-          && lib.length value == 4
-          && (lib.all lib.isString value);
-        desc = "must be a list of the following format: [ left-sep key-value-sep value-sep right-sep ]";
-      };
-    };
+    args =
+      sundry.attrs.validate {
+        strip = {
+          default = false;
+          check = value: lib.isBool value;
+          desc = "must be either 'true' or 'false'";
+        };
+        separators = {
+          default = ["{" ":" "," "}"];
+          check = value:
+            lib.isList value
+            && lib.length value == 4
+            && (lib.all lib.isString value);
+          desc = "must be a list of the following format: [ left-sep key-value-sep value-sep right-sep ]";
+        };
+      }
+      args-in;
     lsep = sundry.list.at 0 args.separators;
     kvsep = sundry.list.at 1 args.separators;
     vsep = sundry.list.at 2 args.separators;

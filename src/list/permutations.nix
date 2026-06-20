@@ -3,7 +3,7 @@
   sundry,
   ...
 }: rec {
-  permutations = list: k: let
+  permutations = k: list: let
     list-len = lib.length list;
     recurse = left: result:
       if (lib.length left) < (list-len - k + 1)
@@ -20,22 +20,22 @@
     else throw "k has to be between 0 and ${toString list-len}, but k is ${toString k}";
   tests = [
     [
-      (permutations [1 2 3] 3)
+      (permutations 3 [1 2 3])
       [[1 2 3] [1 3 2] [2 1 3] [2 3 1] [3 1 2] [3 2 1]]
     ]
     [
-      (permutations [1 2 3] 2)
+      (permutations 2 [1 2 3])
       [[1 2] [1 3] [2 1] [2 3] [3 1] [3 2]]
     ]
     [
-      (permutations [1 2 3] 1)
+      (permutations 1 [1 2 3])
       [[1] [2] [3]]
     ]
     [
-      (permutations [1 2 3] 0)
+      (permutations 0 [1 2 3])
       [[]]
     ]
-    [(permutations [] 0) [[]]]
-    [(sundry.does-throw (permutations [1 2] 3)) true]
+    [(permutations 0 []) [[]]]
+    [(sundry.does-throw (permutations 3 [1 2])) true]
   ];
 }

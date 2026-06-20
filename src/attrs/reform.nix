@@ -8,7 +8,6 @@
     (base (path: value: let
       result =
         sundry.attrs.validate
-        (fn path value)
         {
           path = {
             check = value:
@@ -22,7 +21,8 @@
             check = value: lib.isBool value;
             desc = "must be either 'true' or 'false'";
           };
-        };
+        }
+        (fn path value);
     in
       if !result.omit
       then lib.setAttrByPath result.path result.value

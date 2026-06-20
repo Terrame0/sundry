@@ -6,17 +6,19 @@
   resolve-deps = transforms: let
     layers = lib.pipe transforms [
       (lib.mapAttrsToList (name: value-in: let
-        value = sundry.attrs.validate value-in {
-          deps = {
-            default = [];
-            check = value: lib.isList value && lib.all lib.isString value;
-            desc = "must be a list of strings that represent the stage's dependencies";
-          };
-          transform = {
-            check = value: lib.isFunction value;
-            desc = "must be a transformation function";
-          };
-        };
+        value =
+          sundry.attrs.validate {
+            deps = {
+              default = [];
+              check = value: lib.isList value && lib.all lib.isString value;
+              desc = "must be a list of strings that represent the stage's dependencies";
+            };
+            transform = {
+              check = value: lib.isFunction value;
+              desc = "must be a transformation function";
+            };
+          }
+          value-in;
       in {
         inherit name;
         inherit (value) deps;

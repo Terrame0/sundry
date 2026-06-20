@@ -8,7 +8,7 @@
     bases = lib.attrsToList sundry.attrs.merge-resolvers.base;
     resolver-permutations =
       lib.concatMap
-      (i: (sundry.list.permutations resolvers i))
+      (i: (sundry.list.permutations i resolvers))
       (lib.genList (i: i) (lib.length resolvers + 1));
     product =
       map
