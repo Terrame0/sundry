@@ -25,7 +25,7 @@
               in
                 expected-list
                 == []
-                || sundry.list.is-in expected-list current-value)
+                || sundry.list.contains current-value expected-list)
               comparison.matched))
           && (comparison.extra == {});
         pos = i;
