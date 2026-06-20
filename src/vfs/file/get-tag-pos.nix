@@ -19,10 +19,13 @@
         in
           (lib.all lib.id
             (lib.mapAttrsToList
-              (name: value:
-                sundry.list.at 0 value
-                == sundry.list.at 1 value
-                || sundry.list.at 0 value == {})
+              (name: value: let
+                expected-list = sundry.list.at 0 value;
+                current-value = sundry.list.at 1 value;
+              in
+                expected-list
+                == []
+                || sundry.list.is-in expected-list current-value)
               comparison.matched))
           && (comparison.extra == {});
         pos = i;
@@ -31,11 +34,13 @@
   tests = let
     file = {
       text = "x";
-      tags = [{x = "1";} {y = "1";} {z = "2";}];
+      tags = [{x = "1";}];
     };
   in [
-    [(sundry.vfs.file.get-tag-pos {y = "1";} file) 1]
-    [(sundry.vfs.file.get-tag-pos {z = "2";} file) 2]
-    [(sundry.vfs.file.get-tag-pos {w = "1";} file) (-1)]
+    [(sundry.vfs.file.get-tag-pos {x = "1";} file) 0]
+    [(sundry.vfs.file.get-tag-pos {x = "2";} file) (-1)]
+    [(sundry.vfs.file.get-tag-pos {x = ["1" "2"];} file) 0]
+    [(sundry.vfs.file.get-tag-pos {x = [];} file) 0]
+    [(sundry.vfs.file.get-tag-pos {y = "1";} file) (-1)]
   ];
 }
