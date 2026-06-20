@@ -10,7 +10,7 @@ The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks ever
 |---|---|---|
 | `src/vfs/dir/reform.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.reform` |
 | `src/vfs/dir/filter-by-tag.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.filter-by-tag` |
-| `src/vfs/file/get-tag-pos.nix` | `sundry.vfs.file` | `sundry.vfs.file.get-tag-pos` |
+| `src/vfs/file/get-tag-pos.nix` | `sundry.vfs.file` | `sundry.vfs.file.get.tag-pos` |
 | `src/list/permutations.nix` | `sundry.list` | `sundry.list.permutations` |
 
 Pick the filename to match what's inside: a single function gets the function's name; a cohesive cluster gets a name describing the cluster.
@@ -36,7 +36,7 @@ The split usually pays off when the test block, not the function block, is what'
 
 ## Where helpers live
 
-A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) inspects `file.tags`, so it lives in `vfs/file/` — even though its caller [src/vfs/dir/filter-by-tag.nix](../src/vfs/dir/filter-by-tag.nix) sits in `vfs/dir/`. Co-locating with the data type beats co-locating with the consumer.
+A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) walks a file's `tag-list`, so it lives in `vfs/file/` next to the node fields it reads — not wherever it happens to be called from. Co-locating with the data type beats co-locating with the consumer.
 
 ## Renaming / restructuring
 

@@ -37,7 +37,7 @@
       value =
         value
         // {
-          tags = map (dir:
+          tag-list = map (dir:
             lib.pipe dir [
               (sundry.str.between lsep rsep)
               (map (tag-str: let
@@ -65,52 +65,42 @@
       {
         A = {
           text = "contents of A";
-          tags = [{a = "1";}];
+          tag-list = [{a = "1";}];
         };
         B = {
           text = "contents of B";
-          tags = [{a = ["2" "3"];}];
+          tag-list = [{a = ["2" "3"];}];
         };
         C = {
           text = "contents of C";
-          tags = [
-            {
-              a = "1";
-              b = "1";
-            }
-          ];
+          tag-list = [({a = "1";} // {b = "1";})];
         };
         D = {
           text = "contents of D";
-          tags = [
-            {
-              a = "";
-              b = "";
-            }
-          ];
+          tag-list = [({a = "";} // {b = "";})];
         };
         E = {
           text = "contents of E";
-          tags = [{}];
+          tag-list = [{}];
         };
         "=" = {
           F = {
             text = "contents of F";
-            tags = [{a = "1";} {a = "2";}];
+            tag-list = [{a = "1";} {a = "2";}];
           };
           I = {
             text = "contents of I";
-            tags = [{b = "1";} {c = "1";}];
+            tag-list = [{b = "1";} {c = "1";}];
           };
           "=" = {
             G = {
               text = "contents of G";
-              tags = [{a = "1";} {b = "1";} {b = "2";}];
+              tag-list = [{a = "1";} {b = "1";} {b = "2";}];
             };
             "=" = {
               H = {
                 text = "contents of H";
-                tags = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
+                tag-list = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
               };
             };
           };

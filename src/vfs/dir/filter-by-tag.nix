@@ -6,7 +6,7 @@
 }: {
   filter-by-tag = tag:
     sundry.vfs.dir.filter (path: file:
-      sundry.vfs.file.get-tag-pos tag file != -1);
+      lib.any (sundry.vfs.tags-match tag) file.tag-list);
 
   tests = let
     dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [

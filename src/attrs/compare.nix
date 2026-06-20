@@ -3,40 +3,40 @@
   sundry,
   ...
 }: let
-  compare-base = cond: lhs: rhs:
+  compare-base = cond: val: ref:
     sundry.attrs.merge-with-resolvers (with sundry.attrs.merge-resolvers; [
-      (default: name: lhs: rhs:
+      (default: name: val: ref:
         if name == "missing"
-        then sundry.attrs.remove-by-path rhs lhs
-        else default name lhs rhs)
+        then sundry.attrs.remove-by-path ref val
+        else default name val ref)
       recursive
       base.no-collision
     ])
     (
       [
         {
-          missing = rhs;
+          missing = ref;
           matched = {};
           extra = {};
         }
       ]
       ++ (lib.mapAttrsToListRecursiveCond
-        # -- only recurse when rhs also has an attrset here
-        # otherwise treat lhs subtree as a leaf
+        # -- only recurse when ref also has an attrset here
+        # otherwise treat val subtree as a leaf
         (path: _: let
-          rhs-value = lib.getAttrFromPath path rhs;
+          ref-value = lib.getAttrFromPath path ref;
         in
-          lib.hasAttrByPath path rhs
-          && lib.isAttrs rhs-value
-          && cond rhs-value)
+          lib.hasAttrByPath path ref
+          && lib.isAttrs ref-value
+          && cond ref-value)
         (path: value:
-          if lib.hasAttrByPath path rhs
+          if lib.hasAttrByPath path ref
           then {
-            matched = lib.setAttrByPath path [value (lib.getAttrFromPath path rhs)];
+            matched = lib.setAttrByPath path [value (lib.getAttrFromPath path ref)];
             missing = path;
           }
           else {extra = lib.setAttrByPath path value;})
-        lhs)
+        val)
     );
 in rec {
   compare = compare-base lib.isAttrs;
