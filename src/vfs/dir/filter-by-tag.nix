@@ -4,12 +4,9 @@
   flake-root,
   ...
 }: {
-  filter = tag:
-    sundry.vfs.dir.by-tag.reform tag (path: tag-pos: value: {
-      omit = tag-pos == -1;
-      inherit path;
-      inherit value;
-    });
+  filter-by-tag = tag:
+    sundry.vfs.dir.filter (path: file:
+      sundry.vfs.file.get-tag-pos tag file != -1);
 
   tests = let
     dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
@@ -18,7 +15,7 @@
     ];
   in [
     [
-      (sundry.vfs.dir.collapse (path: file: file.text) (sundry.vfs.dir.by-tag.filter {b = "1";} dir))
+      (sundry.vfs.dir.collapse (path: file: file.text) (sundry.vfs.dir.filter-by-tag {b = "1";} dir))
       ["contents of H" "contents of G" "contents of I" "contents of C"]
     ]
   ];

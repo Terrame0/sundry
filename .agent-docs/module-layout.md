@@ -9,7 +9,7 @@ The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks ever
 | File | Exports at | Function ends up at |
 |---|---|---|
 | `src/vfs/dir/reform.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.reform` |
-| `src/vfs/dir/by-tag/walk.nix` | `sundry.vfs.dir.by-tag` | `sundry.vfs.dir.by-tag.walk` |
+| `src/vfs/dir/filter-by-tag.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.filter-by-tag` |
 | `src/vfs/file/get-tag-pos.nix` | `sundry.vfs.file` | `sundry.vfs.file.get-tag-pos` |
 | `src/list/permutations.nix` | `sundry.list` | `sundry.list.permutations` |
 
@@ -30,13 +30,13 @@ Cohesive clusters that live in one file:
 
 Cases that earned a split:
 
-- `src/vfs/dir/transforms.nix` (since removed) bundled `reform`, `filter`, `collapse`, `walk` with four different test fixtures in one `tests` block. Now: [reform.nix](../src/vfs/dir/reform.nix), [filter.nix](../src/vfs/dir/filter.nix), [collapse.nix](../src/vfs/dir/collapse.nix), [walk.nix](../src/vfs/dir/walk.nix). Same pattern for the by-tag variants under [src/vfs/dir/by-tag/](../src/vfs/dir/by-tag/).
+- `src/vfs/dir/transforms.nix` (since removed) bundled `reform`, `filter`, `collapse`, `walk` with four different test fixtures in one `tests` block. Now: [reform.nix](../src/vfs/dir/reform.nix), [filter.nix](../src/vfs/dir/filter.nix), [collapse.nix](../src/vfs/dir/collapse.nix), [walk.nix](../src/vfs/dir/walk.nix).
 
 The split usually pays off when the test block, not the function block, is what's making the file hard to read.
 
 ## Where helpers live
 
-A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) inspects `file.tags`, so it lives in `vfs/file/` — even though its only callers are in [src/vfs/dir/by-tag/](../src/vfs/dir/by-tag/). Co-locating with the data type beats co-locating with the consumer.
+A helper goes in the namespace whose domain it operates on, not in the namespace that happens to call it. [src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) inspects `file.tags`, so it lives in `vfs/file/` — even though its caller [src/vfs/dir/filter-by-tag.nix](../src/vfs/dir/filter-by-tag.nix) sits in `vfs/dir/`. Co-locating with the data type beats co-locating with the consumer.
 
 ## Renaming / restructuring
 
