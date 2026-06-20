@@ -72,7 +72,7 @@
     ]
     [(resolve-deps {}) {}]
     [
-      (builtins.tryEval (resolve-deps {
+      (sundry.does-throw (resolve-deps {
         A = {
           deps = ["B"];
           transform = _: 1;
@@ -81,8 +81,8 @@
           deps = ["A"];
           transform = _: 1;
         };
-      })).success
-      false
+      }))
+      true
     ]
   ];
 }

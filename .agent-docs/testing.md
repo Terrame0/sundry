@@ -41,16 +41,16 @@ The expected coverage per function:
 
 1. **Happy path** — the function applied to a representative input.
 2. **Obvious edges** — empty input, identity/no-op, boundary values, formal errors (when catchable). Only add what's *obviously* missing; do not invent exotica.
-3. **Documented failure modes** — when a function throws on misuse and the throw is reachable via `tryEval`, add a `tryEval` test to lock the contract in.
+3. **Documented failure modes** — when a function throws on misuse and the throw is catchable, add a [`sundry.does-throw`](../src/does-throw.nix) test — `[(sundry.does-throw <expr>) true]` — to lock the contract in.
 
 What does *not* warrant a test: alternative spellings of the happy path that don't exercise a new branch; property-based variants beyond what the implementation actually branches on.
 
-## `tryEval` does not catch everything
+## `does-throw` does not catch everything
 
-`builtins.tryEval` catches only `throw` and `abort`. It does **not** catch Nix evaluator errors raised by built-ins, such as:
+[`sundry.does-throw`](../src/does-throw.nix) wraps `builtins.tryEval`, which catches only `throw` and `abort`. It does **not** catch Nix evaluator errors raised by built-ins, such as:
 
 - `builtins.head []`, `builtins.tail []`, `builtins.elemAt list i` out of range
 - `attrs.${missing-key}`, `lib.getAttrFromPath` on a non-existent path
 - type mismatches at the C-implementation level
 
-If a function's edge case hits one of those (e.g. `excl-head []` calls `lib.head []` internally), the case **cannot** be expressed as a test — wrapping in `tryEval` re-throws an uncatchable error and the whole suite blows up. Either rewrite the function to `throw` explicitly on the bad input, or accept that the case is undefined behavior and leave it out.
+If a function's edge case hits one of those (e.g. `excl-head []` calls `lib.head []` internally), the case **cannot** be expressed as a test — `does-throw` re-throws an uncatchable error and the whole suite blows up. Either rewrite the function to `throw` explicitly on the bad input, or accept that the case is undefined behavior and leave it out.

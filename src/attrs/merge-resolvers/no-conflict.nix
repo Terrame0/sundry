@@ -13,7 +13,7 @@
       ''
     else rhs;
   tests = [
-    [(builtins.tryEval (base.no-conflict "_" {A = 1;} {A = 2;})).success false]
+    [(sundry.does-throw (base.no-conflict "_" {A = 1;} {A = 2;})) true]
     [(base.no-conflict "_" 1 1) 1]
     [
       (sundry.attrs.merge.no-conflict [

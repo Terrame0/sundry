@@ -36,6 +36,6 @@
       [[]]
     ]
     [(permutations [] 0) [[]]]
-    [(builtins.tryEval (permutations [1 2] 3)).success false]
+    [(sundry.does-throw (permutations [1 2] 3)) true]
   ];
 }

@@ -170,18 +170,18 @@ in rec {
       }
     ]
     [
-      (builtins.tryEval (
+      (sundry.does-throw (
         validate
         {A = 1;}
         {
           A = {};
           B = {};
         }
-      )).success
-      false
+      ))
+      true
     ]
     [
-      (builtins.tryEval (
+      (sundry.does-throw (
         validate
         {A = 1;}
         {
@@ -191,11 +191,11 @@ in rec {
             desc = "must be even";
           };
         }
-      )).success
-      false
+      ))
+      true
     ]
     [
-      (builtins.tryEval (
+      (sundry.does-throw (
         validate
         {
           A = 1;
@@ -204,8 +204,8 @@ in rec {
         {
           A = {};
         }
-      )).success
-      false
+      ))
+      true
     ]
   ];
 }

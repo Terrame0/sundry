@@ -13,6 +13,6 @@
   tests = [
     [(un-singleton [1]) 1]
     [(un-singleton [1 2]) [1 2]]
-    [(builtins.tryEval (un-singleton 1)).success false]
+    [(sundry.does-throw (un-singleton 1)) true]
   ];
 }

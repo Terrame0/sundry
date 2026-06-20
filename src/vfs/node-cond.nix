@@ -27,6 +27,6 @@
     [(is-leaf "..." {text = {};}) false]
     [(is-leaf-node "..." {text = "...";}) true]
     [(is-leaf-node "..." {a = {};}) false]
-    [(builtins.tryEval (is-leaf-node ["x" "y" "z"] {a = 10;})).success false]
+    [(sundry.does-throw (is-leaf-node ["x" "y" "z"] {a = 10;})) true]
   ];
 }

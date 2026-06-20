@@ -5,7 +5,9 @@
 }: rec {
   get = rec {
     name = path:
-      lib.last path;
+      if path == []
+      then throw "\nan empty path has no name"
+      else lib.last path;
     name-split = path:
       lib.splitString "." (name path);
     stem = path:
@@ -15,19 +17,24 @@
       sundry.is-null
       (sundry.list.excl-last (name-split path)) "";
     str = path:
-      lib.foldl (
-        str-acc: dir: "${sundry.str.trim-right "/" str-acc}/${sundry.str.trim-left "/" dir}"
-      ) (lib.head path)
-      (lib.tail path);
+      if path != []
+      then
+        lib.foldl (
+          str-acc: dir: "${sundry.str.trim-right "/" str-acc}/${sundry.str.trim-left "/" dir}"
+        ) (lib.head path)
+        (lib.tail path)
+      else "";
   };
-  tests = let
-    path = ["A" "B" "C.txt"];
-  in [
-    [(get.name path) "C.txt"]
-    [(get.stem path) "C"]
-    [(get.ext path) "txt"]
+  tests = [
+    [(get.name ["A" "B" "C.txt"]) "C.txt"]
+    [(get.stem ["A" "B" "C.txt"]) "C"]
+    [(get.ext ["A" "B" "C.txt"]) "txt"]
     [(get.str ["A" "B"]) "A/B"]
     [(get.str ["/A/" "/B"]) "/A/B"]
     [(get.str ["//A//" "//B//" "//C//"]) "//A/B/C//"]
+    [(get.str []) ""]
+    [(sundry.does-throw (get.name [])) true]
+    [(sundry.does-throw (get.stem [])) true]
+    [(sundry.does-throw (get.ext [])) true]
   ];
 }

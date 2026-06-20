@@ -1,4 +1,8 @@
-{lib, ...}: rec {
+{
+  lib,
+  sundry,
+  ...
+}: rec {
   topo-stratify = let
     levels = done: left:
       if left == []
@@ -68,7 +72,7 @@
     [(topo-stratify [A]) [[A]]]
     [(topo-stratify [A G]) [[A G]]]
     [
-      (builtins.tryEval (topo-stratify [
+      (sundry.does-throw (topo-stratify [
         {
           name = "X";
           deps = ["Y"];
@@ -77,17 +81,17 @@
           name = "Y";
           deps = ["X"];
         }
-      ])).success
-      false
+      ]))
+      true
     ]
     [
-      (builtins.tryEval (topo-stratify [
+      (sundry.does-throw (topo-stratify [
         {
           name = "X";
           deps = ["missing"];
         }
-      ])).success
-      false
+      ]))
+      true
     ]
   ];
 }

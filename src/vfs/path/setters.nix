@@ -10,18 +10,23 @@
     else "${stem}.${ext}";
 in rec {
   set = rec {
-    name = name: path: lib.init path ++ [name];
+    name = name: path:
+      if path == []
+      then throw "\nan empty path has no name"
+      else lib.init path ++ [name];
     stem = stem: path: name (join-name stem (get.ext path)) path;
     ext = ext: path: name (join-name (get.stem path) ext) path;
   };
-  tests = let
-    path = ["A" "B" "C.txt"];
-  in [
-    [(set.name "D.md" path) ["A" "B" "D.md"]]
-    [(set.stem "C'" path) ["A" "B" "C'.txt"]]
-    [(set.ext "md" path) ["A" "B" "C.md"]]
-    [(set.ext "" path) ["A" "B" "C"]]
-    [(set.ext "css" ["A" "B"]) ["A" "B.css"]]
+  tests = [
+    [(set.name "D.md" ["A" "B" "C.txt"]) ["A" "B" "D.md"]]
+    [(set.stem "C'" ["A" "B" "C.txt"]) ["A" "B" "C'.txt"]]
+    [(set.ext "md" ["A" "B" "C.txt"]) ["A" "B" "C.md"]]
+    [(set.ext "" ["A" "B" "C.txt"]) ["A" "B" "C"]]
+    [(set.name "B.md" ["A" "B"]) ["A" "B.md"]]
     [(set.stem "B'" ["A" "B"]) ["A" "B'"]]
+    [(set.ext "md" ["A" "B"]) ["A" "B.md"]]
+    [(sundry.does-throw (set.name "A.md" [])) true]
+    [(sundry.does-throw (set.stem "A" [])) true]
+    [(sundry.does-throw (set.ext "md" [])) true]
   ];
 }
