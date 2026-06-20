@@ -12,9 +12,10 @@
     wanted-matched =
       lib.all lib.id
       (lib.mapAttrsToList (key: pair:
-        lib.any
-        (value: sundry.list.contains (sundry.list.at 1 pair) value)
-        (lib.toList (sundry.list.at 0 pair))
+        sundry.list.intersect
+        (sundry.list.at 0 pair)
+        (sundry.list.at 1 pair)
+        != []
         || (sundry.list.at 1 pair) == [])
       wanted-diff.matched);
     unwanted-diff = lib.pipe tag-spec [
