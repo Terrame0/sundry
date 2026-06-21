@@ -8,7 +8,7 @@
     sundry.vfs.dir.filter (path: file: let
       tags = sundry.attrs.merge.concat file.tag-list;
     in
-      lib.any (spec: sundry.vfs.tags-match spec tags) (lib.toList tag));
+      lib.any (spec: sundry.vfs.tag.matches spec tags) (lib.toList tag));
 
   tests = let
     dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [

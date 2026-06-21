@@ -6,7 +6,7 @@ How to *build* a function, once [module-layout.md](module-layout.md) has told yo
 
 Before writing code that splits, diffs, merges, or loops over a structure, look for a `sundry.*` function that already does it. The library is meant to be composed against itself.
 
-`compare` returns `{ matched, missing, extra }` for two attrsets, so a whole tag-set predicate is three conditions over its output — [src/vfs/tags-match.nix](../src/vfs/tags-match.nix). Reach for [compare](../src/attrs/compare.nix), [merge](../src/attrs/merge-fns.nix), [switch](../src/switch.nix), [range](../src/range.nix), [list.contains](../src/list/contains.nix) instead of re-deriving them inline.
+`compare` returns `{ matched, missing, extra }` for two attrsets, so a whole tag-set predicate is three conditions over its output — [src/vfs/tag/matches.nix](../src/vfs/tag/matches.nix). Reach for [compare](../src/attrs/compare.nix), [merge](../src/attrs/merge-fns.nix), [switch](../src/switch.nix), [range](../src/range.nix), [list.contains](../src/list/contains.nix), [list.intersect](../src/list/intersect.nix) instead of re-deriving them inline.
 
 A pile of small single-use `let` helpers that filter/index/diff a structure is the usual tell that a primitive is being rebuilt by hand.
 
@@ -14,13 +14,13 @@ A pile of small single-use `let` helpers that filter/index/diff a structure is t
 
 When a value flows through more than one call, write it as a `lib.pipe`, not nested application. Nested calls read inside-out and make the reader match parentheses; a pipe reads top-to-bottom in evaluation order. The bar is low — two nested calls, each with its own arguments, already justify it.
 
-[src/vfs/tags-match.nix](../src/vfs/tags-match.nix) pipes a tag-spec through `filterAttrs` then `compare` instead of nesting the two; [resolve-tags.nix](../src/vfs/dir/resolve-tags.nix), [validate.nix](../src/attrs/validate.nix), and [str/trim.nix](../src/str/trim.nix) chain the same way.
+[src/vfs/tag/matches.nix](../src/vfs/tag/matches.nix) pipes a tag-spec through `filterAttrs` then `compare` instead of nesting the two; [resolve-tags.nix](../src/vfs/dir/resolve-tags.nix), [validate.nix](../src/attrs/validate.nix), and [str/trim.nix](../src/str/trim.nix) chain the same way.
 
 ## One condition, derive the rest
 
 When two functions ask the same question in different shapes — "does it hold?" vs. "where does it hold?" — write the predicate once and derive the others from it.
 
-[src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) is `findFirst` over [tags-match](../src/vfs/tags-match.nix): the position is the index where the predicate first holds, not a second copy of the matching logic.
+[src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) is `findFirst` over [matches](../src/vfs/tag/matches.nix): the position is the index where the predicate first holds, not a second copy of the matching logic.
 
 The codebase has a naming convention for the general/specialized split: the fully parameterized function takes a `-base` suffix (kept private in `let`) or a `-until` suffix (public, exposing the stop-`cond`), and the everyday function is that base with the common argument pre-applied. [trim-left / trim-right](../src/str/trim.nix) are `trim-base` with the has/remove fns fixed; [filter](../src/attrs/filter.nix) is `filter-base sundry.attrs.reform`; [compare / compare-until](../src/attrs/compare.nix) fix or expose the `cond`. Write the general one, specialize by partial application — never copy the body.
 
@@ -28,7 +28,7 @@ Forking the logic per consumer — a separate predicate for filtering and anothe
 
 ## Pick the simplest model the real call sites need
 
-Implement the one model the actual callers require; don't branch for speculative edge semantics (spread vs. joint keys, universal vs. existential absence, a sentinel for an undefined case). [tags-match](../src/vfs/tags-match.nix) matches a query against a single tag-set — one rule applied uniformly — rather than separate rules per edge.
+Implement the one model the actual callers require; don't branch for speculative edge semantics (spread vs. joint keys, a sentinel for an undefined case). [matches](../src/vfs/tag/matches.nix) matches a query against a single tag-set — one rule applied uniformly. Where a real distinction *does* surface — universal vs. existential absence across a file's levels — it is resolved by the caller's quantifier ([filter-by-tag](../src/vfs/dir/filter-by-tag.nix) matches the merged set, [get-tag-pos](../src/vfs/file/get-tag-pos.nix) walks levels), not by a branch inside the predicate. See [tag-matching.md](tag-matching.md).
 
 This is [testing.md](testing.md)'s "don't invent exotica" applied to implementation, not just tests: an edge case earns a code branch only when a caller exercises it.
 

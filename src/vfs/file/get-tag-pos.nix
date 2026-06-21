@@ -6,7 +6,7 @@
   get-tag-pos = tag-spec: file:
     lib.findFirst
     (i:
-      sundry.vfs.tags-match
+      sundry.vfs.tag.matches
       tag-spec (sundry.list.at i file.tag-list))
     (-1)
     (sundry.range [(lib.length file.tag-list)]);
