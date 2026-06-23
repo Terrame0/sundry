@@ -1,8 +1,8 @@
 {lib, ...}: rec {
-  collapse-matched-until = does-match: do-descend: fn: set:
+  collapse-matched-until = does-match: halt: fn: set:
     lib.pipe set [
       (lib.mapAttrsToListRecursiveCond
-        (path: attrs: !(do-descend path attrs))
+        (path: attrs: !(halt path attrs))
         (path: value:
           if does-match path value
           then [(fn path value)]

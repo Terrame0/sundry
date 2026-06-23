@@ -18,11 +18,11 @@
     };
   };
 in rec {
-  reform-matched-until = does-match: do-recurse: fn: attrs:
+  reform-matched-until = does-match: halt: fn: attrs:
     lib.pipe attrs [
       (sundry.attrs.collapse-matched-until
         (path: value: true)
-        do-recurse
+        halt
         (path: value: let
           result = validate-leaf (fn path value);
         in

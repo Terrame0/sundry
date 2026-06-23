@@ -1,11 +1,11 @@
 {lib, ...}: rec {
-  walk-matched-until = does-match: do-descend: fn: set: let
+  walk-matched-until = does-match: halt: fn: set: let
     recurse = path:
       lib.mapAttrs (
         name: value: let
           path' = path ++ [name];
         in
-          if lib.isAttrs value && !(do-descend path' value)
+          if lib.isAttrs value && !(halt path' value)
           then recurse path' value
           else if does-match path' value
           then fn path' value

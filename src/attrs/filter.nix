@@ -3,9 +3,9 @@
   sundry,
   ...
 }: rec {
-  filter-matched-until = does-match: do-recurse: fn: (sundry.attrs.reform-matched-until
+  filter-matched-until = does-match: halt: fn: (sundry.attrs.reform-matched-until
     does-match
-    do-recurse
+    halt
     (path: value: {
       inherit path;
       inherit value;
