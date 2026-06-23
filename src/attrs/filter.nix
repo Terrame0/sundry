@@ -26,9 +26,10 @@
       (filter-matched-until
         (path: value: value != 0)
         (path: value: lib.length path > 1)
-        (path: value: value != 1)
+        (path: value: value != 0)
         attrs)
       {
+        B = 1;
         C = {D = 2;};
         E = {F = {G = 0;};};
       }
@@ -36,22 +37,21 @@
     [
       (filter-until
         (path: value: lib.length path > 1)
-        (path: value: value != 1)
+        (path: value: value != 0)
         attrs)
       {
-        A = 0;
+        B = 1;
         C = {D = 2;};
         E = {F = {G = 0;};};
       }
     ]
     [
       (filter
-        (path: value: value != 1)
+        (path: value: value != 0)
         attrs)
       {
-        A = 0;
+        B = 1;
         C = {D = 2;};
-        E = {F = {G = 0;};};
       }
     ]
   ];
