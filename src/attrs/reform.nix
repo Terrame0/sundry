@@ -3,84 +3,87 @@
   sundry,
   ...
 }: let
-  reform-base = base: fn: attrs:
-    sundry.attrs.merge.recursive.no-collision
-    (base (path: value: let
-      result =
-        sundry.attrs.validate
-        {
-          path = {
-            check = value:
-              lib.isList value
-              && (lib.all (x: lib.isString x) value);
-            desc = "must be a list of strings";
-          };
-          value = {};
-          omit = {
-            default = false;
-            check = value: lib.isBool value;
-            desc = "must be either 'true' or 'false'";
-          };
-        }
-        (fn path value);
-    in
-      if !result.omit
-      then lib.setAttrByPath result.path result.value
-      else {})
-    attrs);
+  validate-leaf = sundry.attrs.validate {
+    path = {
+      check = value:
+        lib.isList value
+        && (lib.all (x: lib.isString x) value);
+      desc = "must be a list of strings";
+    };
+    value = {};
+    omit = {
+      default = false;
+      check = value: lib.isBool value;
+      desc = "must be either 'true' or 'false'";
+    };
+  };
 in rec {
-  reform-until = cond:
-    reform-base (sundry.attrs.collapse-until cond);
-  reform = reform-base sundry.attrs.collapse;
-  tests = [
+  reform-matched-until = does-match: do-recurse: fn: attrs:
+    lib.pipe attrs [
+      (sundry.attrs.collapse-matched-until
+        does-match
+        do-recurse
+        (path: value: let
+          result = validate-leaf (fn path value);
+        in
+          if !result.omit
+          then lib.setAttrByPath result.path result.value
+          else {}))
+      sundry.attrs.merge.recursive.no-collision
+    ];
+
+  reform-until = reform-matched-until (path: value: true);
+  reform = reform-until (path: value: false);
+  tests = let
+    attrs = {
+      A = 0;
+      B = 1;
+      C = {D = 2;};
+      E = {F = {G = 0;};};
+    };
+  in [
     [
-      (reform-until
-        (path: value: value ? E)
+      (reform-matched-until
+        (path: value: value != 0)
+        (path: value: lib.length path > 1)
         (path: value: {
-          value = value;
-          path = map (x: x + "-M") path;
-          omit = lib.isInt value && value == 1;
+          path = [(lib.concatStringsSep "." path)];
+          inherit value;
         })
-        {
-          A = {
-            B = 1;
-            C = 2;
-            D = {E = 3;};
-          };
-        })
+        attrs)
       {
-        A-M = {
-          C-M = 2;
-          D-M = {
-            E = 3;
-          };
-        };
+        B = 1;
+        "C.D" = 2;
+        "E.F" = {G = 0;};
       }
     ]
     [
       (reform-until
-        (path: value: !lib.isAttrs value)
+        (path: value: lib.length path > 1)
         (path: value: {
-          inherit path value;
-          omit = true;
+          path = [(lib.concatStringsSep "." path)];
+          inherit value;
         })
-        {
-          A = 1;
-          B = {C = 2;};
-        })
-      {}
+        attrs)
+      {
+        A = 0;
+        B = 1;
+        "C.D" = 2;
+        "E.F" = {G = 0;};
+      }
     ]
     [
-      (reform-until
-        (path: value: !lib.isAttrs value)
-        (path: value: {inherit path value;})
-        {
-          A = 1;
-          B = {C = 2;};
+      (reform
+        (path: value: {
+          path = [(lib.concatStringsSep "." path)];
+          inherit value;
         })
+        attrs)
       {
-        A = 1;
-        B = {C = 2;};
+        A = 0;
+        B = 1;
+        "C.D" = 2;
+        "E.F.G" = 0;
       }
     ]
   ];

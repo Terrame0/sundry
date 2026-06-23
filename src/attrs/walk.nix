@@ -1,39 +1,63 @@
 {lib, ...}: rec {
-  walk-until = cond: fn: set: let
+  walk-matched-until = does-match: do-descend: fn: set: let
     recurse = path:
       lib.mapAttrs (
         name: value: let
           path' = path ++ [name];
         in
-          if lib.isAttrs value && !(cond path' value)
+          if lib.isAttrs value && !(do-descend path' value)
           then recurse path' value
-          else fn path' value
+          else if does-match path' value
+          then fn path' value
+          else value
       );
   in
     recurse [] set;
-  walk = lib.mapAttrsRecursive;
-  tests = [
+  walk-until = walk-matched-until (path: value: true);
+  walk = walk-until (path: value: false);
+
+  tests = let
+    attrs = {
+      A = 0;
+      B = 1;
+      C = {D = 2;};
+      E = {F = {G = 0;};};
+    };
+  in [
     [
-      (walk-until (path: value: lib.length path > 1) (path: value: 1) {
-        A = 2;
-        B = {
-          C = {D = 4;};
-        };
-      })
+      (walk-matched-until
+        (path: value: value != 0)
+        (path: value: lib.length path > 1)
+        (path: value: "x")
+        attrs)
       {
-        A = 1;
-        B = {C = 1;};
+        A = 0;
+        B = "x";
+        C = {D = "x";};
+        E = {F = "x";};
       }
     ]
-    [(walk-until (path: value: true) (path: value: "X") {}) {}]
     [
-      (walk-until (path: value: true) (path: value: "X") {
-        A = {B = 1;};
-        C = 2;
-      })
+      (walk-until
+        (path: value: lib.length path > 1)
+        (path: value: "x")
+        attrs)
       {
-        A = "X";
-        C = "X";
+        A = "x";
+        B = "x";
+        C = {D = "x";};
+        E = {F = "x";};
+      }
+    ]
+    [
+      (walk
+        (path: value: "x")
+        attrs)
+      {
+        A = "x";
+        B = "x";
+        C = {D = "x";};
+        E = {F = {G = "x";};};
       }
     ]
   ];
