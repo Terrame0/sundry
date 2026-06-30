@@ -4,47 +4,22 @@
   flake-root,
   ...
 }: rec {
-  resolve-tags = args-in: let
-    args =
-      sundry.attrs.validate {
-        strip = {
-          default = false;
-          check = value: lib.isBool value;
-          desc = "must be either 'true' or 'false'";
-        };
-        separators = {
-          default = ["{" ":" "," "}"];
-          check = value:
-            lib.isList value
-            && lib.length value == 4
-            && (lib.all lib.isString value);
-          desc = "must be a list of the following format: [ left-sep key-value-sep value-sep right-sep ]";
-        };
-      }
-      args-in;
-    lsep = sundry.list.at 0 args.separators;
-    kvsep = sundry.list.at 1 args.separators;
-    vsep = sundry.list.at 2 args.separators;
-    rsep = sundry.list.at 3 args.separators;
-  in
+  resolve-tags =
     sundry.attrs.reform-until
     sundry.vfs.is-leaf-node
     (path: value: {
-      path =
-        if args.strip
-        then sundry.vfs.path.strip-between lsep rsep path
-        else path;
+      path = sundry.vfs.path.strip-between "{" "}" path;
       value =
         value
         // {
           tag-list = map (dir:
             lib.pipe dir [
-              (sundry.str.between lsep rsep)
+              (sundry.str.between "{" "}")
               (map (tag-str: let
-                tag-parts = lib.splitString kvsep tag-str;
+                tag-parts = lib.splitString ":" tag-str;
                 tag-key = lib.head tag-parts;
                 tag-value = sundry.is-null (sundry.list.excl-last tag-parts) "";
-                tag-list = lib.splitString vsep tag-value;
+                tag-list = lib.splitString "," tag-value;
               in {
                 ${tag-key} = sundry.list.un-singleton tag-list;
               }))
@@ -57,10 +32,7 @@
     [
       (lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
         sundry.vfs.dir.from-src
-        (resolve-tags {
-          strip = true;
-          separators = ["{" ":" "," "}"];
-        })
+        resolve-tags
       ])
       {
         A = {

@@ -17,7 +17,7 @@
     filter-dir = sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/filtering";
     tag-dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
       sundry.vfs.dir.from-src
-      (sundry.vfs.dir.resolve-tags {strip = true;})
+      sundry.vfs.dir.resolve-tags
     ];
   in [
     [
