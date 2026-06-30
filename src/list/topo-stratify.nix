@@ -8,8 +8,6 @@
       if left == []
       then []
       else let
-        expose-names = entries:
-          map (entry: entry.name) entries;
         current-level =
           lib.filter
           (entry:
@@ -20,12 +18,8 @@
       in
         if current-level != []
         then let
-          level-entry-names = expose-names current-level;
-          next-left = lib.filter (entry:
-            !(lib.elem
-              entry.name
-              level-entry-names))
-          left;
+          level-entry-names = map (entry: entry.name) current-level;
+          next-left = lib.filter (entry: !(lib.elem entry.name level-entry-names)) left;
           next-done = done ++ level-entry-names;
         in
           [current-level] ++ levels next-done next-left

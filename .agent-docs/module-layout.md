@@ -9,9 +9,9 @@ The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks ever
 | File | Exports at | Function ends up at |
 |---|---|---|
 | `src/vfs/dir/reform.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.reform` |
-| `src/vfs/dir/filter-by-tag.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.filter-by-tag` |
+| `src/vfs/dir/filter.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.filter`, `sundry.vfs.dir.filter-by-tag` |
 | `src/vfs/file/get-tag-pos.nix` | `sundry.vfs.file` | `sundry.vfs.file.get-tag-pos` |
-| `src/vfs/tag/matches.nix` | `sundry.vfs.tag` | `sundry.vfs.tag.matches` |
+| `src/boolean/operands/tag.nix` | `sundry.boolean.operands` | `sundry.boolean.operands.tag` |
 | `src/list/permutations.nix` | `sundry.list` | `sundry.list.permutations` |
 
 Pick the filename to match what's inside: a single function gets the function's name; a cohesive cluster gets a name describing the cluster.

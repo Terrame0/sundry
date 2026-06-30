@@ -18,7 +18,7 @@
     };
   };
 in rec {
-  reform-matched-until = does-match: halt: fn: attrs:
+  reform-matched-until = matches: halt: fn: attrs:
     lib.pipe attrs [
       (sundry.attrs.collapse-matched-until
         (path: value: true)
@@ -26,12 +26,12 @@ in rec {
         (path: value: let
           result = validate-leaf (fn path value);
         in
-          if !result.omit
+          if matches path value
           then
-            if does-match path value
-            then lib.setAttrByPath result.path result.value
-            else lib.setAttrByPath path value
-          else {}))
+            if result.omit
+            then {}
+            else lib.setAttrByPath result.path result.value
+          else lib.setAttrByPath path value))
       sundry.attrs.merge.recursive.no-collision
     ];
 
@@ -60,6 +60,32 @@ in rec {
         "C.D" = "x";
         "E.F" = "x";
       }
+    ]
+    [
+      (reform-matched-until
+        (path: value: value != 0)
+        (path: value: false)
+        (path: value:
+          if value == 1
+          then {inherit path value;} // {omit = true;}
+          else {inherit path value;})
+        attrs)
+      {
+        A = 0;
+        C = {D = 2;};
+        E = {F = {G = 0;};};
+      }
+    ]
+    [
+      (reform-matched-until
+        (path: value: value != 0)
+        (path: value: false)
+        (path: value:
+          if value == 0
+          then throw "fn called on non-matched leaf"
+          else {inherit path value;})
+        attrs)
+      attrs
     ]
     [
       (reform-until

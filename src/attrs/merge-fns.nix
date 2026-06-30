@@ -11,7 +11,7 @@
       (resolvers:
         lib.concatMap
         (i: sundry.list.permutations i resolvers)
-        (lib.genList lib.id (lib.length resolvers + 1)))
+        (sundry.range [(lib.length resolvers + 1)]))
       (permutations: sundry.list.product permutations bases)
       (map lib.flatten)
       (map (list:

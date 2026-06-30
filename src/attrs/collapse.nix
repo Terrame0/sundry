@@ -1,10 +1,10 @@
 {lib, ...}: rec {
-  collapse-matched-until = does-match: halt: fn: set:
+  collapse-matched-until = matches: halt: fn: set:
     lib.pipe set [
       (lib.mapAttrsToListRecursiveCond
         (path: attrs: !(halt path attrs))
         (path: value:
-          if does-match path value
+          if matches path value
           then [(fn path value)]
           else []))
       lib.concatLists

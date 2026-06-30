@@ -1,5 +1,5 @@
 {lib, ...}: rec {
-  at = i: list: lib.elemAt list i;
+  at = lib.flip lib.elemAt;
   incl-init = list:
     if lib.length list != 1
     then lib.init list

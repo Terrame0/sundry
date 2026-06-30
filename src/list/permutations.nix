@@ -13,7 +13,7 @@
           recurse
           (sundry.list.remove-at i left)
           (result ++ [(sundry.list.at i left)]))
-        (lib.genList lib.id (lib.length left)));
+        (sundry.range [(lib.length left)]));
   in
     if k >= 0 && k <= list-len
     then recurse list []

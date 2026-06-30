@@ -76,11 +76,9 @@
             ];
         }
         else throw "unmatched lsep"
-      else
-        sundry.best-by (l: r: l < r) [
-          [lsep-current-pos on-lsep]
-          [rsep-current-pos on-rsep]
-        ];
+      else if lsep-current-pos < rsep-current-pos
+      then on-lsep
+      else on-rsep;
   in
     recurse {};
   tests = let

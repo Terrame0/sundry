@@ -3,8 +3,8 @@
   sundry,
   ...
 }: rec {
-  filter-matched-until = does-match: halt: fn: (sundry.attrs.reform-matched-until
-    does-match
+  filter-matched-until = matches: halt: fn: (sundry.attrs.reform-matched-until
+    matches
     halt
     (path: value: {
       inherit path;
@@ -26,11 +26,22 @@
       (filter-matched-until
         (path: value: value != 0)
         (path: value: lib.length path > 1)
-        (path: value: value != 0)
+        (path: value: value != 1)
         attrs)
       {
-        B = 1;
+        A = 0;
         C = {D = 2;};
+        E = {F = {G = 0;};};
+      }
+    ]
+    [
+      (filter-matched-until
+        (path: value: value != 0)
+        (path: value: false)
+        (path: value: false)
+        attrs)
+      {
+        A = 0;
         E = {F = {G = 0;};};
       }
     ]
