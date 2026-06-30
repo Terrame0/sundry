@@ -31,7 +31,7 @@
     (path: file:
       (removeAttrs file ["text"])
       // rec {
-        src = sundry.vfs.path.get.str [base rel];
+        origin = sundry.vfs.path.get.str [base rel];
         base = base-path;
         rel = sundry.vfs.path.get.str path;
       })
@@ -43,8 +43,16 @@
         (lib.pipe "${flake-root}/tests/vfs-test-dir/test-files" [
           sundry.vfs.dir.from-src
           (materialize "test-dir")
-        ])."A.txt".src)
+        ])."A.txt".origin)
       "contents of A.txt"
+    ]
+    [
+      (builtins.readFile
+        (lib.pipe "${flake-root}/tests/vfs-test-dir/escaping" [
+          sundry.vfs.dir.from-src
+          (materialize "escaping-dir")
+        ])."A.txt".origin)
+      "a'b'c"
     ]
   ];
 }

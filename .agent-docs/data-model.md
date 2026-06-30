@@ -8,7 +8,7 @@ A node is an attrset — either a **leaf** (a file) or a **directory** (a subtre
 
 | predicate | returns |
 |---|---|
-| `is-leaf path node` | `true` when the node has a string `text`, a string-or-derivation `src`, or is itself a derivation |
+| `is-leaf path node` | `true` when the node has a string `text` or a string-or-derivation `origin` |
 | `is-dir path node` | `true` when every value is an attrset (so `{}` is a directory) |
 | `is-leaf-node path node` | `true` for a leaf, `false` for a directory, **throws** otherwise — this is the `cond` the traversals use |
 
@@ -17,20 +17,23 @@ Leaf fields:
 | field | type | meaning |
 |---|---|---|
 | `text` | string | file contents, in memory |
-| `src` | string \| derivation | location of the real file on disk |
+| `origin` | string \| derivation | the file's **last physical location on disk** — the import path after [from-src](../src/vfs/file/from-src.nix), the store path after [materialize](../src/vfs/dir/materialize.nix). Tracks provenance across transforms independently of the node's key path; survives `resolve-tags` stripping (so it carries the original tagged path even once the key is cleaned). |
 | `tag-list` | list of attrsets | per directory-level tags parsed from the filename — one attrset per path segment — present after `resolve-tags`; queried per [tag-matching.md](tag-matching.md) (fixture naming: [test-naming.md](test-naming.md)) |
 
 A directory maps a path segment to a child node:
 
 ```nix
 {
-  "A.txt" = { text = "contents of A.txt"; };   # leaf, in memory
-  "B.css" = { src = "/nix/store/…-dir/B.css"; };  # leaf, on disk
+  "A.txt" = { text = "contents of A.txt"; origin = "/…/A.txt"; };  # imported: in memory + on disk
+  "B.css" = { origin = "/nix/store/…-dir/B.css"; };               # materialized: store path only
   sub = { "C.txt" = { text = "…"; }; };        # directory: key = segment, value = node
 }
 ```
 
-A bare derivation is treated as a leaf, so traversals stop on it instead of recursing into its cyclic attrs. [materialize](../src/vfs/dir/materialize.nix) rewrites every leaf to `{ src = <store-path>; }`.
+`text` and `origin` are **not** mutually exclusive across a node's life — they exclude only as a state transition:
+
+- **Imported** ([from-src](../src/vfs/file/from-src.nix)) — the leaf carries **both** `text` (read into memory) and `origin` (where it was read from).
+- **Materialized** ([materialize](../src/vfs/dir/materialize.nix)) — `text` is **dropped** and `origin` is overwritten with the new store path, so the materialized leaf carries `origin` alone. Dropping `text` removes any chance of it drifting from the file on disk; to get in-memory contents back, re-import. Materialize is the final step in a pipeline, so overwriting the import path with the store path loses nothing still needed.
 
 ## Path
 

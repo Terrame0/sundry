@@ -20,13 +20,16 @@
       {
         "A.txt" = {
           text = "contents of A.txt";
+          origin = "${flake-root}/tests/vfs-test-dir/test-files/A.txt";
         };
         "B.txt" = {
           text = "contents of B.txt";
+          origin = "${flake-root}/tests/vfs-test-dir/test-files/B.txt";
         };
         "=" = {
           "C.txt" = {
             text = "contents of C.txt";
+            origin = "${flake-root}/tests/vfs-test-dir/test-files/=/C.txt";
           };
         };
       }

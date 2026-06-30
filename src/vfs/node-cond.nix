@@ -6,12 +6,11 @@
   is-dir = _: attrs: lib.all lib.id (lib.mapAttrsToList (name: value: lib.isAttrs value) attrs);
   is-leaf = _: attrs: let
     text = attrs.text or null;
-    src = attrs.src or null;
+    origin = attrs.origin or null;
   in
     lib.isString text
-    || lib.isString src
-    || lib.isDerivation src
-    || lib.isDerivation attrs;
+    || lib.isString origin
+    || lib.isDerivation origin;
   is-leaf-node = path: attrs:
     if is-leaf path attrs
     then true
