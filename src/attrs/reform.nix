@@ -20,8 +20,7 @@
 in rec {
   reform-matched-until = matches: halt: fn: attrs:
     lib.pipe attrs [
-      (sundry.attrs.collapse-matched-until
-        (path: value: true)
+      (sundry.attrs.collapse-until
         halt
         (path: value: let
           result = validate-leaf (fn path value);

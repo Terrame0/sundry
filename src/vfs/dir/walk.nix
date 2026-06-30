@@ -8,7 +8,7 @@
     sundry.attrs.walk-until
     sundry.vfs.is-leaf-node;
 
-  walk-by-tag = expr-fn:
+  walk-within-tag = expr-fn:
     sundry.attrs.walk-matched-until
     (path: file: sundry.boolean.expr expr-fn (sundry.attrs.merge.concat file.tag-list))
     sundry.vfs.is-leaf-node;
@@ -31,7 +31,7 @@
     [
       (sundry.vfs.dir.collapse
         (path: file: file.text)
-        (sundry.vfs.dir.walk-by-tag
+        (sundry.vfs.dir.walk-within-tag
           (e: with e; tag {b = "1";})
           (path: file: file // {text = "walked ${file.text}";})
           tag-dir))

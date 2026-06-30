@@ -8,7 +8,7 @@
     sundry.attrs.reform-until
     sundry.vfs.is-leaf-node;
 
-  reform-by-tag = expr-fn:
+  reform-within-tag = expr-fn:
     sundry.attrs.reform-matched-until
     (path: file: sundry.boolean.expr expr-fn (sundry.attrs.merge.concat file.tag-list))
     sundry.vfs.is-leaf-node;
@@ -47,7 +47,7 @@
     [
       (sundry.vfs.dir.collapse
         (path: file: file.text)
-        (sundry.vfs.dir.reform-by-tag
+        (sundry.vfs.dir.reform-within-tag
           (e: with e; tag {b = "1";})
           (path: file: {
             path = [(lib.last path)];

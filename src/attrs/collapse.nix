@@ -1,15 +1,11 @@
 {lib, ...}: rec {
-  collapse-matched-until = matches: halt: fn: set:
+  collapse-until = halt: fn: set:
     lib.pipe set [
       (lib.mapAttrsToListRecursiveCond
-        (path: attrs: !(halt path attrs))
-        (path: value:
-          if matches path value
-          then [(fn path value)]
-          else []))
+        (path: value: !(halt path value))
+        (path: value: [(fn path value)]))
       lib.concatLists
     ];
-  collapse-until = collapse-matched-until (path: value: true);
   collapse = collapse-until (path: value: false);
 
   tests = let
@@ -20,18 +16,6 @@
       E = {F = {G = 0;};};
     };
   in [
-    [
-      (collapse-matched-until
-        (path: value: value != 0)
-        (path: value: lib.length path > 1)
-        (path: value: path)
-        attrs)
-      [
-        ["B"]
-        ["C" "D"]
-        ["E" "F"]
-      ]
-    ]
     [
       (collapse-until
         (path: value: lib.length path > 1)

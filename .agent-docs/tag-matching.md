@@ -19,19 +19,21 @@ Value matching is set **intersection** ([list.intersect](../src/list/intersect.n
 
 `tag-list` is a *list* of tag-sets (one per path level). The `tag` operand decides a single set; how that lifts over the levels differs by what you are asking, and **the operand stays uniform** — the level-quantifier lives in the caller, not in branches inside the predicate.
 
-**Membership — [filter-by-tag](../src/vfs/dir/filter.nix)** matches the expr against the **merged** set (`sundry.attrs.merge.concat tag-list`, a lossless union of every level's tags):
+**Membership — [select-by-tag](../src/vfs/dir/select.nix)** matches the expr against the **merged** set (`sundry.attrs.merge.concat tag-list`, a lossless union of every level's tags):
 
 ```nix
-filter-by-tag (e: e.tag { b = "1"; }) dir      # file kept iff the merged set matches
+select-by-tag (e: e.tag { b = "1"; }) dir      # file kept iff the merged set matches
 ```
 
 Merging makes the quantifier fall out right: a value match is **existential** over levels (the value appears at *some* level). Negation over the merged set is therefore **universal** — `!(tag { b = []; })` holds when `b` is on *no* level. Matching per level with `lib.any` instead would let that pass any file with even one level lacking `b` — the bug this design avoids.
 
-`filter-by-tag` takes an `expr-fn` over [boolean.expr](../src/boolean/expr.nix) operands, so disjunction and negation are just `||` and `!`:
+`select-by-tag` takes an `expr-fn` over [boolean.expr](../src/boolean/expr.nix) operands, so disjunction and negation are just `||` and `!`:
 
 ```nix
-filter-by-tag (e: with e; tag { hosts = host.name; } || !(tag { hosts = []; })) dir   # this host OR untagged
+select-by-tag (e: with e; tag { hosts = host.name; } || !(tag { hosts = []; })) dir   # this host OR untagged
 ```
+
+The same `expr-fn` over the merged set is the `matches` axis of the ternary [filter-within-tag](../src/vfs/dir/filter.nix) / `walk-within-tag` / `reform-within-tag`, which restrict a transform to the tag-matched branches and leave the rest in place.
 
 **Position — [get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix)** is `findFirst` per level: it returns the index of the **first level** whose tag-set matches the expr, or `-1`. It is positional, so its match is per-level by definition.
 
@@ -41,8 +43,8 @@ File `tag-list = [ { a = "1"; } { b = ["1" "2"]; } ]`, merged `{ a = "1"; b = ["
 
 | query | result |
 |---|---|
-| `filter-by-tag (e: e.tag { b = "2"; })` | kept — `b` present, `["1" "2"] ∩ ["2"] ≠ ∅` |
-| `filter-by-tag (e: !(e.tag { a = []; }))` | dropped — `a` present in the merged set (universal absence) |
-| `filter-by-tag (e: !(e.tag { c = []; }))` | kept — `c` on no level |
-| `filter-by-tag (e: with e; tag { a = "9"; } || !(tag { c = []; }))` | kept — the second term holds (disjunction) |
+| `select-by-tag (e: e.tag { b = "2"; })` | kept — `b` present, `["1" "2"] ∩ ["2"] ≠ ∅` |
+| `select-by-tag (e: !(e.tag { a = []; }))` | dropped — `a` present in the merged set (universal absence) |
+| `select-by-tag (e: !(e.tag { c = []; }))` | kept — `c` on no level |
+| `select-by-tag (e: with e; tag { a = "9"; } || !(tag { c = []; }))` | kept — the second term holds (disjunction) |
 | `get-tag-pos (e: e.tag { b = "1"; })` | `1` — first level with a matching `b` |

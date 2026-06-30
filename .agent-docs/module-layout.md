@@ -9,7 +9,8 @@ The framework ([core/glob-functions.nix](../core/glob-functions.nix)) walks ever
 | File | Exports at | Function ends up at |
 |---|---|---|
 | `src/vfs/dir/reform.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.reform` |
-| `src/vfs/dir/filter.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.filter`, `sundry.vfs.dir.filter-by-tag` |
+| `src/vfs/dir/filter.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.filter`, `sundry.vfs.dir.filter-within-tag` |
+| `src/vfs/dir/select.nix` | `sundry.vfs.dir` | `sundry.vfs.dir.select-by-tag` |
 | `src/vfs/file/get-tag-pos.nix` | `sundry.vfs.file` | `sundry.vfs.file.get-tag-pos` |
 | `src/boolean/operands/tag.nix` | `sundry.boolean.operands` | `sundry.boolean.operands.tag` |
 | `src/list/permutations.nix` | `sundry.list` | `sundry.list.permutations` |
