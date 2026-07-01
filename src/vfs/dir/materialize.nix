@@ -25,13 +25,14 @@
           cmd-acc + mk-dir-cmd + cp-file-cmd
       ) ""
       files;
-    base-path = pkgs.runCommand drv-name {} cmd;
+    drv-path = pkgs.runCommand drv-name {} cmd;
   in
     sundry.vfs.dir.walk
     (path: file:
       (removeAttrs file ["text"])
       // {
-        origin = sundry.vfs.path.get.str ([base-path] ++ path);
+        origin = sundry.vfs.path.get.str ([drv-path] ++ path);
+        inherit drv-path;
       })
     dir;
 
