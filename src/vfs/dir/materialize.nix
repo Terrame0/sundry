@@ -30,10 +30,8 @@
     sundry.vfs.dir.walk
     (path: file:
       (removeAttrs file ["text"])
-      // rec {
-        origin = sundry.vfs.path.get.str [base rel];
-        base = base-path;
-        rel = sundry.vfs.path.get.str path;
+      // {
+        origin = sundry.vfs.path.get.str ([base-path] ++ path);
       })
     dir;
 
