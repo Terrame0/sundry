@@ -1,7 +1,7 @@
 {lib, ...}: rec {
   compose = fns:
     lib.foldr
-    (f: acc: f acc)
+    (f: f)
     (lib.last fns)
     (lib.init fns);
 

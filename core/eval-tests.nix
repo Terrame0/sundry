@@ -52,10 +52,7 @@ args @ {
 
   parsed-tests = lib.concatMap glob-tests [
     {
-      eval-fn = imported:
-        if imported ? tests
-        then imported.tests
-        else [];
+      eval-fn = imported: imported.tests or [];
       dir-path = ../src;
     }
   ];
@@ -97,7 +94,7 @@ args @ {
 
     blocks-str =
       sundry.str.join-with "\n\n"
-      (lib.mapAttrsToList (name: block: join-lines block) padded-blocks);
+      (lib.mapAttrsToList (_: join-lines) padded-blocks);
   in ''
     < test №${toString test.meta.number} (${test.meta.type}) from '${test.meta.source}' >
 
