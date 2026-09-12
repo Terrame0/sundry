@@ -1,8 +1,4 @@
-{
-  sundry,
-  lib,
-  ...
-}: rec {
+{sundry, ...}: rec {
   strip-between = lsep: rsep:
     map (path: "${sundry.str.join (sundry.str.outside lsep rsep path)}");
   tests = [

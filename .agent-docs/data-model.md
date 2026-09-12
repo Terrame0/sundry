@@ -8,7 +8,7 @@ A valid node is an attrset — either a **leaf** (a file) or a **directory** (a 
 
 | predicate | returns |
 |---|---|
-| `is-leaf path node` | `true` when the node has a string `text` or a string-or-derivation `origin` |
+| `is-leaf path node` | `true` when the node has a string `text` or a path-or-string `origin` |
 | `is-dir path node` | `true` when the node is not a leaf and every value is an attrset (so `{}` is a directory) |
 | `is-leaf-node path node` | `true` for a leaf, `false` for a directory, **throws** for a non-attrset or malformed attrset — this is the `halt` predicate the traversals use |
 
@@ -17,7 +17,7 @@ Leaf fields:
 | field | type | meaning |
 |---|---|---|
 | `text` | string | file contents, in memory |
-| `origin` | string \| derivation | the file's last physical location; tracks provenance independently of the node's key path |
+| `origin` | path \| string | the file's last physical location; tracks provenance independently of the node's key path |
 | `tag-list` | list of attrsets | root-to-leaf tags, exactly one attrset per original path segment after `resolve-tags` |
 | `expr` | any Nix value | lazy imported or derived payload attached by `load-nix` / `load-nix-with` |
 

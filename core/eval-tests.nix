@@ -45,7 +45,9 @@ args @ {
     lib.concatMap
     (path: parse-module combinator-args path)
     (lib.filter
-      (path: lib.hasSuffix ".nix" path)
+      # -- baseNameOf is required to avoid store coercion inside hasSuffix
+      # - (that will break on invalid file names)
+      (path: lib.hasSuffix ".nix" (baseNameOf path))
       (lib.filesystem.listFilesRecursive dir-path));
 
   parsed-tests = lib.concatMap glob-tests [

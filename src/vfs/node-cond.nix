@@ -11,8 +11,8 @@
     origin = node.origin or null;
   in
     lib.isString text
-    || lib.isString origin
-    || lib.isDerivation origin;
+    || lib.isPath origin
+    || lib.isString origin;
   is-leaf-node = path: node:
     if !lib.isAttrs node
     then throw "\nvfs directory node at '/${sundry.vfs.path.get.str path}' is not an attribute set"
@@ -33,6 +33,7 @@
       false
     ]
     [(is-leaf "..." {text = "...";}) true]
+    [(is-leaf "..." {origin = ./node-cond.nix;}) true]
     [
       (is-leaf "..." {
         origin = "...";

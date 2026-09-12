@@ -36,6 +36,50 @@ Why: merge resolvers run only where two inputs contain the same key. A unique ma
 
 Avoid it: deeply force `sundry.vfs.dir.path-strs tree` or `sundry.vfs.dir.collapse (_: _: null) tree` when validation outside merge-relevant collisions matters. These projections validate node structure without forcing leaf payload such as `expr`.
 
+## Path values copy to the store under most string operations
+
+Rule: convert a path to a string only with `builtins.toString`; never hand a path to another string builtin.
+
+Why: Nix's path-to-string coercion defaults to `copyToStore = true`, so several string builtins copy the file into `/nix/store` under its basename before returning. A basename that is not a legal store name then aborts evaluation — which is what a `lib.hasSuffix ".nix"` filter over `listFilesRecursive` of a path literal hits on a name such as `что?`. [core/mk-lib.nix](../core/mk-lib.nix) sidesteps it by testing `baseNameOf path`.
+
+| Operation | Effect on a path |
+| --- | --- |
+| `builtins.toString` | string, no copy |
+| `builtins.baseNameOf` / `dirOf` | string, no copy |
+| `lib.splitString` | string list, no copy |
+| `builtins.readFile` | file contents, no copy |
+| `builtins.trace` / `lib.traceValSeq` | no copy |
+| `lib.isPath` / `isString`, `builtins.typeOf` | no copy |
+| `lib.escapeShellArg`, `lib.generators.toPretty` | string, no copy |
+| interpolation `"${path}"` | **copies to store** |
+| `builtins.stringLength` (`sundry.str.len`), `lib.substring`, `lib.stringToCharacters` | **copies to store** |
+| `lib.hasPrefix` / `hasSuffix` / `hasInfix` / `removePrefix` / `removeSuffix` | **copies to store** |
+| `lib.concatStrings` (`sundry.str.join`) / `concatStringsSep` (`sundry.str.join-with`) | **copies to store** |
+| `builtins.toJSON` | **copies to store**, even when nested in an attrset |
+| `lib.replaceStrings` / `lib.toUpper` | throws `expected a string but found a path` |
+
+Path/string equality does not coerce either way: `path == "/abs/path"` is simply `false`.
+
+Avoid it: keep paths out of string helpers. Filter or compare on `baseNameOf path`, or convert once with `toString` and work on the resulting string. [from-str.nix](../src/vfs/path/from-str.nix) already does the latter with `builtins.unsafeDiscardStringContext (toString path-str)`.
+
+## Store path context survives string operations
+
+Rule: `unsafeDiscardStringContext` a string before using it as a dynamic attribute name or any other context-free datum.
+
+Why: a string that carries store context — e.g. `"${flake-root}/..."`, since `self.outPath` is a context-carrying string — keeps that context through `toString`, `removeSuffix`, `splitString`, and `removePrefix` (which preserves the context of the sliced string, not of the prefix). Building module paths with `lib.filesystem.listFilesRecursive "${flake-root}/src"` therefore leaves each path segment carrying the source store path, and Nix rejects it as an attribute name: `the string 'attrs' is not allowed to refer to a store path`. Iterating with a path literal (`listFilesRecursive ../src`) avoids this, because `builtins.toString` on a path is context-free.
+
+Avoid it: iterate path values and derive names with `toString`; when the input is already a context-carrying string, discard explicitly with `builtins.unsafeDiscardStringContext`. [from-str.nix](../src/vfs/path/from-str.nix) normalizes both cases this way.
+
+## Per-file store copies break relative imports
+
+Rule: never materialize a single `.nix` file with `builtins.path` / interpolation and then `import` it; copy the whole tree instead.
+
+Why: `import` resolves a relative import such as `import ./b.nix` against the importing file's own directory. A per-file `builtins.path { path = ./a.nix; name = "a.nix"; }` lands the copy in the store root, so `./b.nix` is looked up beside the store object: `error: 'b.nix' is too short to be a valid store path`. The tree-level copy from [materialize](../src/vfs/dir/materialize.nix) keeps siblings together and is unaffected.
+
+Avoid it: keep tree-structured sources as path values and let [`dir.materialize`](../src/vfs/dir/materialize.nix) copy the whole tree, or copy a whole directory (`builtins.path { path = ./dir; }`). Reserve `to-store` for leaf data files that no relative import reaches, such as a `.jq`, `.yaml`, or `.png`.
+
+This is why [`file.from-src`](../src/vfs/file/from-src.nix) stores its `fs-path` unchanged instead of normalizing `origin` to a store string: `origin` is the exact value [`load-nix-with`](../src/vfs/dir/load-nix.nix) feeds to `import`, so a per-file copy there would turn every relative import in a loaded `.nix` into the error above. Normalizing `origin` at construction time plants a mine under the loader; the raw path keeps the tree intact until a stage that legitimately copies it whole.
+
 ## `resolve-tags` is not idempotent
 
 Rule: resolve annotations once, before tag-aware operations.
