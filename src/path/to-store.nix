@@ -4,10 +4,12 @@
   ...
 }: let
   # -- the top-level store object that contains a store-resident path
-  store-root = let
-    depth = lib.length (lib.splitString "/" builtins.storeDir) + 1;
-  in
-    path-str: lib.concatStringsSep "/" (lib.take depth (lib.splitString "/" path-str));
+  store-root = path-str:
+    lib.pipe path-str [
+      (lib.splitString "/")
+      (lib.take (lib.length (lib.splitString "/" builtins.storeDir) + 1))
+      (lib.concatStringsSep "/")
+    ];
 in rec {
   to-store = value:
     if lib.isPath value
@@ -15,8 +17,7 @@ in rec {
       if lib.hasPrefix builtins.storeDir (toString value)
       then
         builtins.appendContext
-        (toString value)
-        {"${store-root (toString value)}" = {path = true;};}
+        (toString value) {"${store-root (toString value)}" = {path = true;};}
       else
         builtins.path {
           path = value;
