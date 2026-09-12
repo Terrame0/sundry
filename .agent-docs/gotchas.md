@@ -80,6 +80,14 @@ Avoid it: keep tree-structured sources as path values and let [`dir.materialize`
 
 This is why [`file.from-src`](../src/vfs/file/from-src.nix) stores its `fs-path` unchanged instead of normalizing `origin` to a store string: `origin` is the exact value [`load-nix-with`](../src/vfs/dir/load-nix.nix) feeds to `import`, so a per-file copy there would turn every relative import in a loaded `.nix` into the error above. Normalizing `origin` at construction time plants a mine under the loader; the raw path keeps the tree intact until a stage that legitimately copies it whole.
 
+## `origin` accepts a derivation, and external stages rely on it
+
+Rule: do not narrow the accepted `origin` types to what `sundry`'s own constructors produce; `is-leaf` must keep accepting a derivation.
+
+Why: the node contract is public, and downstream pipelines build derivation origins themselves. [`file.from-src`](../src/vfs/file/from-src.nix) emits a path or string origin, but [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, and a later [`reform`](../src/vfs/dir/reform.nix) can set `origin` to a build derivation — producing a derivation-only leaf. Dropping `lib.isDerivation origin` from [is-leaf](../src/vfs/node-cond.nix) makes such a node neither leaf nor directory, so `is-leaf-node` throws (`... is neither a leaf nor a directory`) on a tree that previously worked.
+
+Avoid it: treat a node with a derivation `origin` as a leaf. When auditing which types a field may hold, check external consumers, not only the in-repo constructors; a library's field contract outlives the call sites visible here.
+
 ## `resolve-tags` is not idempotent
 
 Rule: resolve annotations once, before tag-aware operations.

@@ -12,7 +12,8 @@
   in
     lib.isString text
     || lib.isPath origin
-    || lib.isString origin;
+    || lib.isString origin
+    || lib.isDerivation origin;
   is-leaf-node = path: node:
     if !lib.isAttrs node
     then throw "\nvfs directory node at '/${sundry.vfs.path.get.str path}' is not an attribute set"
@@ -34,6 +35,10 @@
     ]
     [(is-leaf "..." {text = "...";}) true]
     [(is-leaf "..." {origin = ./node-cond.nix;}) true]
+    # -- a materialized file drops 'text' and downstream stages may re-point
+    # - 'origin' at a derivation, so a derivation-only node is still a leaf
+    [(is-leaf "..." {origin = {type = "derivation";};}) true]
+    [(is-leaf-node "..." {origin = {type = "derivation";};}) true]
     [
       (is-leaf "..." {
         origin = "...";

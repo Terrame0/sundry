@@ -11,7 +11,7 @@ sundry.vfs.file.from-text ["A" "B.txt"] "contents"
 # => { A."B.txt" = { text = "contents"; }; }
 ```
 
-Both require a non-empty VFS path. `from-text` adds `text`; `from-src` reads the physical file and adds both `text` and `origin`. `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node-cond.nix) accepts either a path or a string. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
+Both require a non-empty VFS path. `from-text` adds `text`; `from-src` reads the physical file and adds both `text` and `origin`. `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node-cond.nix) accepts a path, string, or derivation. The derivation form matters downstream: [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, so a later stage that re-points `origin` at a build derivation produces a derivation-only leaf. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
 
 ## Assemble first, interpret later
 
