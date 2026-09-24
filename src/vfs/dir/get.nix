@@ -45,13 +45,8 @@
       then sundry.path.store-root (toString node.origin)
       else null;
   in
-    if !(lib.isPath path)
+    if !(lib.isPath path) || origin-root == null
     then node
-    else if origin-root == null
-    then
-      lib.warn
-      "vfs.dir.get: cannot verify the store object of '/${path-str}' against a node without a path origin"
-      node
     else if origin-root != sundry.path.store-root (toString path)
     then
       lib.warn

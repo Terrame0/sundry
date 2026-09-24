@@ -94,7 +94,7 @@ This is why [`file.from-src`](../src/vfs/file/from-src.nix) stores its `fs-path`
 
 Rule: a path argument to [`vfs.dir.get`](../src/vfs/dir/get.nix) is resolved relative to the store object that contains it, and a store-object mismatch only warns.
 
-Why: `get` strips the store-root (see [`strip-store`](../src/path/strip-store.nix)) and looks the remainder up in `dir`, so a path under a *different* top-level store object that happens to share a suffix resolves to that suffix's node — e.g. another derivation's `flake.nix` maps onto `dir`'s `flake.nix`. The function compares the node's `origin` store-root against the input's and emits `lib.warn` on a mismatch (or when the node has no path origin), but it still returns the node. A string argument is vfs-relative and does **not** undergo this check.
+Why: `get` strips the store-root (see [`strip-store`](../src/path/strip-store.nix)) and looks the remainder up in `dir`, so a path under a *different* top-level store object that happens to share a suffix resolves to that suffix's node — e.g. another derivation's `flake.nix` maps onto `dir`'s `flake.nix`. The function compares the node's `origin` store-root against the input's and emits `lib.warn` on a mismatch, but it still returns the node. Only leaves carry `origin`; directories and generated leaves have nothing to compare and return silently. A string argument is vfs-relative and does **not** undergo this check.
 
 Avoid it: treat the warning as an error in your context. To target a node by provenance rather than suffix, compare `origin` explicitly. A trailing `/`, an empty-segment path, and the root `"/"` all throw; a missing node throws a catchable `throw` (not `abort`).
 
