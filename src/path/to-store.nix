@@ -2,22 +2,14 @@
   lib,
   sundry,
   ...
-}: let
-  # -- the top-level store object that contains a store-resident path
-  store-root = path-str:
-    lib.pipe path-str [
-      (lib.splitString "/")
-      (lib.take (lib.length (lib.splitString "/" builtins.storeDir) + 1))
-      (lib.concatStringsSep "/")
-    ];
-in rec {
+}: rec {
   to-store = value:
     if lib.isPath value
     then
       if lib.hasPrefix builtins.storeDir (toString value)
       then
         builtins.appendContext
-        (toString value) {"${store-root (toString value)}" = {path = true;};}
+        (toString value) {"${sundry.path.store-root (toString value)}" = {path = true;};}
       else
         builtins.path {
           path = value;

@@ -86,9 +86,17 @@ Rule: never materialize a single `.nix` file with `builtins.path` / interpolatio
 
 Why: `import` resolves a relative import such as `import ./b.nix` against the importing file's own directory. A per-file `builtins.path { path = ./a.nix; name = "a.nix"; }` lands the copy in the store root, so `./b.nix` is looked up beside the store object: `error: 'b.nix' is too short to be a valid store path`. The tree-level copy from [materialize](../src/vfs/dir/materialize.nix) keeps siblings together and is unaffected.
 
-Avoid it: keep tree-structured sources as path values and let [`dir.materialize`](../src/vfs/dir/materialize.nix) copy the whole tree, or copy a whole directory (`builtins.path { path = ./dir; }`). [`to-store`](../src/path/to-store.nix) leaves a path already inside the store in place — as a context-carrying string pointing at its top-level store object, without copying — so it never breaks relative imports for store-resident files; it copies only paths outside the store.
+Avoid it: keep tree-structured sources as path values and let [`dir.materialize`](../src/vfs/dir/materialize.nix) copy the whole tree, or copy a whole directory (`builtins.path { path = ./dir; }`). [`to-store`](../src/path/to-store.nix) leaves a path already inside the store in place — as a context-carrying string pointing at its top-level store object, without copying — so it never breaks relative imports for store-resident files; it copies only paths outside the store. [`store-root`](../src/path/store-root.nix) returns that top-level object (`/nix/store/<hash>-name`) and [`strip-store`](../src/path/strip-store.nix) returns the path relative to it (`/src/f.nix`).
 
 This is why [`file.from-src`](../src/vfs/file/from-src.nix) stores its `fs-path` unchanged instead of normalizing `origin` to a store string: `origin` is the exact value [`load-nix-with`](../src/vfs/dir/load-nix.nix) feeds to `import`, so a per-file copy there would turn every relative import in a loaded `.nix` into the error above. Normalizing `origin` at construction time plants a mine under the loader; the raw path keeps the tree intact until a stage that legitimately copies it whole.
+
+## `vfs.dir.get` matches a path by position inside a store object
+
+Rule: a path argument to [`vfs.dir.get`](../src/vfs/dir/get.nix) is resolved relative to the store object that contains it, and a store-object mismatch only warns.
+
+Why: `get` strips the store-root (see [`strip-store`](../src/path/strip-store.nix)) and looks the remainder up in `dir`, so a path under a *different* top-level store object that happens to share a suffix resolves to that suffix's node — e.g. another derivation's `flake.nix` maps onto `dir`'s `flake.nix`. The function compares the node's `origin` store-root against the input's and emits `lib.warn` on a mismatch (or when the node has no path origin), but it still returns the node. A string argument is vfs-relative and does **not** undergo this check.
+
+Avoid it: treat the warning as an error in your context. To target a node by provenance rather than suffix, compare `origin` explicitly. A trailing `/`, an empty-segment path, and the root `"/"` all throw; a missing node throws a catchable `throw` (not `abort`).
 
 ## `origin` accepts a derivation, and external stages rely on it
 

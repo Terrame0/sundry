@@ -7,7 +7,7 @@
     sundry.attrs.merge-with-resolvers (with sundry.attrs.merge-resolvers; [
       (resolve-next: path: val: ref:
         if path == ["missing"]
-        then sundry.attrs.remove-by-path ref val
+        then sundry.attrs.remove-at ref val
         else resolve-next path val ref)
       recursive
       base.no-collision
