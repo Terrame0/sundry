@@ -10,10 +10,12 @@
     text = node.text or null;
     origin = node.origin or null;
   in
-    lib.isString text
-    || lib.isPath origin
+    # -- 'origin' first so its short-circuit recognizes a physical leaf without
+    # - forcing the readFile thunk behind 'text' during structure-only traversal
+    lib.isPath origin
     || lib.isString origin
-    || lib.isDerivation origin;
+    || lib.isDerivation origin
+    || lib.isString text;
   is-leaf-node = path: node:
     if !lib.isAttrs node
     then throw "\nvfs directory node at '/${sundry.vfs.path.get.str path}' is not an attribute set"
@@ -43,6 +45,13 @@
       (is-leaf "..." {
         origin = "...";
         expr = throw "expr was forced";
+      })
+      true
+    ]
+    [
+      (is-leaf "..." {
+        origin = "...";
+        text = throw "text was forced";
       })
       true
     ]

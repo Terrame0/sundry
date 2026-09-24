@@ -16,6 +16,6 @@ A utility Nix library (`sundry.*`), assembled from files under `src/` where the 
 - [authoring.md](.agent-docs/authoring.md) — how to build a function: compose existing primitives, keep pipe chains visible, derive related conditions from one condition, prefer the simplest model, and use few units.
 - [testing.md](.agent-docs/testing.md) — test format (`tests = [ [ actual expected ] ]`) and running tests with `bash eval-result.sh`.
 - [test-naming.md](.agent-docs/test-naming.md) — naming conventions for test fixtures.
-- [gotchas.md](.agent-docs/gotchas.md) — counter-intuitive lazy evaluation, empty-branch, reform-collision, collision-only directory validation, implicit path-to-store coercion, string-context propagation, per-file copy import breakage, derivation-origin leaves, and repeated tag-resolution behavior.
+- [gotchas.md](.agent-docs/gotchas.md) — counter-intuitive lazy evaluation, empty-branch, text-forcing leaf recognition, reform-collision, collision-only directory validation, implicit path-to-store coercion, string-context propagation, per-file copy import breakage, derivation-origin leaves, and repeated tag-resolution behavior.
 
 When you add, rename, or remove a doc under `.agent-docs/`, update this index in the same change so it does not drift from what's on disk.

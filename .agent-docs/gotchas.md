@@ -10,6 +10,14 @@ Why: `walk` is branch-lazy, while evaluating `collapse`, `reform`, or `filter` f
 
 Avoid it: use [`sundry.does-throw`](testing.md#does-throw-does-not-catch-everything) when the question is whether the **entire result, including payload**, evaluates. For VFS structure-only validation without forcing lazy `expr`, deeply force a payload-free projection such as `sundry.vfs.dir.path-strs tree` or `sundry.vfs.dir.collapse (_: _: null) tree`.
 
+## Leaf recognition forces `text` unless `origin` is tested first
+
+Rule: keep the `origin` checks before the `text` check in [`is-leaf`](../src/vfs/node-cond.nix).
+
+Why: `builtins.isString text` forces `text` to weak head normal form. For a [`from-src`](../src/vfs/file/from-src.nix) leaf, `text` is a `builtins.readFile` thunk, so every `is-leaf-node` call reads the file from disk — and `is-leaf-node` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix), plus the [`directories`](../src/attrs/merge-resolvers/directories.nix) merge resolver. `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never touches `text`.
+
+Avoid it: do not reorder the disjunction to test `text` first; the order is load-bearing. A generated text-only leaf has no `origin`, so it still forces `text` — but that is an in-memory literal, not file I/O.
+
 ## Rebuilding traversals lose traversable empty attrsets
 
 Rule: do not use `collapse`, `reform`, or `filter` when an unhalted empty attrset must survive as a structural node.
