@@ -98,6 +98,8 @@ Why: `get` strips the store-root (see [`strip-store`](../src/path/strip-store.ni
 
 Avoid it: treat the warning as an error in your context. To target a node by provenance rather than suffix, compare `origin` explicitly. A trailing `/`, an empty-segment path, and the root `"/"` all throw; a missing node throws a catchable `throw` (not `abort`).
 
+`get` strips tag annotations (`{...}`, via [`strip-between`](../src/vfs/path/strip-between.nix)) from a query segment when the cleaned path exists in `dir`, so an annotated segment such as `network{modules:system}` resolves against a `resolve-tags`-cleaned tree. It falls back to the raw segment when the cleaned path is absent, so the same call also works on an unresolved tree whose keys still carry annotations. `origin` keeps its annotations regardless.
+
 ## `origin` accepts a derivation, and external stages rely on it
 
 Rule: do not narrow the accepted `origin` types to what `sundry`'s own constructors produce; `is-leaf` must keep accepting a derivation.
