@@ -7,7 +7,7 @@
         args'
         // {
           inherit (args'.pkgs) lib;
-          flake-root = self.outPath;
+          flake-root = ./.;
         };
     in
       args;

@@ -4,7 +4,7 @@
     (sundry.str.trim-left "/"
       # -- segments become attribute names, which forbid store context
       # - toString keeps that context when the input is already a context-carrying string
-      # - so we discard to accept both path literals and "${flake-root}/..." strings
+      # - so we discard to accept both path literals and context-carrying strings
       (builtins.unsafeDiscardStringContext (toString path-str)));
   tests = [
     [

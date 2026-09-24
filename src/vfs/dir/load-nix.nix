@@ -13,7 +13,7 @@
     (path: file: expr: expr);
 
   tests = let
-    dir = sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/nix";
+    dir = sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/nix");
     loadable =
       sundry.vfs.dir.filter
       (path: _: lib.last path != "D-throws.nix")

@@ -19,7 +19,7 @@ The framework ([core/mk-lib.nix](../core/mk-lib.nix)) walks every `.nix` file un
 
 Pick the filename to match what's inside: a single function gets the function's name; a cohesive cluster gets a name describing the cluster.
 
-Each module receives the shared library arguments (`sundry`, `lib`, `pkgs`, and `flake-root` as needed) and returns an attrset of exports. The assembly is a lazy fixed point, so modules may call other `sundry.*` functions regardless of filesystem discovery order. `tests` is the one reserved top-level attribute: the framework removes it from public exports. Two modules may contribute different attributes to one namespace, but the assembly throws if they export the same terminal attribute path.
+Each module receives the shared library arguments (`sundry`, `lib`, `pkgs`, and `flake-root` as needed) and returns an attrset of exports. `flake-root` is a path (`./.` from the flake); build a location with `flake-root + "/path"`, never `"${flake-root}/path"`, since interpolating a path copies the tree to the store (see [gotchas.md](gotchas.md#store-path-context-survives-string-operations)). The assembly is a lazy fixed point, so modules may call other `sundry.*` functions regardless of filesystem discovery order. `tests` is the one reserved top-level attribute: the framework removes it from public exports. Two modules may contribute different attributes to one namespace, but the assembly throws if they export the same terminal attribute path.
 
 ## When to split, when to keep together
 

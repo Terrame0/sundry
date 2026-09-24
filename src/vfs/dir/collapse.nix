@@ -8,7 +8,7 @@
     sundry.vfs.is-leaf-node;
 
   tests = let
-    test-dir = sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
+    test-dir = sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files");
   in [
     [
       (sundry.vfs.dir.collapse (path: file: file.text) test-dir)

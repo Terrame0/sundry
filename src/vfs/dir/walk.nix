@@ -14,8 +14,8 @@
     sundry.vfs.is-leaf-node;
 
   tests = let
-    test-dir = sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files";
-    tag-dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
+    test-dir = sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files");
+    tag-dir = lib.pipe (flake-root + "/tests/vfs-test-dir/tags") [
       sundry.vfs.dir.from-src
       sundry.vfs.dir.resolve-tags
     ];

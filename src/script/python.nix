@@ -49,7 +49,7 @@
         nativeBuildInputs = [
           (python {
             pname = "hello";
-            source = "${flake-root}/tests/python";
+            source = flake-root + "/tests/python";
             deps = py: [py.click];
           })
         ];

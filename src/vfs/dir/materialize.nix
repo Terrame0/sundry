@@ -45,7 +45,7 @@
   tests = [
     [
       (builtins.readFile
-        (lib.pipe "${flake-root}/tests/vfs-test-dir/test-files" [
+        (lib.pipe (flake-root + "/tests/vfs-test-dir/test-files") [
           sundry.vfs.dir.from-src
           (materialize "test-dir")
           (result: result.dir)
@@ -54,7 +54,7 @@
     ]
     [
       (builtins.readFile
-        (lib.pipe "${flake-root}/tests/vfs-test-dir/test-files" [
+        (lib.pipe (flake-root + "/tests/vfs-test-dir/test-files") [
           sundry.vfs.dir.from-src
           (materialize "test-dir-drv")
           (result: "${result.drv}/A.txt")
@@ -63,7 +63,7 @@
     ]
     [
       (builtins.readFile
-        (lib.pipe "${flake-root}/tests/vfs-test-dir/escaping" [
+        (lib.pipe (flake-root + "/tests/vfs-test-dir/escaping") [
           sundry.vfs.dir.from-src
           (materialize "escaping-dir")
           (result: result.dir)

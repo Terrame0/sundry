@@ -10,7 +10,7 @@
     dir;
   tests = [
     [
-      (path-strs (sundry.vfs.dir.from-src "${flake-root}/tests/vfs-test-dir/test-files"))
+      (path-strs (sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files")))
       [
         "=/C.txt"
         "A.txt"

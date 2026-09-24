@@ -25,7 +25,7 @@ args @ {
 
   module-contents = path: let
     path-str = lib.removeSuffix ".nix" (toString path);
-    store-path = "${flake-root}/src/";
+    store-path = toString flake-root + "/src/";
     no-store-path = lib.removePrefix store-path path-str;
     functions-path = lib.init (lib.splitString "/" no-store-path);
     functions = removeAttrs (import path args) ["tests"];

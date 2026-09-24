@@ -9,7 +9,7 @@
     (path: file: sundry.boolean.expr expr-fn file.tag-list);
 
   tests = let
-    tag-dir = lib.pipe "${flake-root}/tests/vfs-test-dir/tags" [
+    tag-dir = lib.pipe (flake-root + "/tests/vfs-test-dir/tags") [
       sundry.vfs.dir.from-src
       sundry.vfs.dir.resolve-tags
     ];
