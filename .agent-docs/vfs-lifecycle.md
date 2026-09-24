@@ -20,7 +20,7 @@ Construction and semantic interpretation are separate stages. `from-src` is one 
 For example, the VFS-aware merge resolver described in [attrs-merge.md](attrs-merge.md) can combine several imported trees with a generated file:
 
 ```nix
-sundry.attrs.merge.directories.no-collision [
+sundry.attrs.merge.dirs.no-collision [
   (sundry.vfs.dir.from-src source-a)
   (sundry.vfs.dir.from-src source-b)
   (sundry.vfs.file.from-text

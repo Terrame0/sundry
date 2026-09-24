@@ -1,5 +1,5 @@
 {sundry, ...}: {
-  merge = lhs: rhs: sundry.attrs.merge.directories.no-collision [lhs rhs];
+  merge = lhs: rhs: sundry.attrs.merge.dirs.no-collision [lhs rhs];
   tests = [
     [
       (sundry.vfs.dir.merge

@@ -3,7 +3,7 @@
   sundry,
   ...
 }: rec {
-  directories = resolve-next: path: acc-value: value: let
+  dirs = resolve-next: path: acc-value: value: let
     nodes-are-leaves = map (sundry.vfs.is-leaf-node path) [value acc-value];
   in
     # -- first we handle a leaf/leaf collision (both are leaves)
@@ -13,11 +13,11 @@
     # -- with leaf/leaf handled, 'any' distinguishes a mixed collision from dir/dir
     else if lib.any lib.id nodes-are-leaves
     then throw "there is a directory to leaf collision at '/${sundry.vfs.path.get.str path}'"
-    else sundry.attrs.merge-with (next-path: directories resolve-next (path ++ next-path)) [acc-value value];
+    else sundry.attrs.merge-with (next-path: dirs resolve-next (path ++ next-path)) [acc-value value];
   tests = [
     [
       # -- both are directories
-      (sundry.attrs.merge.directories.override [
+      (sundry.attrs.merge.dirs.override [
         {
           A = {
             B = {
@@ -50,7 +50,7 @@
     ]
     [
       # -- both are leaves
-      (sundry.attrs.merge.directories.override [
+      (sundry.attrs.merge.dirs.override [
         {
           A = {
             text = "old";
@@ -71,7 +71,7 @@
     ]
     [
       # -- one node is invalid
-      (sundry.does-throw (sundry.attrs.merge.directories.override [
+      (sundry.does-throw (sundry.attrs.merge.dirs.override [
         {
           A = {
             unexpected-attribute = "abc";
@@ -87,7 +87,7 @@
     ]
     [
       # -- directory to leaf collision
-      (sundry.does-throw (sundry.attrs.merge.directories.override [
+      (sundry.does-throw (sundry.attrs.merge.dirs.override [
         {
           A = {
             text = "a";

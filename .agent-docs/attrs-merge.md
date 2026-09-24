@@ -24,7 +24,7 @@ A conditional resolver either handles a collision or delegates it to the remaini
 resolve-next -> path -> lhs -> rhs -> collision result
 ```
 
-The conditional resolvers are `concat-lists`, `recursive`, and `directories`. `sundry.attrs.merge-with-resolvers` composes a non-empty list from left to right: the first conditional resolver gets the first chance to handle a collision, and a base resolver terminates the chain.
+The conditional resolvers are `concat-lists`, `recursive`, and `dirs`. `sundry.attrs.merge-with-resolvers` composes a non-empty list from left to right: the first conditional resolver gets the first chance to handle a collision, and a base resolver terminates the chain.
 
 | resolver | handles |
 |---|---|
@@ -34,13 +34,13 @@ The conditional resolvers are `concat-lists`, `recursive`, and `directories`. `s
 | `no-collision` | none; always throws |
 | `concat-lists` | two lists; otherwise delegates |
 | `recursive` | two attrsets; otherwise delegates |
-| `directories` | classifies VFS node pairs; delegates leaf/leaf, recurses directory/directory, and throws for mixed or invalid pairs |
+| `dirs` | classifies VFS node pairs; delegates leaf/leaf, recurses directory/directory, and throws for mixed or invalid pairs |
 
 [`merge-fns.nix`](../src/attrs/merge-fns.nix) exposes permutations of conditional resolvers followed by a base resolver under `sundry.attrs.merge`. For example:
 
 ```nix
 sundry.attrs.merge.recursive.override
-sundry.attrs.merge.directories.no-conflict
+sundry.attrs.merge.dirs.no-conflict
 sundry.attrs.merge.concat-lists.recursive.no-collision
 ```
 
@@ -50,7 +50,7 @@ Every conditional resolver exported under `sundry.attrs.merge-resolvers` partici
 
 `recursive` descends whenever both collided values are attrsets. Every nested `merge-with` appends the next singleton path to the accumulated path.
 
-`directories` applies the VFS node contract from [data-model.md](data-model.md) to each collided pair:
+`dirs` applies the VFS node contract from [data-model.md](data-model.md) to each collided pair:
 
 | collision | result |
 |---|---|
@@ -59,6 +59,6 @@ Every conditional resolver exported under `sundry.attrs.merge-resolvers` partici
 | leaf / directory | throw a structural collision error |
 | invalid node / any node | throw the `is-leaf-node` validation error |
 
-Resolvers run only for collisions. A unique branch passes through unchanged, so `directories` validates only nodes relevant to the merge rather than validating both complete input trees.
+Resolvers run only for collisions. A unique branch passes through unchanged, so `dirs` validates only nodes relevant to the merge rather than validating both complete input trees.
 
-Delegation gives the remaining resolver chain control over leaf collisions. A chain containing `directories.recursive` may deliberately re-enter leaf attrsets after `directories` delegates them.
+Delegation gives the remaining resolver chain control over leaf collisions. A chain containing `dirs.recursive` may deliberately re-enter leaf attrsets after `dirs` delegates them.

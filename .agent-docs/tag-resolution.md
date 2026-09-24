@@ -31,6 +31,6 @@ Every original segment contributes exactly one tag-set, including `{}` when the 
 
 All annotation blocks are removed from each logical path segment. Existing leaf fields remain, so `origin` continues to name the original physical path with annotations.
 
-`resolve-tags` rebuilds the cleaned tree through generic `attrs.reform`, so cleaned-path overlaps use structural `recursive.no-collision` rather than the VFS-aware `directories` resolver. Collision errors surface only when the relevant rebuilt fields are demanded. The exact overlap hazard and avoidance rule live in [gotchas.md](gotchas.md#reform-collision-handling-is-structural-not-vfs-aware).
+`resolve-tags` rebuilds the cleaned tree through generic `attrs.reform`, so cleaned-path overlaps use structural `recursive.no-collision` rather than the VFS-aware `dirs` resolver. Collision errors surface only when the relevant rebuilt fields are demanded. The exact overlap hazard and avoidance rule live in [gotchas.md](gotchas.md#reform-collision-handling-is-structural-not-vfs-aware).
 
 Tag-aware functions consume `tag-list` according to [tag-matching.md](tag-matching.md). Run resolution once, before tag queries; see [gotchas.md](gotchas.md#resolve-tags-is-not-idempotent).

@@ -14,7 +14,7 @@ Avoid it: use [`sundry.does-throw`](testing.md#does-throw-does-not-catch-everyth
 
 Rule: keep the `origin` checks before the `text` check in [`is-leaf`](../src/vfs/node-cond.nix).
 
-Why: `builtins.isString text` forces `text` to weak head normal form. When `text` is a lazily-read `builtins.readFile` thunk, testing it is what reads the file. `is-leaf-node` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix) and the [`directories`](../src/attrs/merge-resolvers/directories.nix) merge resolver; `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never evaluates `text`. This keeps those traversals from being a forcing point.
+Why: `builtins.isString text` forces `text` to weak head normal form. When `text` is a lazily-read `builtins.readFile` thunk, testing it is what reads the file. `is-leaf-node` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix) and the [`dirs`](../src/attrs/merge-resolvers/dirs.nix) merge resolver; `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never evaluates `text`. This keeps those traversals from being a forcing point.
 
 Avoid it: do not reorder the disjunction to test `text` first, and do not add a construction-time type check on `text` to a builder such as [`from-text`](../src/vfs/file/from-text.nix). Any `assert lib.isString text` forces WHNF of the `readFile` thunk that [`from-src`](../src/vfs/file/from-src.nix) puts there, reading every file while the tree is assembled. The leaf type gate is [`is-leaf`](../src/vfs/node-cond.nix); leave validation to the classifier. A generated text-only leaf has no `origin`, so it still forces `text` — an in-memory literal, not file I/O.
 
@@ -38,11 +38,11 @@ Why: reform fragments are combined with `recursive.no-collision`. Two attrset fr
 
 Avoid it: detect incompatible terminal overlaps before rebuilding. For VFS, do not emit two leaves at one target or make a leaf target the ancestor of another emitted path. Shared directory prefixes are safe. A later VFS traversal catches malformed rebuilt nodes, but cannot detect a hidden subtree once `text` or `origin` makes the combined attrset a valid leaf.
 
-## `directories` validates collisions only
+## `dirs` validates collisions only
 
 Rule: use a separate traversal when complete input-tree validation is required.
 
-Why: merge resolvers run only where two inputs contain the same key. A unique malformed branch passes through `sundry.attrs.merge.directories.*` unchanged.
+Why: merge resolvers run only where two inputs contain the same key. A unique malformed branch passes through `sundry.attrs.merge.dirs.*` unchanged.
 
 Avoid it: deeply force `sundry.vfs.dir.path-strs tree` or `sundry.vfs.dir.collapse (_: _: null) tree` when validation outside merge-relevant collisions matters. These projections validate node structure without forcing leaf payload such as `expr`.
 
