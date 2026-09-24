@@ -88,5 +88,31 @@
         };
       }
     ]
+    [
+      (sundry.does-throw-whnf (resolve-tags {
+        "A{a:1}" = {
+          text = "abc";
+          origin = "/A";
+        };
+        "A{a:2}" = {
+          text = "def";
+          origin = "/A";
+        };
+      }))
+      false
+    ]
+    [
+      (sundry.does-throw (resolve-tags {
+        "A{a:1}" = {
+          text = "abc";
+          origin = "/A";
+        };
+        "A{a:2}" = {
+          text = "def";
+          origin = "/A";
+        };
+      }))
+      true
+    ]
   ];
 }

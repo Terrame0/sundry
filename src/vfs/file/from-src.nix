@@ -23,9 +23,7 @@
         };
       }
     ]
-    [
-      (sundry.does-throw (from-src [] "${flake-root}/tests/vfs-test-dir/test-files/A.txt"))
-      true
-    ]
+    [(sundry.does-throw (from-src [] "${flake-root}/tests/vfs-test-dir/test-files/A.txt")) true]
+    [(sundry.does-throw-whnf (from-src ["A"] "${flake-root}/tests/vfs-test-dir/test-files")) false]
   ];
 }

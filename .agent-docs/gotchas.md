@@ -14,9 +14,11 @@ Avoid it: use [`sundry.does-throw`](testing.md#does-throw-does-not-catch-everyth
 
 Rule: keep the `origin` checks before the `text` check in [`is-leaf`](../src/vfs/node-cond.nix).
 
-Why: `builtins.isString text` forces `text` to weak head normal form. For a [`from-src`](../src/vfs/file/from-src.nix) leaf, `text` is a `builtins.readFile` thunk, so every `is-leaf-node` call reads the file from disk — and `is-leaf-node` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix), plus the [`directories`](../src/attrs/merge-resolvers/directories.nix) merge resolver. `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never touches `text`.
+Why: `builtins.isString text` forces `text` to weak head normal form. When `text` is a lazily-read `builtins.readFile` thunk, testing it is what reads the file. `is-leaf-node` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix) and the [`directories`](../src/attrs/merge-resolvers/directories.nix) merge resolver; `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never evaluates `text`. This keeps those traversals from being a forcing point.
 
-Avoid it: do not reorder the disjunction to test `text` first; the order is load-bearing. A generated text-only leaf has no `origin`, so it still forces `text` — but that is an in-memory literal, not file I/O.
+Avoid it: do not reorder the disjunction to test `text` first, and do not add a construction-time type check on `text` to a builder such as [`from-text`](../src/vfs/file/from-text.nix). Any `assert lib.isString text` forces WHNF of the `readFile` thunk that [`from-src`](../src/vfs/file/from-src.nix) puts there, reading every file while the tree is assembled. The leaf type gate is [`is-leaf`](../src/vfs/node-cond.nix); leave validation to the classifier. A generated text-only leaf has no `origin`, so it still forces `text` — an in-memory literal, not file I/O.
+
+The trade-off: without the assert, `from-text ["A"] {}` builds `{A = {text = {};};}`, which the node model classifies as a **directory**, not a malformed leaf (see [data-model.md](data-model.md)). The classifier rejects scalar non-string `text`, but an attrset-shaped one becomes a directory.
 
 ## Rebuilding traversals lose traversable empty attrsets
 

@@ -43,6 +43,18 @@ The expected coverage per function:
 
 What does *not* warrant a test: alternative spellings of the happy path that don't exercise a new branch; property-based variants beyond what the implementation actually branches on.
 
+## `does-throw` forces deeply, `does-throw-whnf` only to WHNF
+
+[`sundry.does-throw`](../src/does-throw.nix) forces its argument with `builtins.deepSeq`, so an explicit `throw` anywhere inside it — including a lazy attrset field or list element — is caught. [`sundry.does-throw-whnf`](../src/does-throw.nix) forces only with `builtins.seq`: it catches a throw in the outer shell but is blind to one nested inside an attrset or list.
+
+Use `does-throw-whnf` when the contract under test is about **not forcing payload**. A test like `[(does-throw-whnf (from-src ["A"] (throw "text was forced"))) false]` asserts that building the tree does not evaluate its `text`, which `does-throw` cannot express because it would force the throw.
+
+The trick is to hand the variant the **exact level** being tested. Selecting a branch first — `(does-throw-whnf (walk (_: _: null) {A = ...; B = throw "B was forced";}).A)` — checks that reading `A` never touches the throwing sibling; handing it the whole `walk` result would instead check only that the root shell builds. Pair such a negative with a `does-throw` positive control on the same payload (`...).B`) so the test cannot pass vacuously when the throw is unreachable.
+
+Laziness contracts locked this way include the deferred read in [from-text](../src/vfs/file/from-text.nix) / [from-src](../src/vfs/file/from-src.nix), the deferred `import` in [load-nix](../src/vfs/dir/load-nix.nix), and unforced sibling transforms in [resolve-deps](../src/attrs/resolve-deps.nix).
+
+Reserve these tests for contracts that are both documented and fragile — where a refactor could plausibly force payload that should stay lazy. Branch-laziness inherited from a primitive such as `lib.mapAttrs`, as in [walk](../src/attrs/walk.nix), is the library's own behavior and does not earn a test.
+
 ## `does-throw` does not catch everything
 
 [`sundry.does-throw`](../src/does-throw.nix) deeply evaluates its argument with `builtins.deepSeq` before inspecting `builtins.tryEval`. Explicit errors inside lazy attrset fields or list elements are therefore observable without selecting each nested value in the test expression.

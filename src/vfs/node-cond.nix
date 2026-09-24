@@ -10,8 +10,6 @@
     text = node.text or null;
     origin = node.origin or null;
   in
-    # -- 'origin' first so its short-circuit recognizes a physical leaf without
-    # - forcing the readFile thunk behind 'text' during structure-only traversal
     lib.isPath origin
     || lib.isString origin
     || lib.isDerivation origin

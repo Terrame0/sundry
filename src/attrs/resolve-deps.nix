@@ -46,7 +46,12 @@
         ]
     ) {}
     layers;
-  tests = [
+  tests = let
+    fixture = resolve-deps {
+      boom = {transform = _: throw "boom was forced";};
+      safe = {transform = _: 1;};
+    };
+  in [
     [
       (resolve-deps {
         first = {
@@ -86,5 +91,7 @@
       }))
       true
     ]
+    [(sundry.does-throw-whnf fixture.safe) false]
+    [(sundry.does-throw fixture.boom) true]
   ];
 }

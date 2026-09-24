@@ -77,5 +77,24 @@
         }))
       true
     ]
+    [
+      (sundry.does-throw-whnf (materialize "lazy" {
+        "A.txt" = {
+          origin = "/tmp/A.txt";
+          text = throw "text was forced";
+        };
+      }))
+      false
+    ]
+    [
+      (sundry.does-throw
+        (materialize "lazy" {
+          "A.txt" = {
+            origin = "/tmp/A.txt";
+            text = throw "text was forced";
+          };
+        }).drv)
+      true
+    ]
   ];
 }

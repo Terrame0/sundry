@@ -11,7 +11,7 @@ sundry.vfs.file.from-text ["A" "B.txt"] "contents"
 # => { A."B.txt" = { text = "contents"; }; }
 ```
 
-Both require a non-empty VFS path. `from-text` adds `text`; `from-src` reads the physical file and adds both `text` and `origin`. `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node-cond.nix) accepts a path, string, or derivation. The derivation form matters downstream: [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, so a later stage that re-points `origin` at a build derivation produces a derivation-only leaf. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
+Both require a non-empty VFS path. `from-text` adds `text`; `from-src` adds both `text` and `origin` and defers the physical read — `text` is a lazy `builtins.readFile` thunk, so assembling a tree reads nothing. The read happens when a stage demands `text`, such as `materialize` or a callback that selects `file.text`; `origin`-only work, including the `is-leaf-node` classification that `path-strs` and merge perform, never touches it. Neither constructor type-checks `text` at assembly; [`is-leaf`](../src/vfs/node-cond.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node-cond.nix) accepts a path, string, or derivation. The derivation form matters downstream: [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, so a later stage that re-points `origin` at a build derivation produces a derivation-only leaf. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
 
 ## Assemble first, interpret later
 
@@ -36,7 +36,7 @@ Run `resolve-tags` after assembly so every source follows the same logical-path 
 | operation | input requirement | leaf fields after the operation |
 |---|---|---|
 | `file.from-text` | non-empty VFS path, string contents | `text` |
-| `file.from-src` / `dir.from-src` | readable physical file or directory | `text`, `origin` |
+| `file.from-src` / `dir.from-src` | readable physical file or directory | `text` (lazy `readFile` thunk), `origin` |
 | [`dir.resolve-tags`](../src/vfs/dir/resolve-tags.nix) | valid VFS tree | existing fields plus `tag-list`; logical paths are cleaned |
 | [`dir.load-nix`](../src/vfs/dir/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
 | `dir.load-nix-with fn` | `origin` when `fn` demands the imported value | existing fields plus `expr = fn path file imported` |

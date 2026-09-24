@@ -255,5 +255,33 @@ in rec {
       ))
       true
     ]
+    [
+      (sundry.does-throw-whnf (validate {A = {default = _: throw "default called";};} {A = 1;}))
+      false
+    ]
+    [
+      (sundry.does-throw (validate {A = {default = _: throw "default called";};} {}))
+      true
+    ]
+    [
+      (validate {
+        A = {
+          nullable = true;
+          check = _: throw "check called";
+          desc = "must be checked";
+        };
+      } {A = null;})
+      {A = null;}
+    ]
+    [
+      (sundry.does-throw (validate {
+        A = {
+          nullable = true;
+          check = _: throw "check called";
+          desc = "must be checked";
+        };
+      } {A = 1;}))
+      true
+    ]
   ];
 }
