@@ -3,18 +3,18 @@
   lib,
   ...
 }: rec {
-  slice = str: args-list:
+  slice = args-list: str:
     lib.foldl (acc: i: acc + sundry.str.at i str)
     "" (sundry.range args-list);
   tests = [
-    [(slice "abc" [2]) "ab"]
-    [(slice "abc" [1 2]) "b"]
-    [(slice "abc" [0 3 2]) "ac"]
-    [(slice "abc" [2 (-1) (-1)]) "cba"]
-    [(slice "abc" [1 (-2) (-1)]) "bac"]
-    [(slice "abc" [3 0]) ""]
-    [(slice "abc" [0 3 (-1)]) ""]
-    [(slice "abc" [1 1]) ""]
-    [(slice "abcdefg" [0 5 3]) "ad"]
+    [(slice [2] "abc") "ab"]
+    [(slice [1 2] "abc") "b"]
+    [(slice [0 3 2] "abc") "ac"]
+    [(slice [2 (-1) (-1)] "abc") "cba"]
+    [(slice [1 (-2) (-1)] "abc") "bac"]
+    [(slice [3 0] "abc") ""]
+    [(slice [0 3 (-1)] "abc") ""]
+    [(slice [1 1] "abc") ""]
+    [(slice [0 5 3] "abcdefg") "ad"]
   ];
 }

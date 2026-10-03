@@ -4,10 +4,10 @@ How [`at`](../src/str/at.nix), [`slice`](../src/str/slice.nix), and [`range`](..
 
 ## `slice` is a composition, not a special case
 
-`slice str args-list` folds [`at`](../src/str/at.nix) over the labels produced by [`range`](../src/range.nix):
+`slice args-list str` folds [`at`](../src/str/at.nix) over the labels produced by [`range`](../src/range.nix):
 
 ```nix
-slice = str: args-list:
+slice = args-list: str:
   lib.foldl (acc: i: acc + sundry.str.at i str) "" (sundry.range args-list);
 ```
 
@@ -19,7 +19,7 @@ The same `range` is a general primitive — [permutations](../src/list/permutati
 
 `at` accepts `0..len-1` and `-len..-1`, mapping a negative label `i` to cell `len+i`. A label stays signed through the `range` walk and is resolved to a cell only in `at`. Each cell therefore has **two labels**: `k` and `k-len`.
 
-The count `range` walks is away-from-zero division of `stop-start` by `step` ([`div-away`](../src/math/div-away.nix)). When `stop` and `step` point opposite ways the count is negative and `range` clamps it with `lib.max 0`, so the slice is empty rather than an error — `slice "abc" [0 3 (-1)]` is `""`. A label outside `-len..len-1` is a catchable `throw` from `at`; there is no modular wrap, so a walk that runs past either end fails loudly.
+The count `range` walks is away-from-zero division of `stop-start` by `step` ([`div-away`](../src/math/div-away.nix)). When `stop` and `step` point opposite ways the count is negative and `range` clamps it with `lib.max 0`, so the slice is empty rather than an error — `slice [0 3 (-1)] "abc"` is `""`. A label outside `-len..len-1` is a catchable `throw` from `at`; there is no modular wrap, so a walk that runs past either end fails loudly.
 
 ## Divergence from Python
 
@@ -29,8 +29,8 @@ For `"abcdefgh"` (length 8):
 
 | Python | sundry | result |
 |---|---|---|
-| `s[5:1:-1]` | `slice s [5 1 (-1)]` | `"fedc"` — same |
-| `s[5:0:-1]` | `slice s [5 0 (-1)]` | `"fedcb"` — same |
-| `s[5:-1:-1]` | `slice s [5 (-1) (-1)]` | Python `""`, sundry `"fedcba"` |
+| `s[5:1:-1]` | `slice [5 1 (-1)] s` | `"fedc"` — same |
+| `s[5:0:-1]` | `slice [5 0 (-1)] s` | `"fedcb"` — same |
+| `s[5:-1:-1]` | `slice [5 (-1) (-1)] s` | Python `""`, sundry `"fedcba"` |
 
-The negative stop is what makes a full reverse expressible as `[<last> (-1) (-1)]` instead of a special `reverse` function. Mixed signed walks follow: `slice "abc" [1 (-2) (-1)]` is `"bac"` (labels `1, 0, -1`), and `slice "abc" [2 (-1) (-1)]` is `"cba"`.
+The negative stop is what makes a full reverse expressible as `[<last> (-1) (-1)]` instead of a special `reverse` function. Mixed signed walks follow: `slice [1 (-2) (-1)] "abc"` is `"bac"` (labels `1, 0, -1`), and `slice [2 (-1) (-1)] "abc"` is `"cba"`.
