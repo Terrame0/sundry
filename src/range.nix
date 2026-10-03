@@ -12,9 +12,9 @@
         [1 2 3]
         rec {
           start =
-            if arg-count >= 2
-            then arg-at 0
-            else 0;
+            if arg-count == 1
+            then 0
+            else arg-at 0;
           count = let
             base =
               if arg-count == 1
@@ -22,7 +22,7 @@
               else arg-at 1;
             diff = base - start;
           in
-            diff / step + sundry.math.abs (lib.mod diff step);
+            sundry.math.div-away diff step;
           step =
             if arg-count == 3
             then arg-at 2
@@ -34,12 +34,18 @@
   in
     lib.genList (i: args.start + i * args.step) (lib.max 0 args.count);
   tests = [
+    [(range [0 2 (-3)]) []]
     [(range [5]) [0 1 2 3 4]]
     [(range [0]) []]
     [(range [2 5]) [2 3 4]]
     [(range [3 3]) []]
     [(range [1 6 2]) [1 3 5]]
+    [(range [1 7 3]) [1 4]]
+    [(range [1 8 3]) [1 4 7]]
     [(range [5 2 (-2)]) [5 3]]
+    [(range [3 0 (-1)]) [3 2 1]]
+    [(range [5 0 (-3)]) [5 2]]
+    [(range [(-2) 2]) [(-2) (-1) 0 1]]
     [(range [0 5 (-1)]) []]
     [(sundry.does-throw (range [])) true]
     [(sundry.does-throw (range [1 2 3 4])) true]
