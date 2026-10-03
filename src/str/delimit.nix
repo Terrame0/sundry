@@ -18,7 +18,7 @@
       lsep-offset = sundry.str.len lsep;
       rsep-offset = sundry.str.len rsep;
       depth = lib.length lsep-stack;
-      get-substr = from: to: lib.substring from (to - from) str;
+      get-substr = from: to: sundry.str.slice str [from to];
       on-lsep = recurse {
         current-pos = lsep-current-pos + lsep-offset;
         lsep-stack = lsep-stack ++ [(lsep-current-pos + lsep-offset)];

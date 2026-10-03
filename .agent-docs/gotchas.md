@@ -115,3 +115,11 @@ Rule: resolve annotations once, before tag-aware operations.
 Why: the first pass removes annotation blocks from logical path segments and records them in `tag-list`. A second pass reads the cleaned names and overwrites every leaf's useful list with empty tag-sets.
 
 Avoid it: retain the already-resolved tree instead of calling `resolve-tags` again.
+
+## Negative string indices are labels, not Python normalization
+
+Rule: keep a negative index signed through the `range` walk; resolve it to a cell only in [`at`](../src/str/at.nix).
+
+Why: Python rewrites `-k` to `len-k` before comparing it against the start, so `"abcdefgh"[5:-1:-1]` is `""`. Here the label stays `-1` and `slice "abcdefgh" [5 (-1) (-1)]` walks `5,4,3,2,1,0` to `"fedcba"`. The reverse and mixed slices `[2 (-1) (-1)]` and `[1 (-2) (-1)]` depend on that sign surviving the walk. Pre-normalizing a bound with `len+i`, or making `at` normalize before the sign check, silently turns them empty or wrong. The full model is in [str-indexing.md](str-indexing.md).
+
+Avoid it: build ranges from signed labels and let `at` resolve the sign last. Do not add modular wrap — an out-of-range label must `throw`.
