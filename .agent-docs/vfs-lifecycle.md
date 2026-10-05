@@ -37,12 +37,13 @@ Run `resolve-tags` after assembly so every source follows the same logical-path 
 |---|---|---|
 | `file.from-text` | non-empty VFS path, string contents | `text` |
 | `file.from-src` / `dir.from-src` | readable physical file or directory | `text` (lazy `readFile` thunk), `origin` |
-| [`dir.resolve-tags`](../src/vfs/dir/resolve-tags.nix) | valid VFS tree | existing fields plus `tag-list`; logical paths are cleaned |
+| [`dir.resolve-tags`](../src/vfs/dir/resolve-tags.nix) | valid VFS tree without `tag-list` | existing fields plus `tag-list`; logical paths are cleaned |
+| [`dir.strip-tags`](../src/vfs/dir/strip-tags.nix) | valid VFS tree | `tag-list` removed; logical paths are cleaned |
 | [`dir.load-nix`](../src/vfs/dir/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
 | `dir.load-nix-with fn` | `origin` when `fn` demands the imported value | existing fields plus `expr = fn path file imported` |
 | [`dir.materialize name`](../src/vfs/dir/materialize.nix) | string `text` on every consumed leaf | `text` removed, `origin` replaced with the new store path; other metadata preserved |
 
-`resolve-tags` is explained in [tag-resolution.md](tag-resolution.md). Tag-aware selection and `*-within-tag` transformations require its `tag-list` field; they do not synthesize missing tags.
+`resolve-tags` is explained in [tag-resolution.md](tag-resolution.md). Tag-aware selection and `*-within-tag` transformations require its `tag-list` field; they do not synthesize missing tags. `strip-tags` neutralizes annotations and `tag-list` for handing a tree to a pipeline that owns its own tag logic; unlike `resolve-tags`, it is idempotent and safe on an already-resolved tree.
 
 `load-nix` and `load-nix-with` visit every leaf regardless of its extension. Nix keeps `import file.origin` lazy, so a missing or invalid `origin` surfaces only when the callback or its stored `expr` demands the import. Select the intended files before loading when the tree also contains non-Nix files.
 

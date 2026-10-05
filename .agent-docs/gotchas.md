@@ -108,13 +108,13 @@ Why: the node contract is public, and downstream pipelines build derivation orig
 
 Avoid it: treat a node with a derivation `origin` as a leaf. When auditing which types a field may hold, check external consumers, not only the in-repo constructors; a library's field contract outlives the call sites visible here.
 
-## `resolve-tags` is not idempotent
+## `resolve-tags` throws on an already-resolved tree
 
 Rule: resolve annotations once, before tag-aware operations.
 
-Why: the first pass removes annotation blocks from logical path segments and records them in `tag-list`. A second pass reads the cleaned names and overwrites every leaf's useful list with empty tag-sets.
+Why: the first pass removes annotation blocks from logical path segments and records them in `tag-list`. A second pass has no annotations left to read and would overwrite every leaf's useful list with empty tag-sets, so `resolve-tags` throws per leaf that already carries `tag-list`.
 
-Avoid it: retain the already-resolved tree instead of calling `resolve-tags` again.
+Avoid it: retain the already-resolved tree. To hand a tree to another owner, neutralize it with [`strip-tags`](../src/vfs/dir/strip-tags.nix), which removes the annotations and the `tag-list` instead of re-resolving.
 
 ## Negative string indices are labels, not Python normalization
 

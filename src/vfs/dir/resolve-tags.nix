@@ -7,27 +7,30 @@
   resolve-tags =
     sundry.attrs.reform-until
     sundry.vfs.is-leaf-node
-    (path: value: {
-      path = sundry.vfs.path.strip-between "{" "}" path;
-      value =
-        value
-        // {
-          tag-list = map (dir:
-            lib.pipe dir [
-              (sundry.str.between "{" "}")
-              (map (tag-str: let
-                tag-parts = sundry.str.split ":" tag-str;
-                tag-key = lib.head tag-parts;
-                tag-value = sundry.is-null (sundry.list.excl-last tag-parts) "";
-                tag-list = sundry.str.split "," tag-value;
-              in {
-                ${tag-key} = sundry.list.un-singleton tag-list;
-              }))
-              sundry.attrs.merge.no-collision
-            ])
-          path;
-        };
-    });
+    (path: value:
+      if value ? tag-list
+      then throw "\nvfs.dir.resolve-tags: node at '/${sundry.vfs.path.get.str path}' already has 'tag-list'"
+      else {
+        path = sundry.vfs.path.strip-between "{" "}" path;
+        value =
+          value
+          // {
+            tag-list = map (dir:
+              lib.pipe dir [
+                (sundry.str.between "{" "}")
+                (map (tag-str: let
+                  tag-parts = sundry.str.split ":" tag-str;
+                  tag-key = lib.head tag-parts;
+                  tag-value = sundry.is-null (sundry.list.excl-last tag-parts) "";
+                  tag-list = sundry.str.split "," tag-value;
+                in {
+                  ${tag-key} = sundry.list.un-singleton tag-list;
+                }))
+                sundry.attrs.merge.no-collision
+              ])
+            path;
+          };
+      });
   tests = [
     [
       (lib.pipe (flake-root + "/tests/vfs-test-dir/tags") [
@@ -110,6 +113,16 @@
         "A{a:2}" = {
           text = "def";
           origin = "/A";
+        };
+      }))
+      true
+    ]
+    [
+      (sundry.does-throw (resolve-tags {
+        A = {
+          text = "abc";
+          origin = "/A";
+          tag-list = [{}];
         };
       }))
       true

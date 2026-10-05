@@ -31,6 +31,10 @@ Every original segment contributes exactly one tag-set, including `{}` when the 
 
 All annotation blocks are removed from each logical path segment. Existing leaf fields remain, so `origin` continues to name the original physical path with annotations.
 
+`resolve-tags` owns `tag-list`: a leaf that already carries the field marks an already-resolved tree. Rather than silently overwriting it, `resolve-tags` throws per such leaf when the rebuilt fields are demanded. Call it once per assembly, before any tag query; see [gotchas.md](gotchas.md#resolve-tags-throws-on-an-already-resolved-tree).
+
+To hand a tree to a pipeline that owns its own tag logic, neutralize it first with [`sundry.vfs.dir.strip-tags`](../src/vfs/dir/strip-tags.nix). It removes annotation blocks from logical segments and drops any existing `tag-list`, and is idempotent on both dirty and resolved trees. `origin` is left untouched: it names provenance, not tags.
+
 `resolve-tags` rebuilds the cleaned tree through generic `attrs.reform`, so cleaned-path overlaps use structural `recursive.no-collision` rather than the VFS-aware `dirs` resolver. Collision errors surface only when the relevant rebuilt fields are demanded. The exact overlap hazard and avoidance rule live in [gotchas.md](gotchas.md#reform-collision-handling-is-structural-not-vfs-aware).
 
-Tag-aware functions consume `tag-list` according to [tag-matching.md](tag-matching.md). Run resolution once, before tag queries; see [gotchas.md](gotchas.md#resolve-tags-is-not-idempotent).
+Tag-aware functions consume `tag-list` according to [tag-matching.md](tag-matching.md); they do not synthesize missing tags.

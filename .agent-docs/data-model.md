@@ -18,7 +18,7 @@ Leaf fields:
 |---|---|---|
 | `text` | string | file contents, in memory |
 | `origin` | path \| string \| derivation | the file's last physical location; tracks provenance independently of the node's key path |
-| `tag-list` | list of attrsets | root-to-leaf tags, exactly one attrset per original path segment after `resolve-tags` |
+| `tag-list` | list of attrsets | root-to-leaf tags, exactly one attrset per original path segment; written by `resolve-tags`, removed by `strip-tags` |
 | `expr` | any Nix value | lazy imported or derived payload attached by `load-nix` / `load-nix-with` |
 
 Leaf recognition takes precedence over every other field. Once `text` or `origin` has a valid leaf type, the complete attrset is terminal and traversal does not inspect any child-shaped metadata inside it. This keeps a lazy `expr` payload from being forced. `expr` itself is not a discriminator: an attrset-valued expression must remain distinguishable from a directory containing a child segment named `expr`.
