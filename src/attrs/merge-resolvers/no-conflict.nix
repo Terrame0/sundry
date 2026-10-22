@@ -11,10 +11,10 @@
             ${sundry.str.pretty rhs}
       ''
     else rhs;
-  tests = [
-    [(sundry.does-throw (base.no-conflict ["_"] {A = 1;} {A = 2;})) true]
-    [(base.no-conflict ["_"] 1 1) 1]
-    [
+  tests = {
+    throws-on-conflict = [(sundry.does-throw (base.no-conflict ["_"] {A = 1;} {A = 2;})) true];
+    equal-scalars = [(base.no-conflict ["_"] 1 1) 1];
+    non-conflicting-merge = [
       (sundry.attrs.merge.no-conflict [
         {A = 1;}
         {
@@ -26,6 +26,6 @@
         A = 1;
         B = 2;
       }
-    ]
-  ];
+    ];
+  };
 }

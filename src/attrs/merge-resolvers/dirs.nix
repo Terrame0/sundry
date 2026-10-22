@@ -14,8 +14,8 @@
     else if lib.any lib.id nodes-are-leaves
     then throw "there is a directory to leaf collision at '/${sundry.vfs.path.get.str path}'"
     else sundry.attrs.merge-with (next-path: dirs resolve-next (path ++ next-path)) [acc-value value];
-  tests = [
-    [
+  tests = {
+    dir-dir = [
       # -- both are directories
       (sundry.attrs.merge.dirs.override [
         {
@@ -47,8 +47,8 @@
           };
         };
       }
-    ]
-    [
+    ];
+    leaf-leaf = [
       # -- both are leaves
       (sundry.attrs.merge.dirs.override [
         {
@@ -68,8 +68,8 @@
           text = "new";
         };
       }
-    ]
-    [
+    ];
+    invalid-node = [
       # -- one node is invalid
       (sundry.does-throw (sundry.attrs.merge.dirs.override [
         {
@@ -84,8 +84,8 @@
         }
       ]))
       true
-    ]
-    [
+    ];
+    dir-leaf-collision = [
       # -- directory to leaf collision
       (sundry.does-throw (sundry.attrs.merge.dirs.override [
         {
@@ -104,6 +104,6 @@
         }
       ]))
       true
-    ]
-  ];
+    ];
+  };
 }

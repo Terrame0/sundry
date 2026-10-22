@@ -7,15 +7,15 @@
   in
     recurse init-state;
 
-  tests = [
-    [
+  tests = {
+    count-to-ten = [
       (while
         (state: state.x != 10)
         {x = 0;}
         (prev: {x = prev.x + 1;}))
       {x = 10;}
-    ]
-    [
+    ];
+    break-early = [
       (while
         sundry.true-fn
         {x = 0;}
@@ -24,13 +24,13 @@
           break = true;
         }))
       {x = 1;}
-    ]
-    [
+    ];
+    condition-false-initially = [
       (while
         (state: false)
         {x = 0;}
         (prev: {x = prev.x + 1;}))
       {x = 0;}
-    ]
-  ];
+    ];
+  };
 }

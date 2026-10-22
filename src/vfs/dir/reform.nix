@@ -1,6 +1,6 @@
 {
   sundry,
-  flake-root,
+  fixtures-dir,
   lib,
   ...
 }: {
@@ -14,13 +14,13 @@
     sundry.vfs.is-leaf-node;
 
   tests = let
-    test-dir = sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files");
-    tag-dir = lib.pipe (flake-root + "/tests/vfs-test-dir/tags") [
+    fixture-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files");
+    tags-file-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
       sundry.vfs.dir.from-src
       sundry.vfs.dir.resolve-tags
     ];
-  in [
-    [
+  in {
+    reformed-fixture = [
       (sundry.vfs.dir.reform (path: file: {
           path = [(lib.last path)];
           value = {
@@ -28,7 +28,7 @@
             text = "reformed ${file.text}";
           };
         })
-        test-dir)
+        fixture-file-tree)
       {
         "A.txt" = {
           text = "reformed contents of A.txt";
@@ -43,8 +43,8 @@
           path = "=/C.txt";
         };
       }
-    ]
-    [
+    ];
+    within-tag = [
       (sundry.vfs.dir.collapse
         (path: file: file.text)
         (sundry.vfs.dir.reform-within-tag
@@ -53,7 +53,7 @@
             path = [(lib.last path)];
             value = file // {text = "reformed ${file.text}";};
           })
-          tag-dir))
+          tags-file-tree))
       [
         "contents of F"
         "contents of A"
@@ -65,6 +65,6 @@
         "reformed contents of H"
         "reformed contents of I"
       ]
-    ]
-  ];
+    ];
+  };
 }

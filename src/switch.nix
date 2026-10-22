@@ -20,36 +20,36 @@
   in
     recurse cases;
 
-  tests = [
-    [
+  tests = {
+    match-second-case = [
       (switch "B" [
         [["A"] "1"]
         [["B"] "2"]
         "3"
       ])
       "2"
-    ]
-    [
+    ];
+    default-case = [
       (switch "C" [
         [["A"] "1"]
         [["B"] "2"]
         "3"
       ])
       "3"
-    ]
-    [
+    ];
+    multi-value-match = [
       (switch "B" [
         [["A" "B"] "1"]
         "2"
       ])
       "1"
-    ]
-    [
+    ];
+    predicate-match = [
       (switch 5 [
         [(x: x > 3) "1"]
         "2"
       ])
       "1"
-    ]
-  ];
+    ];
+  };
 }

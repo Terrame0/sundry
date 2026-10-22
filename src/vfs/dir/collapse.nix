@@ -1,6 +1,6 @@
 {
   sundry,
-  flake-root,
+  fixtures-dir,
   ...
 }: {
   collapse =
@@ -8,11 +8,11 @@
     sundry.vfs.is-leaf-node;
 
   tests = let
-    test-dir = sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files");
-  in [
-    [
-      (sundry.vfs.dir.collapse (path: file: file.text) test-dir)
+    fixture-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files");
+  in {
+    collapsed-texts = [
+      (sundry.vfs.dir.collapse (path: file: file.text) fixture-file-tree)
       ["contents of C.txt" "contents of A.txt" "contents of B.txt"]
-    ]
-  ];
+    ];
+  };
 }

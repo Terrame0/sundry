@@ -14,9 +14,9 @@
         else value)
       (lib.head list)
       (lib.tail list);
-  tests = [
-    [(best (lhs: rhs: lhs < rhs) [4]) 4]
-    [(best (lhs: rhs: lhs < rhs) [1 2 3 4]) 1]
-    [(sundry.does-throw (best (lhs: rhs: true) [])) true]
-  ];
+  tests = {
+    single-element = [(best (lhs: rhs: lhs < rhs) [4]) 4];
+    ascending-list = [(best (lhs: rhs: lhs < rhs) [1 2 3 4]) 1];
+    throws-on-empty = [(sundry.does-throw (best (lhs: rhs: true) [])) true];
+  };
 }

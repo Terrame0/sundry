@@ -84,26 +84,26 @@
   tests = let
     s = pos: substr: depth: {inherit pos substr depth;};
     ans = inside: outside: {inherit inside outside;};
-  in [
-    [
+  in {
+    sequential = [
       (delimit "[" "]" "[A][B][C]")
       (ans [(s 1 "A" 1) (s 4 "B" 1) (s 7 "C" 1)] [(s 0 "" 0) (s 3 "" 0) (s 6 "" 0) (s 9 "" 0)])
-    ]
-    [
+    ];
+    text-between = [
       (delimit "[" "]" "X[A]Y[B]Z")
       (ans [(s 2 "A" 1) (s 6 "B" 1)] [(s 0 "X" 0) (s 4 "Y" 0) (s 8 "Z" 0)])
-    ]
-    [
+    ];
+    no-delimiters = [
       (delimit "[" "]" "ABC")
       (ans [] [(s 0 "ABC" 0)])
-    ]
-    [
+    ];
+    empty-string = [
       (delimit "[" "]" "")
       (ans [] [(s 0 "" 0)])
-    ]
-    [
+    ];
+    nested = [
       (delimit "[" "]" "[A[B]A]")
       (ans [(s 3 "B" 2) (s 1 "A[B]A" 1)] [(s 0 "" 0) (s 7 "" 0)])
-    ]
-  ];
+    ];
+  };
 }

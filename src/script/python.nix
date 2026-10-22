@@ -2,7 +2,7 @@
   sundry,
   lib,
   pkgs,
-  flake-root,
+  fixtures-dir,
   ...
 }: rec {
   python = {
@@ -43,18 +43,18 @@
       src = build-tree.drv;
       build-system = [pkgs.python3Packages.hatchling];
     };
-  tests = [
-    [
+  tests = {
+    build-hello = [
       (builtins.readFile (pkgs.runCommand "python-test" {
         nativeBuildInputs = [
           (python {
             pname = "hello";
-            source = flake-root + "/tests/python";
+            source = fixtures-dir + "/python";
             deps = py: [py.click];
           })
         ];
       } "hello 'world' > $out"))
       "hello, world!\n"
-    ]
-  ];
+    ];
+  };
 }

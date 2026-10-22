@@ -58,14 +58,14 @@
       name = "I";
       deps = ["B"];
     };
-  in [
-    [(topo-stratify [A B C D]) [[A] [B C] [D]]]
-    [(topo-stratify [A B I]) [[A] [B] [I]]]
-    [(topo-stratify [A B C D E F G H]) [[A G] [B C] [D E] [F] [H]]]
-    [(topo-stratify [D C B A]) [[A] [C B] [D]]]
-    [(topo-stratify [A]) [[A]]]
-    [(topo-stratify [A G]) [[A G]]]
-    [
+  in {
+    diamond = [(topo-stratify [A B C D]) [[A] [B C] [D]]];
+    linear-chain = [(topo-stratify [A B I]) [[A] [B] [I]]];
+    complex-graph = [(topo-stratify [A B C D E F G H]) [[A G] [B C] [D E] [F] [H]]];
+    reversed-input = [(topo-stratify [D C B A]) [[A] [C B] [D]]];
+    single-node = [(topo-stratify [A]) [[A]]];
+    independent-nodes = [(topo-stratify [A G]) [[A G]]];
+    cycle-throws = [
       (sundry.does-throw (topo-stratify [
         {
           name = "X";
@@ -77,8 +77,8 @@
         }
       ]))
       true
-    ]
-    [
+    ];
+    missing-dependency-throws = [
       (sundry.does-throw (topo-stratify [
         {
           name = "X";
@@ -86,6 +86,6 @@
         }
       ]))
       true
-    ]
-  ];
+    ];
+  };
 }

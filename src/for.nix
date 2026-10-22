@@ -9,20 +9,20 @@
   in
     recurse init-state init-id;
 
-  tests = [
-    [
+  tests = {
+    factorial = [
       (for [1 (i: i <= 10) (i: i + 1)]
         {acc = 1;}
         (prev: i: {acc = i * prev.acc;}))
       {acc = 3628800;}
-    ]
-    [
+    ];
+    condition-false-initially = [
       (for [0 (i: i != 0) (i: i)]
         {value = 0;}
         (prev: i: {value = 10;}))
       {value = 0;}
-    ]
-    [
+    ];
+    break-early = [
       (for [0 (i: i < 10) (i: i + 1)]
         {acc = 1;}
         (prev: i: {
@@ -30,6 +30,6 @@
           break = i == 1;
         }))
       {acc = 1;}
-    ]
-  ];
+    ];
+  };
 }

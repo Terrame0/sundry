@@ -42,8 +42,8 @@ in rec {
   compare = compare-base (_: false);
   compare-until = compare-base;
 
-  tests = [
-    [
+  tests = {
+    nested-diff = [
       (compare {
           A = "A";
           B = {C = {D = "B.C.D";};};
@@ -65,8 +65,8 @@ in rec {
           D = "D";
         };
       }
-    ]
-    [
+    ];
+    identity = [
       (compare {
           A = 1;
           B = 2;
@@ -82,24 +82,24 @@ in rec {
         };
         missing = {};
       }
-    ]
-    [
+    ];
+    disjoint = [
       (compare {A = 1;} {B = 2;})
       {
         extra = {A = 1;};
         matched = {};
         missing = {B = 2;};
       }
-    ]
-    [
+    ];
+    empty = [
       (compare {} {})
       {
         extra = {};
         matched = {};
         missing = {};
       }
-    ]
-    [
+    ];
+    compare-until-stop = [
       (compare-until
         (ref-value: ref-value ? stop)
         {
@@ -127,6 +127,6 @@ in rec {
         };
         missing = {};
       }
-    ]
-  ];
+    ];
+  };
 }

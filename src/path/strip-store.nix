@@ -11,10 +11,10 @@
     else if !(lib.hasPrefix builtins.storeDir path-str)
     then throw "strip-store: expected a path under '${builtins.storeDir}', got '${path-str}'"
     else lib.removePrefix (sundry.path.store-root path-str) path-str;
-  tests = [
-    [(strip-store "${builtins.storeDir}/abc-x/src/f.nix") "/src/f.nix"]
-    [(strip-store "${builtins.storeDir}/abc-x") ""]
-    [(sundry.does-throw (strip-store "/tmp/A.txt")) true]
-    [(sundry.does-throw (strip-store 10)) true]
-  ];
+  tests = {
+    nested-path = [(strip-store "${builtins.storeDir}/abc-x/src/f.nix") "/src/f.nix"];
+    store-root = [(strip-store "${builtins.storeDir}/abc-x") ""];
+    outside-store = [(sundry.does-throw (strip-store "/tmp/A.txt")) true];
+    non-string = [(sundry.does-throw (strip-store 10)) true];
+  };
 }

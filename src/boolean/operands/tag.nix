@@ -7,20 +7,20 @@ in rec {
   tests = let
     tag-list = [{a = "1";} {b = ["1" "2"];}];
     override-list = [{modules = "user";} {a = "1";} {modules = "system";}];
-  in [
-    [(tag tag-list {a = "1";}) true]
-    [(tag tag-list {b = "2";}) true]
-    [(tag tag-list ({a = "1";} // {b = "2";})) true]
-    [(tag [] {}) true]
-    [(tag [] {a = "1";}) false]
+  in {
+    tag-exact-match = [(tag tag-list {a = "1";}) true];
+    tag-list-contains = [(tag tag-list {b = "2";}) true];
+    tag-conjunction = [(tag tag-list ({a = "1";} // {b = "2";})) true];
+    tag-empty-spec = [(tag [] {}) true];
+    tag-empty-spec-miss = [(tag [] {a = "1";}) false];
 
-    [(deepest-tag override-list {modules = "system";}) true]
-    [(deepest-tag override-list {modules = "user";}) false]
-    [(deepest-tag override-list {modules = [];}) true]
-    [(deepest-tag override-list {absent = "x";}) false]
-    [(deepest-tag [{modules = "user";} {a = "1";}] {modules = "user";}) true]
-    [(deepest-tag [{modules = ["system" "user"];}] {modules = "user";}) true]
-    [(deepest-tag [] {}) true]
-    [(deepest-tag [] {modules = "system";}) false]
-  ];
+    deepest-overrides = [(deepest-tag override-list {modules = "system";}) true];
+    deepest-shadowed = [(deepest-tag override-list {modules = "user";}) false];
+    deepest-empty-spec = [(deepest-tag override-list {modules = [];}) true];
+    deepest-absent = [(deepest-tag override-list {absent = "x";}) false];
+    deepest-single = [(deepest-tag [{modules = "user";} {a = "1";}] {modules = "user";}) true];
+    deepest-list-value = [(deepest-tag [{modules = ["system" "user"];}] {modules = "user";}) true];
+    deepest-empty-tag = [(deepest-tag [] {}) true];
+    deepest-empty-tag-miss = [(deepest-tag [] {modules = "system";}) false];
+  };
 }

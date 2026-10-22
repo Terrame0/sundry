@@ -1,7 +1,7 @@
 {
   lib,
   sundry,
-  flake-root,
+  fixtures-dir,
   pkgs,
   ...
 }: rec {
@@ -42,42 +42,42 @@
       dir;
   };
 
-  tests = [
-    [
+  tests = {
+    dir-origin-text = [
       (builtins.readFile
-        (lib.pipe (flake-root + "/tests/vfs-test-dir/test-files") [
+        (lib.pipe (fixtures-dir + "/vfs-test-dir/test-files") [
           sundry.vfs.dir.from-src
           (materialize "test-dir")
           (result: result.dir)
         ])."A.txt".origin)
       "contents of A.txt"
-    ]
-    [
+    ];
+    drv-path-text = [
       (builtins.readFile
-        (lib.pipe (flake-root + "/tests/vfs-test-dir/test-files") [
+        (lib.pipe (fixtures-dir + "/vfs-test-dir/test-files") [
           sundry.vfs.dir.from-src
           (materialize "test-dir-drv")
           (result: "${result.drv}/A.txt")
         ]))
       "contents of A.txt"
-    ]
-    [
+    ];
+    escaped-quote-text = [
       (builtins.readFile
-        (lib.pipe (flake-root + "/tests/vfs-test-dir/escaping") [
+        (lib.pipe (fixtures-dir + "/vfs-test-dir/escaping") [
           sundry.vfs.dir.from-src
           (materialize "escaping-dir")
           (result: result.dir)
         ])."A.txt".origin)
       "a'b'c"
-    ]
-    [
+    ];
+    throws-on-missing-text = [
       (sundry.does-throw
         (materialize "missing-text" {
           "A.txt" = {origin = "/tmp/A.txt";};
         }))
       true
-    ]
-    [
+    ];
+    lazy-text = [
       (sundry.does-throw-whnf (materialize "lazy" {
         "A.txt" = {
           origin = "/tmp/A.txt";
@@ -85,8 +85,8 @@
         };
       }))
       false
-    ]
-    [
+    ];
+    throws-on-forced-text = [
       (sundry.does-throw
         (materialize "lazy" {
           "A.txt" = {
@@ -95,6 +95,6 @@
           };
         }).drv)
       true
-    ]
-  ];
+    ];
+  };
 }

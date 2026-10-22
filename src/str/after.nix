@@ -6,9 +6,9 @@
   after = sep: string:
     sundry.str.join-with sep (lib.tail (sundry.str.split sep string));
 
-  tests = [
-    [(after "." "A.B") "B"]
-    [(after "." "A.B.C") "B.C"]
-    [(after "." "A") ""]
-  ];
+  tests = {
+    single-dot = [(after "." "A.B") "B"];
+    multiple-dots = [(after "." "A.B.C") "B.C"];
+    no-delimiter = [(after "." "A") ""];
+  };
 }

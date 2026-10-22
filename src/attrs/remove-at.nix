@@ -15,8 +15,8 @@
         then attrs // {${key} = recursion-result;}
         else removeAttrs attrs [key];
 
-  tests = [
-    [
+  tests = {
+    nested-leaf = [
       (remove-at ["A" "B" "C"] {
         A = {
           B = {
@@ -26,18 +26,18 @@
         };
       })
       {A = {B = {D = 2;};};}
-    ]
-    [
+    ];
+    empties-parent = [
       (remove-at ["A" "B" "C"] {A = {B = {C = 1;};};})
       {}
-    ]
-    [
+    ];
+    top-level = [
       (remove-at ["A"] {
         A = 1;
         B = 2;
       })
       {B = 2;}
-    ]
-    [(remove-at [] {A = 1;}) {A = 1;}]
-  ];
+    ];
+    empty-path = [(remove-at [] {A = 1;}) {A = 1;}];
+  };
 }

@@ -22,50 +22,50 @@
     else if is-dir path node
     then false
     else throw "\nvfs directory node at '/${sundry.vfs.path.get.str path}' is neither a leaf nor a directory";
-  tests = [
-    [(is-dir "..." {a = {};}) true]
-    [(is-dir "..." {}) true]
-    [(is-dir "..." {a = 10;}) false]
-    [
+  tests = {
+    is-dir-nested-attrs = [(is-dir "..." {a = {};}) true];
+    is-dir-empty = [(is-dir "..." {}) true];
+    is-dir-scalar-child = [(is-dir "..." {a = 10;}) false];
+    is-dir-lazy-expr = [
       (is-dir "..." {
         origin = "...";
         expr = throw "expr was forced";
       })
       false
-    ]
-    [(is-leaf "..." {text = "...";}) true]
-    [(is-leaf "..." {origin = ./node-cond.nix;}) true]
+    ];
+    is-leaf-text = [(is-leaf "..." {text = "...";}) true];
+    is-leaf-path-origin = [(is-leaf "..." {origin = ./node-cond.nix;}) true];
     # -- a materialized file drops 'text' and downstream stages may re-point
     # - 'origin' at a derivation, so a derivation-only node is still a leaf
-    [(is-leaf "..." {origin = {type = "derivation";};}) true]
-    [(is-leaf-node "..." {origin = {type = "derivation";};}) true]
-    [
+    is-leaf-derivation-origin = [(is-leaf "..." {origin = {type = "derivation";};}) true];
+    is-leaf-node-derivation-origin = [(is-leaf-node "..." {origin = {type = "derivation";};}) true];
+    is-leaf-lazy-expr = [
       (is-leaf "..." {
         origin = "...";
         expr = throw "expr was forced";
       })
       true
-    ]
-    [
+    ];
+    is-leaf-lazy-text = [
       (is-leaf "..." {
         origin = "...";
         text = throw "text was forced";
       })
       true
-    ]
-    [(is-leaf "..." {expr = 10;}) false]
-    [(is-leaf "..." {file = {text = "...";};}) false]
-    [(is-leaf "..." {text = {};}) false]
-    [(is-leaf-node "..." {text = "...";}) true]
-    [
+    ];
+    is-leaf-unknown-attr = [(is-leaf "..." {expr = 10;}) false];
+    is-leaf-nested-dir = [(is-leaf "..." {file = {text = "...";};}) false];
+    is-leaf-non-string-text = [(is-leaf "..." {text = {};}) false];
+    is-leaf-node-text = [(is-leaf-node "..." {text = "...";}) true];
+    is-leaf-node-lazy-expr = [
       (is-leaf-node "..." {
         origin = "...";
         expr = throw "expr was forced";
       })
       true
-    ]
-    [(is-leaf-node "..." {a = {};}) false]
-    [(sundry.does-throw (is-leaf-node ["x" "y" "z"] {a = 10;})) true]
-    [(sundry.does-throw (is-leaf-node ["x" "y" "z"] 10)) true]
-  ];
+    ];
+    is-leaf-node-directory = [(is-leaf-node "..." {a = {};}) false];
+    throws-on-non-dir-child = [(sundry.does-throw (is-leaf-node ["x" "y" "z"] {a = 10;})) true];
+    throws-on-non-attrs = [(sundry.does-throw (is-leaf-node ["x" "y" "z"] 10)) true];
+  };
 }

@@ -26,8 +26,8 @@
       C = {D = 2;};
       E = {F = {G = 0;};};
     };
-  in [
-    [
+  in {
+    matched-until = [
       (walk-matched-until
         (path: value: value != 0)
         (path: value: lib.length path > 1)
@@ -39,8 +39,8 @@
         C = {D = "x";};
         E = {F = "x";};
       }
-    ]
-    [
+    ];
+    matched = [
       (walk-matched
         (path: value: value != 0)
         (path: value: "x")
@@ -51,8 +51,8 @@
         C = {D = "x";};
         E = {F = {G = 0;};};
       }
-    ]
-    [
+    ];
+    until = [
       (walk-until
         (path: value: lib.length path > 1)
         (path: value: "x")
@@ -63,8 +63,8 @@
         C = {D = "x";};
         E = {F = "x";};
       }
-    ]
-    [
+    ];
+    walk-all = [
       (walk
         (path: value: "x")
         attrs)
@@ -74,6 +74,6 @@
         C = {D = "x";};
         E = {F = {G = "x";};};
       }
-    ]
-  ];
+    ];
+  };
 }

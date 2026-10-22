@@ -1,7 +1,7 @@
 {
   lib,
   sundry,
-  flake-root,
+  fixtures-dir,
   ...
 }: rec {
   resolve-tags =
@@ -31,67 +31,67 @@
             path;
           };
       });
-  tests = [
-    [
-      (lib.pipe (flake-root + "/tests/vfs-test-dir/tags") [
+  tests = {
+    tagged-tree = [
+      (lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
         sundry.vfs.dir.from-src
         resolve-tags
       ])
       {
         A = {
           text = "contents of A";
-          origin = flake-root + "/tests/vfs-test-dir/tags/A{a:1}";
+          origin = fixtures-dir + "/vfs-test-dir/tags/A{a:1}";
           tag-list = [{a = "1";}];
         };
         B = {
           text = "contents of B";
-          origin = flake-root + "/tests/vfs-test-dir/tags/B{a:2,3}";
+          origin = fixtures-dir + "/vfs-test-dir/tags/B{a:2,3}";
           tag-list = [{a = ["2" "3"];}];
         };
         C = {
           text = "contents of C";
-          origin = flake-root + "/tests/vfs-test-dir/tags/C{a:1}{b:1}";
+          origin = fixtures-dir + "/vfs-test-dir/tags/C{a:1}{b:1}";
           tag-list = [({a = "1";} // {b = "1";})];
         };
         D = {
           text = "contents of D";
-          origin = flake-root + "/tests/vfs-test-dir/tags/D{a}{b:}";
+          origin = fixtures-dir + "/vfs-test-dir/tags/D{a}{b:}";
           tag-list = [({a = "";} // {b = "";})];
         };
         E = {
           text = "contents of E";
-          origin = flake-root + "/tests/vfs-test-dir/tags/E";
+          origin = fixtures-dir + "/vfs-test-dir/tags/E";
           tag-list = [{}];
         };
         "=" = {
           F = {
             text = "contents of F";
-            origin = flake-root + "/tests/vfs-test-dir/tags/={a:1}/F{a:2}";
+            origin = fixtures-dir + "/vfs-test-dir/tags/={a:1}/F{a:2}";
             tag-list = [{a = "1";} {a = "2";}];
           };
           I = {
             text = "contents of I";
-            origin = flake-root + "/tests/vfs-test-dir/tags/={b:1}/I{c:1}";
+            origin = fixtures-dir + "/vfs-test-dir/tags/={b:1}/I{c:1}";
             tag-list = [{b = "1";} {c = "1";}];
           };
           "=" = {
             G = {
               text = "contents of G";
-              origin = flake-root + "/tests/vfs-test-dir/tags/={a:1}/={b:1}/G{b:2}";
+              origin = fixtures-dir + "/vfs-test-dir/tags/={a:1}/={b:1}/G{b:2}";
               tag-list = [{a = "1";} {b = "1";} {b = "2";}];
             };
             "=" = {
               H = {
                 text = "contents of H";
-                origin = flake-root + "/tests/vfs-test-dir/tags/={a:1}/={b:1}/={c:1}/H{c:2}";
+                origin = fixtures-dir + "/vfs-test-dir/tags/={a:1}/={b:1}/={c:1}/H{c:2}";
                 tag-list = [{a = "1";} {b = "1";} {c = "1";} {c = "2";}];
               };
             };
           };
         };
       }
-    ]
-    [
+    ];
+    collision-lazy = [
       (sundry.does-throw-whnf (resolve-tags {
         "A{a:1}" = {
           text = "abc";
@@ -103,8 +103,8 @@
         };
       }))
       false
-    ]
-    [
+    ];
+    throws-on-collision = [
       (sundry.does-throw (resolve-tags {
         "A{a:1}" = {
           text = "abc";
@@ -116,8 +116,8 @@
         };
       }))
       true
-    ]
-    [
+    ];
+    throws-on-resolved-tag = [
       (sundry.does-throw (resolve-tags {
         A = {
           text = "abc";
@@ -126,6 +126,6 @@
         };
       }))
       true
-    ]
-  ];
+    ];
+  };
 }

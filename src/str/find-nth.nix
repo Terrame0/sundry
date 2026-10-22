@@ -28,19 +28,19 @@ in rec {
     n
     seq
     str;
-  tests = [
-    [(find-nth 1 "A" "ABAB") 0]
-    [(find-nth 2 "A" "ABAB") 2]
-    [(find-nth 1 "AB" "ABABAB") 0]
-    [(find-nth 2 "AB" "ABABAB") 2]
-    [(find-nth 3 "A" "ABAB") null]
-    [(find-nth 0 "A" "ABAB") null]
+  tests = {
+    find-first-char = [(find-nth 1 "A" "ABAB") 0];
+    find-second-char = [(find-nth 2 "A" "ABAB") 2];
+    find-first-pair = [(find-nth 1 "AB" "ABABAB") 0];
+    find-second-pair = [(find-nth 2 "AB" "ABABAB") 2];
+    find-missing = [(find-nth 3 "A" "ABAB") null];
+    find-zero = [(find-nth 0 "A" "ABAB") null];
 
-    [(rfind-nth 1 "A" "ABAB") 2]
-    [(rfind-nth 2 "A" "ABAB") 0]
-    [(rfind-nth 1 "AB" "ABABAB") 4]
-    [(rfind-nth 2 "AB" "ABABAB") 2]
-    [(rfind-nth 3 "A" "ABAB") null]
-    [(rfind-nth 0 "A" "ABAB") null]
-  ];
+    rfind-first-char = [(rfind-nth 1 "A" "ABAB") 2];
+    rfind-second-char = [(rfind-nth 2 "A" "ABAB") 0];
+    rfind-first-pair = [(rfind-nth 1 "AB" "ABABAB") 4];
+    rfind-second-pair = [(rfind-nth 2 "AB" "ABABAB") 2];
+    rfind-missing = [(rfind-nth 3 "A" "ABAB") null];
+    rfind-zero = [(rfind-nth 0 "A" "ABAB") null];
+  };
 }

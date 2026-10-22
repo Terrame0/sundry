@@ -31,15 +31,15 @@
   in
     result.str;
 
-  tests = [
-    [
+  tests = {
+    nested-brackets = [
       (apply-between lib.id "[" "]" "A[X]B[Y]C[Z]D")
       "AXBYCZD"
-    ]
-    [
+    ];
+    adjacent-empty = [
       (apply-between (str: "X") "[" "]" "[[][]][]")
       "XX"
-    ]
-    [(apply-between (str: "X") "[" "]" "ABC") "ABC"]
-  ];
+    ];
+    no-delimiters = [(apply-between (str: "X") "[" "]" "ABC") "ABC"];
+  };
 }

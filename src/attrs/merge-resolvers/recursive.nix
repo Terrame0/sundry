@@ -7,12 +7,12 @@
     if lib.isAttrs acc-value && lib.isAttrs value
     then sundry.attrs.merge-with (next-path: recursive resolve-next (path ++ next-path)) [acc-value value]
     else resolve-next path acc-value value;
-  tests = [
-    [
+  tests = {
+    nested-override = [
       (sundry.attrs.merge.recursive.override [{A = {B = 1;};} {A = {B = 2;};}])
       {A = {B = 2;};}
-    ]
-    [
+    ];
+    nested-merge = [
       (sundry.attrs.merge.recursive.override [{A = {B = 1;};} {A = {C = 2;};}])
       {
         A = {
@@ -20,8 +20,8 @@
           C = 2;
         };
       }
-    ]
-    [
+    ];
+    custom-resolver-path = [
       (sundry.attrs.merge-with-resolvers [
           recursive
           (path: lhs: rhs: path)
@@ -30,6 +30,6 @@
           {A."B.C" = 2;}
         ])
       {A."B.C" = ["A" "B.C"];}
-    ]
-  ];
+    ];
+  };
 }

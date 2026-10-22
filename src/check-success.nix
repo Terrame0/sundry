@@ -8,22 +8,22 @@
     then value
     else throw "\n${attrs.error-msg}";
 
-  tests = [
-    [
+  tests = {
+    success-returns-value = [
       (check-success "A" {
         success = true;
         error-msg = "B";
       })
       "A"
-    ]
-    [
+    ];
+    failure-throws = [
       (sundry.does-throw (check-success "A" {
         success = false;
         error-msg = "B";
       }))
       true
-    ]
-    [(sundry.does-throw (check-success "A" {error-msg = "B";})) true]
-    [(sundry.does-throw (check-success "A" {success = true;})) true]
-  ];
+    ];
+    missing-success = [(sundry.does-throw (check-success "A" {error-msg = "B";})) true];
+    missing-error-msg = [(sundry.does-throw (check-success "A" {success = true;})) true];
+  };
 }

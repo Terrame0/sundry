@@ -1,7 +1,7 @@
 {
   lib,
   sundry,
-  flake-root,
+  fixtures-dir,
   ...
 }: {
   walk =
@@ -14,27 +14,27 @@
     sundry.vfs.is-leaf-node;
 
   tests = let
-    test-dir = sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files");
-    tag-dir = lib.pipe (flake-root + "/tests/vfs-test-dir/tags") [
+    fixture-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files");
+    tags-file-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
       sundry.vfs.dir.from-src
       sundry.vfs.dir.resolve-tags
     ];
-  in [
-    [
-      (sundry.vfs.dir.walk (path: file: {text = "walked ${file.text}";}) test-dir)
+  in {
+    walked-tree = [
+      (sundry.vfs.dir.walk (path: file: {text = "walked ${file.text}";}) fixture-file-tree)
       {
         "A.txt" = {text = "walked contents of A.txt";};
         "B.txt" = {text = "walked contents of B.txt";};
         "=" = {"C.txt" = {text = "walked contents of C.txt";};};
       }
-    ]
-    [
+    ];
+    within-tag = [
       (sundry.vfs.dir.collapse
         (path: file: file.text)
         (sundry.vfs.dir.walk-within-tag
           (e: with e; tag {b = "1";})
           (path: file: file // {text = "walked ${file.text}";})
-          tag-dir))
+          tags-file-tree))
       [
         "walked contents of H"
         "walked contents of G"
@@ -46,6 +46,6 @@
         "contents of D"
         "contents of E"
       ]
-    ]
-  ];
+    ];
+  };
 }

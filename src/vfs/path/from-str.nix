@@ -6,12 +6,12 @@
       # - toString keeps that context when the input is already a context-carrying string
       # - so we discard to accept both path literals and context-carrying strings
       (builtins.unsafeDiscardStringContext (toString path-str)));
-  tests = [
-    [
+  tests = {
+    absolute-path = [
       (from-str "/A/B/C.txt")
       ["A" "B" "C.txt"]
-    ]
-    [(from-str "A/B") ["A" "B"]]
-    [(from-str "") []]
-  ];
+    ];
+    relative-path = [(from-str "A/B") ["A" "B"]];
+    empty-path = [(from-str "") []];
+  };
 }

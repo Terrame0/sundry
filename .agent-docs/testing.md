@@ -4,34 +4,36 @@ How tests are written and run in this library.
 
 ## Test format
 
-Each `.nix` file under `src/` may export a `tests` attribute that is a list of two-element lists:
+Each `.nix` file under `src/` may export a `tests` attribute: a named attrset whose values are two-element lists.
 
 ```nix
-tests = [
-  [ <actual-expression> <expected-value> ]
+tests = {
+  <name> = [ <actual-expression> <expected-value> ];
   ...
-];
+};
 ```
 
-Tests are evaluated by [core/eval-tests.nix](../core/eval-tests.nix). The framework strips `tests` from the module's public exports, so it never leaks into the `sundry.*` namespace.
+The name is a short kebab-case description of the case (`empty-input`, `throws-on-empty`, `finds-at-end`) and is what the failure report prints. It must be a valid unquoted Nix identifier — start with a letter, then letters, digits, `-` or `'` — and unique within the file. Attrsets iterate lexicographically, not in source order, so do not rely on declaration order to group related cases; the name carries that meaning.
 
-A single-element list `[ <value> ]` instead of `[ actual expected ]` is treated as a **debug print** — the value is rendered and shown regardless of correctness. Useful when probing behavior.
+Tests are collected by [tests.nix](../tests.nix), which imports every module through [assemble.nix](../assemble.nix). The assembly strips `tests` from the module's public exports, so it never leaks into the `sundry.*` namespace.
+
+Every entry must be a two-element list. `tests.nix` compares `actual` with `expected` and throws on a malformed entry, so a one-element list is a hard error rather than a debug print.
 
 ## Where tests live
 
-Inline `tests = [...]` blocks in the source file are the default. Use them whenever the test fixture is small and self-contained (an inline attrset, a string literal, a small list).
+Inline `tests = { ... }` blocks in the source file are the default. Use them whenever the test fixture is small and self-contained (an inline attrset, a string literal, a small list).
 
-On-disk fixtures live under `tests/`. The VFS suite uses [tests/vfs-test-dir/](../tests/vfs-test-dir/) through `sundry.vfs.dir.from-src`; the Python packaging test uses [tests/python/](../tests/python/) as its source tree. The VFS fixture naming scheme is described in [test-naming.md](test-naming.md).
+On-disk fixtures live under `test-fixtures/`, outside `src/` so the library globber never picks them up. Test modules address them through the `fixtures-dir` argument (`flake-dir + "/test-fixtures"`), so a fixture at `test-fixtures/vfs-test-dir/test-files` is `fixtures-dir + "/vfs-test-dir/test-files"`; never build the path from `flake-dir` or the module's own location. The VFS suite uses [test-fixtures/vfs-test-dir/](../test-fixtures/vfs-test-dir/) through `sundry.vfs.dir.from-src`; the Python packaging test uses [test-fixtures/python/](../test-fixtures/python/) as its source tree. The VFS fixture naming scheme is described in [test-naming.md](test-naming.md).
 
 ## Running tests
 
 ```bash
-bash eval-result.sh
+nu ./eval-tests.nu
 ```
 
-Returns a Nix list containing failing check reports and every single-element debug report. Empty list `[ ]` means all checks pass and no debug entries remain.
+`eval-tests.nu` evaluates `tests.nix` and renders the failures as a Nushell table: one row per failing case with `name`, `source`, `value`, and `expected`. `source` is relative to the repository root; `value` and `expected` are pretty-printed on one line. An empty result (Nushell renders it as `empty list`) means every check passed.
 
-Each failure is formatted as labeled `expected` and `got` blocks with the source file path.
+`tests.nix` is also the flake's `tests` output; it is a function taking `{lib, pkgs}`.
 
 ## Edge case coverage
 

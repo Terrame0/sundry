@@ -10,9 +10,9 @@
       then sundry.list.at 0 list
       else list
     else throw "\nvalue must be a list";
-  tests = [
-    [(un-singleton [1]) 1]
-    [(un-singleton [1 2]) [1 2]]
-    [(sundry.does-throw (un-singleton 1)) true]
-  ];
+  tests = {
+    single-element = [(un-singleton [1]) 1];
+    multiple-elements = [(un-singleton [1 2]) [1 2]];
+    non-list-throws = [(sundry.does-throw (un-singleton 1)) true];
+  };
 }

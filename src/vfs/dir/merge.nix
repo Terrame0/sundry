@@ -1,7 +1,8 @@
 {sundry, ...}: {
   merge = lhs: rhs: sundry.attrs.merge.dirs.no-collision [lhs rhs];
-  tests = [
-    [
+  merge-n = sundry.attrs.merge.dirs.no-collision;
+  tests = {
+    merge-disjoint = [
       (sundry.vfs.dir.merge
         {
           A = {
@@ -37,12 +38,12 @@
           };
         };
       }
-    ]
-    [
+    ];
+    merge-empty = [
       (sundry.vfs.dir.merge {} {})
       {}
-    ]
-    [
+    ];
+    merge-into-empty = [
       (sundry.vfs.dir.merge
         {}
         {
@@ -55,8 +56,8 @@
           text = "a";
         };
       }
-    ]
-    [
+    ];
+    throws-on-file-collision = [
       (sundry.does-throw (sundry.vfs.dir.merge
         {
           "A.txt" = {
@@ -69,8 +70,8 @@
           };
         }))
       true
-    ]
-    [
+    ];
+    throws-on-file-dir-collision = [
       (sundry.does-throw (sundry.vfs.dir.merge
         {
           A = {
@@ -85,6 +86,6 @@
           };
         }))
       true
-    ]
-  ];
+    ];
+  };
 }

@@ -16,22 +16,22 @@
 
   tests = let
     tag-list = [({A = 1;} // {B = 2;}) {C = 3;}];
-  in [
-    [
+  in {
+    tags-with-id = [
       (foldl (acc: tags: id: acc ++ [[tags id]]) [] tag-list)
       [[({A = 1;} // {B = 2;}) 0] [{C = 3;} 1]]
-    ]
-    [
+    ];
+    ids = [
       (foldl (acc: tags: id: acc ++ [id]) [] tag-list)
       [0 1]
-    ]
-    [
+    ];
+    merge-attrs = [
       (foldl (acc: tags: id: acc // tags) {} tag-list)
       ({A = 1;} // {B = 2;} // {C = 3;})
-    ]
-    [
+    ];
+    empty-list = [
       (foldl (acc: tags: id: acc ++ [id]) [] [])
       []
-    ]
-  ];
+    ];
+  };
 }

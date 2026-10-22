@@ -4,13 +4,13 @@
     (lib.toList a)
     (lib.toList b);
 
-  tests = [
-    [(intersect "A" "A") ["A"]]
-    [(intersect "A" "B") []]
-    [(intersect ["A" "B"] "A") ["A"]]
-    [(intersect ["A" "B"] ["B" "C"]) ["B"]]
-    [(intersect ["A" "B"] ["C" "D"]) []]
-    [(intersect ["A" "B"] []) []]
-    [(intersect [] []) []]
-  ];
+  tests = {
+    same-singletons = [(intersect "A" "A") ["A"]];
+    different-singletons = [(intersect "A" "B") []];
+    list-and-singleton = [(intersect ["A" "B"] "A") ["A"]];
+    overlapping-lists = [(intersect ["A" "B"] ["B" "C"]) ["B"]];
+    disjoint-lists = [(intersect ["A" "B"] ["C" "D"]) []];
+    empty-second = [(intersect ["A" "B"] []) []];
+    both-empty = [(intersect [] []) []];
+  };
 }

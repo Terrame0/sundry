@@ -51,8 +51,8 @@
       boom = {transform = _: throw "boom was forced";};
       safe = {transform = _: 1;};
     };
-  in [
-    [
+  in {
+    dependency-chain = [
       (resolve-deps {
         first = {
           transform = _: 1;
@@ -76,9 +76,9 @@
         third = 3;
         fourth = 5;
       }
-    ]
-    [(resolve-deps {}) {}]
-    [
+    ];
+    empty-input = [(resolve-deps {}) {}];
+    cycle-throws = [
       (sundry.does-throw (resolve-deps {
         A = {
           deps = ["B"];
@@ -90,8 +90,8 @@
         };
       }))
       true
-    ]
-    [(sundry.does-throw-whnf fixture.safe) false]
-    [(sundry.does-throw fixture.boom) true]
-  ];
+    ];
+    lazy-safe = [(sundry.does-throw-whnf fixture.safe) false];
+    boom-throws = [(sundry.does-throw fixture.boom) true];
+  };
 }

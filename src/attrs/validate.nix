@@ -127,8 +127,8 @@ in rec {
       }
     ];
 
-  tests = [
-    [
+  tests = {
+    defaults-and-checks = [
       (
         validate
         {
@@ -160,8 +160,8 @@ in rec {
           D = 3;
         };
       }
-    ]
-    [
+    ];
+    chained-defaults = [
       (
         validate
         {
@@ -180,8 +180,8 @@ in rec {
         B = 2;
         C = 1;
       }
-    ]
-    [
+    ];
+    nested-defaults = [
       (
         validate
         {
@@ -202,8 +202,8 @@ in rec {
           C = 2;
         };
       }
-    ]
-    [
+    ];
+    missing-attribute = [
       (sundry.does-throw (
         validate
         {
@@ -213,8 +213,8 @@ in rec {
         {A = 1;}
       ))
       true
-    ]
-    [
+    ];
+    check-failure = [
       (sundry.does-throw (
         validate
         {
@@ -227,8 +227,8 @@ in rec {
         {A = 1;}
       ))
       true
-    ]
-    [
+    ];
+    extra-attribute = [
       (sundry.does-throw (
         validate
         {
@@ -240,8 +240,8 @@ in rec {
         }
       ))
       true
-    ]
-    [
+    ];
+    unexpected-spec-attribute = [
       (sundry.does-throw (
         validate
         {
@@ -254,16 +254,16 @@ in rec {
         {A = 1;}
       ))
       true
-    ]
-    [
+    ];
+    default-not-forced = [
       (sundry.does-throw-whnf (validate {A = {default = _: throw "default called";};} {A = 1;}))
       false
-    ]
-    [
+    ];
+    default-forced = [
       (sundry.does-throw (validate {A = {default = _: throw "default called";};} {}))
       true
-    ]
-    [
+    ];
+    nullable-value = [
       (validate {
         A = {
           nullable = true;
@@ -272,8 +272,8 @@ in rec {
         };
       } {A = null;})
       {A = null;}
-    ]
-    [
+    ];
+    nullable-rejects-non-null = [
       (sundry.does-throw (validate {
         A = {
           nullable = true;
@@ -282,6 +282,6 @@ in rec {
         };
       } {A = 1;}))
       true
-    ]
-  ];
+    ];
+  };
 }

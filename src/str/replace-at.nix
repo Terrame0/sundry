@@ -8,11 +8,11 @@
     after = lib.substring (pos + len) (sundry.str.len str) str;
   in
     before + replacement + after;
-  tests = [
-    [(replace-at 2 2 "..." "ABCDEF") "AB...EF"]
-    [(replace-at 3 0 "." "ABCDEF") "ABC.DEF"]
-    [(replace-at 2 2 "" "ABCDEF") "ABEF"]
-    [(replace-at 0 0 "X" "ABC") "XABC"]
-    [(replace-at 6 0 "X" "ABCDEF") "ABCDEFX"]
-  ];
+  tests = {
+    replace-middle = [(replace-at 2 2 "..." "ABCDEF") "AB...EF"];
+    insert-middle = [(replace-at 3 0 "." "ABCDEF") "ABC.DEF"];
+    delete-middle = [(replace-at 2 2 "" "ABCDEF") "ABEF"];
+    insert-at-start = [(replace-at 0 0 "X" "ABC") "XABC"];
+    insert-at-end = [(replace-at 6 0 "X" "ABCDEF") "ABCDEFX"];
+  };
 }

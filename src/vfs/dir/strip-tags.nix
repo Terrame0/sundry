@@ -1,7 +1,4 @@
-{
-  sundry,
-  ...
-}: rec {
+{sundry, ...}: rec {
   strip-tags =
     sundry.attrs.reform-until
     sundry.vfs.is-leaf-node
@@ -25,8 +22,8 @@
         tag-list = [{a = "1";}];
       };
     };
-  in [
-    [
+  in {
+    dirty-tree = [
       (strip-tags dirty)
       {
         "=" = {
@@ -36,8 +33,8 @@
           };
         };
       }
-    ]
-    [
+    ];
+    resolved-tree = [
       (strip-tags resolved)
       {
         A = {
@@ -45,10 +42,10 @@
           origin = "/A";
         };
       }
-    ]
-    [
+    ];
+    idempotent = [
       (strip-tags (strip-tags dirty))
       (strip-tags dirty)
-    ]
-  ];
+    ];
+  };
 }

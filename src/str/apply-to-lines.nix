@@ -1,8 +1,8 @@
 {sundry, ...}: rec {
   apply-to-lines = fn: str:
     sundry.str.join-with "\n" (map fn (sundry.str.split "\n" str));
-  tests = [
-    [
+  tests = {
+    multiline = [
       (apply-to-lines
         (line: "${line}-modified")
         ''
@@ -13,7 +13,7 @@
         A-modified
         B-modified
         C-modified''
-    ]
-    [(apply-to-lines (line: "${line}-modified") "A") "A-modified"]
-  ];
+    ];
+    single-line = [(apply-to-lines (line: "${line}-modified") "A") "A-modified"];
+  };
 }

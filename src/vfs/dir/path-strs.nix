@@ -1,6 +1,6 @@
 {
   sundry,
-  flake-root,
+  fixtures-dir,
   ...
 }: rec {
   path-strs = dir:
@@ -8,20 +8,20 @@
     sundry.vfs.is-leaf-node
     (path: _: sundry.vfs.path.get.str path)
     dir;
-  tests = [
-    [
-      (path-strs (sundry.vfs.dir.from-src (flake-root + "/tests/vfs-test-dir/test-files")))
+  tests = {
+    tagged-tree = [
+      (path-strs (sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files")))
       [
         "=/C.txt"
         "A.txt"
         "B.txt"
       ]
-    ]
-    [
+    ];
+    throws-on-invalid = [
       (sundry.does-throw (path-strs {
         invalid = "abc";
       }))
       true
-    ]
-  ];
+    ];
+  };
 }

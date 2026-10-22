@@ -15,7 +15,7 @@ A utility Nix library (`sundry.*`), assembled from files under `src/` where the 
 - [str-indexing.md](.agent-docs/str-indexing.md) — how `at`, `slice`, and `range` compose, the signed index-label model, and where slicing deliberately diverges from Python.
 - [module-layout.md](.agent-docs/module-layout.md) — where a file goes, how it maps to `sundry.*`, and when to split code vs. keep it together.
 - [authoring.md](.agent-docs/authoring.md) — how to build a function: compose existing primitives, keep pipe chains visible, derive related conditions from one condition, prefer the simplest model, and use few units.
-- [testing.md](.agent-docs/testing.md) — test format (`tests = [ [ actual expected ] ]`) and running tests with `bash eval-result.sh`.
+- [testing.md](.agent-docs/testing.md) — test format (`tests = { <name> = [ actual expected ]; }`) and running tests with `nu ./eval-tests.nu`.
 - [test-naming.md](.agent-docs/test-naming.md) — naming conventions for test fixtures.
 - [gotchas.md](.agent-docs/gotchas.md) — counter-intuitive lazy evaluation, empty-branch, text-forcing leaf recognition, reform-collision, collision-only directory validation, implicit path-to-store coercion, string-context propagation, per-file copy import breakage, derivation-origin leaves, already-resolved tag rejection, and signed string indices that must not be normalized.
 

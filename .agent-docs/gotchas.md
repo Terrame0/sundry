@@ -50,7 +50,7 @@ Avoid it: deeply force `sundry.vfs.dir.path-strs tree` or `sundry.vfs.dir.collap
 
 Rule: convert a path to a string only with `builtins.toString`; never hand a path to another string builtin.
 
-Why: Nix's path-to-string coercion defaults to `copyToStore = true`, so several string builtins copy the file into `/nix/store` under its basename before returning. A basename that is not a legal store name then aborts evaluation — which is what a `lib.hasSuffix ".nix"` filter over `listFilesRecursive` of a path literal hits on a name such as `что?`. [core/mk-lib.nix](../core/mk-lib.nix) sidesteps it by testing `baseNameOf path`.
+Why: Nix's path-to-string coercion defaults to `copyToStore = true`, so several string builtins copy the file into `/nix/store` under its basename before returning. A basename that is not a legal store name then aborts evaluation — which is what a `lib.hasSuffix ".nix"` filter over `listFilesRecursive` of a path literal hits on a name such as `что?`. [assemble.nix](../assemble.nix) sidesteps it by testing `baseNameOf path`.
 
 | Operation | Effect on a path |
 | --- | --- |
@@ -76,7 +76,7 @@ Avoid it: keep paths out of string helpers. Filter or compare on `baseNameOf pat
 
 Rule: `unsafeDiscardStringContext` a string before using it as a dynamic attribute name or any other context-free datum.
 
-Why: a string that carries store context — e.g. `"${self.outPath}/..."`, since interpolating a path yields a context-carrying string — keeps that context through `toString`, `removeSuffix`, `splitString`, and `removePrefix` (which preserves the context of the sliced string, not of the prefix). Building module paths with `lib.filesystem.listFilesRecursive "${self.outPath}/src"` therefore leaves each path segment carrying the source store path, and Nix rejects it as an attribute name: `the string 'attrs' is not allowed to refer to a store path`. Iterating with a path value (`listFilesRecursive ../src`) avoids this, because `builtins.toString` on a path is context-free. `flake-root` is itself a path (`./.`), so `flake-root + "/src"` is a context-free path; only interpolation (`"${flake-root}/src"`) would copy it to the store and reintroduce the context.
+Why: a string that carries store context — e.g. `"${self.outPath}/..."`, since interpolating a path yields a context-carrying string — keeps that context through `toString`, `removeSuffix`, `splitString`, and `removePrefix` (which preserves the context of the sliced string, not of the prefix). Building module paths with `lib.filesystem.listFilesRecursive "${self.outPath}/src"` therefore leaves each path segment carrying the source store path, and Nix rejects it as an attribute name: `the string 'attrs' is not allowed to refer to a store path`. Iterating with a path value (`listFilesRecursive ../src`) avoids this, because `builtins.toString` on a path is context-free. `flake-dir` is itself a path (`./.`), so `flake-dir + "/src"` is a context-free path; only interpolation (`"${flake-dir}/src"`) would copy it to the store and reintroduce the context.
 
 Avoid it: iterate path values and derive names with `toString`; when the input is already a context-carrying string, discard explicitly with `builtins.unsafeDiscardStringContext`. [from-str.nix](../src/vfs/path/from-str.nix) normalizes both cases this way.
 
@@ -90,15 +90,17 @@ Avoid it: keep tree-structured sources as path values and let [`dir.materialize`
 
 This is why [`file.from-src`](../src/vfs/file/from-src.nix) stores its `fs-path` unchanged instead of normalizing `origin` to a store string: `origin` is the exact value [`load-nix-with`](../src/vfs/dir/load-nix.nix) feeds to `import`, so a per-file copy there would turn every relative import in a loaded `.nix` into the error above. Normalizing `origin` at construction time plants a mine under the loader; the raw path keeps the tree intact until a stage that legitimately copies it whole.
 
-## `vfs.dir.get` matches a path by position inside a store object
+## `vfs.dir.get-relative-to` needs the root the tree was built from
 
-Rule: a path argument to [`vfs.dir.get`](../src/vfs/dir/get.nix) is resolved relative to the store object that contains it, and a store-object mismatch only warns.
+Rule: pass the tree's root explicitly — `get-relative-to root path dir` — and give a path (value or string) under that root. The function strips `root` and looks the remainder up in `dir`. A path outside `root` throws.
 
-Why: `get` strips the store-root (see [`strip-store`](../src/path/strip-store.nix)) and looks the remainder up in `dir`, so a path under a *different* top-level store object that happens to share a suffix resolves to that suffix's node — e.g. another derivation's `flake.nix` maps onto `dir`'s `flake.nix`. The function compares the node's `origin` store-root against the input's and emits `lib.warn` on a mismatch, but it still returns the node. Only leaves carry `origin`; directories and generated leaves have nothing to compare and return silently. A string argument is vfs-relative and does **not** undergo this check.
+Why: a VFS tree carries no record of its own filesystem root. Leaves have `origin`, but directories do not, so the root cannot be recovered from the tree. Guessing it from `builtins.storeDir` (the previous behaviour) worked only when the tree had been built from a store object and the query path belonged to the same object; a working-copy tree or a merged tree silently produced wrong segments. With an explicit root, one code path covers store and non-store trees alike: `get-relative-to root ./config dir` works whether `root` is `./.` or a store copy.
 
-Avoid it: treat the warning as an error in your context. To target a node by provenance rather than suffix, compare `origin` explicitly. A trailing `/`, an empty-segment path, and the root `"/"` all throw; a missing node throws a catchable `throw` (not `abort`).
+Store paths are not special. `builtins.storeDir` is not consulted; a store tree is just a tree whose root happens to be a store object. When a tree is merged from several sources (`vfs.dir.merge`), pass the root the target node came from — a query under a different source resolves to the wrong (or no) node. The function warns when the found node's `origin` lies outside `root`, but still returns the node.
 
-`get` strips tag annotations (`{...}`, via [`strip-between`](../src/vfs/path/strip-between.nix)) from a query segment when the cleaned path exists in `dir`, so an annotated segment such as `network{modules:system}` resolves against a `resolve-tags`-cleaned tree. It falls back to the raw segment when the cleaned path is absent, so the same call also works on an unresolved tree whose keys still carry annotations. `origin` keeps its annotations regardless.
+Avoid it: build the query from the same root you pass; use `root + "/relative/path"` (a path value) rather than interpolating. A trailing `/`, an empty-segment path, and `root` itself all throw; a missing node throws a catchable `throw` (not `abort`). VFS-relative strings (`"/src/f.nix"`) and segment lists are rejected — they duplicate attribute access, so use `sundry.attrs.get` or `dir.src.f` instead.
+
+`get-relative-to` strips tag annotations (`{...}`, via [`strip-between`](../src/vfs/path/strip-between.nix)) from a query segment when the cleaned path exists in `dir`, so an annotated segment such as `network{modules:system}` resolves against a `resolve-tags`-cleaned tree. It falls back to the raw segment when the cleaned path is absent, so the same call also works on an unresolved tree whose keys still carry annotations. `origin` keeps its annotations regardless.
 
 ## `origin` accepts a derivation, and external stages rely on it
 

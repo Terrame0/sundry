@@ -22,8 +22,8 @@
       C = {D = 2;};
       E = {F = {G = 0;};};
     };
-  in [
-    [
+  in {
+    filter-matched-until = [
       (filter-matched-until
         (path: value: value != 0)
         (path: value: lib.length path > 1)
@@ -34,8 +34,8 @@
         C = {D = 2;};
         E = {F = {G = 0;};};
       }
-    ]
-    [
+    ];
+    filter-matched = [
       (filter-matched
         (path: value: value != 0)
         (path: value: false)
@@ -44,8 +44,8 @@
         A = 0;
         E = {F = {G = 0;};};
       }
-    ]
-    [
+    ];
+    filter-until = [
       (filter-until
         (path: value: lib.length path > 1)
         (path: value: value != 0)
@@ -55,8 +55,8 @@
         C = {D = 2;};
         E = {F = {G = 0;};};
       }
-    ]
-    [
+    ];
+    filter = [
       (filter
         (path: value: value != 0)
         attrs)
@@ -64,6 +64,6 @@
         B = 1;
         C = {D = 2;};
       }
-    ]
-  ];
+    ];
+  };
 }

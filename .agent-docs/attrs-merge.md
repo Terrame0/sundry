@@ -1,6 +1,6 @@
 # Attrset merge
 
-`sundry.attrs.merge-with` merges a list of attrsets one level at a time. Attributes present in only one input pass through unchanged. Values under the same key are folded from left to right with a callback:
+[`sundry.attrs.merge-with`](../src/attrs/merge-with.nix) merges a list of attrsets one level at a time. [bootstrap/merge-attrs.nix](../bootstrap/merge-attrs.nix) keeps a local copy of the same implementation because the assembler needs the primitive before `sundry.*` exists. Attributes present in only one input pass through unchanged. Values under the same key are folded from left to right with a callback:
 
 ```text
 path -> lhs -> rhs -> collision result

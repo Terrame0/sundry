@@ -14,11 +14,11 @@ in rec {
         (lib.removeSuffix seq)
         (lib.removePrefix seq)
       ]);
-  tests = [
-    [(trim "/" "////A//") "A"]
-    [(trim-left "/" "////A//") "A//"]
-    [(trim-right "/" "////A//") "////A"]
-    [(trim "/" "") ""]
-    [(trim "/" "ABC") "ABC"]
-  ];
+  tests = {
+    trim-both = [(trim "/" "////A//") "A"];
+    trim-left = [(trim-left "/" "////A//") "A//"];
+    trim-right = [(trim-right "/" "////A//") "////A"];
+    empty-string = [(trim "/" "") ""];
+    nothing-to-trim = [(trim "/" "ABC") "ABC"];
+  };
 }

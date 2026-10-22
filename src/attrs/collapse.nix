@@ -26,8 +26,8 @@
       C = {D = 2;};
       E = {F = {G = 0;};};
     };
-  in [
-    [
+  in {
+    collapse-until-halt-at-depth = [
       (collapse-until
         (path: value: lib.length path > 1)
         (path: value: path)
@@ -38,8 +38,8 @@
         ["C" "D"]
         ["E" "F"]
       ]
-    ]
-    [
+    ];
+    collapse-all = [
       (collapse
         (path: value: path)
         attrs)
@@ -49,8 +49,8 @@
         ["C" "D"]
         ["E" "F" "G"]
       ]
-    ]
-    [
+    ];
+    halt-called-for-scalar = [
       # -- exists to validate that 'halt' is called for non-attrset terminal values
       (sundry.does-throw (collapse-until
         (path: value:
@@ -60,6 +60,6 @@
         (path: value: value)
         {A = 0;}))
       true
-    ]
-  ];
+    ];
+  };
 }

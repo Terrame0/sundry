@@ -6,7 +6,7 @@
       "label": "run",
       "type": "shell",
       "command": 
-        "alejandra . 2>/dev/null && git add . && ./eval-result.sh",
+        "alejandra . 2>/dev/null && git add . && nu ./eval-tests.nu",
       "group": "none",
     },
   ]

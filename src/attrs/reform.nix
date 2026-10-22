@@ -45,8 +45,8 @@ in rec {
       C = {D = 2;};
       E = {F = {G = 0;};};
     };
-  in [
-    [
+  in {
+    matched-until = [
       (reform-matched-until
         (path: value: value != 0)
         (path: value: lib.length path > 1)
@@ -61,8 +61,8 @@ in rec {
         "C.D" = "x";
         "E.F" = "x";
       }
-    ]
-    [
+    ];
+    matched-omit = [
       (reform-matched
         (path: value: value != 0)
         (path: value:
@@ -75,8 +75,8 @@ in rec {
         C = {D = 2;};
         E = {F = {G = 0;};};
       }
-    ]
-    [
+    ];
+    zero-leaves-unchanged = [
       (reform-matched-until
         (path: value: value != 0)
         (path: value: false)
@@ -86,8 +86,8 @@ in rec {
           else {inherit path value;})
         attrs)
       attrs
-    ]
-    [
+    ];
+    reform-until = [
       (reform-until
         (path: value: lib.length path > 1)
         (path: value: {
@@ -101,8 +101,8 @@ in rec {
         "C.D" = "x";
         "E.F" = "x";
       }
-    ]
-    [
+    ];
+    reform-all = [
       (reform
         (path: value: {
           path = [(sundry.str.join-with "." path)];
@@ -115,6 +115,6 @@ in rec {
         "C.D" = "x";
         "E.F.G" = "x";
       }
-    ]
-  ];
+    ];
+  };
 }
