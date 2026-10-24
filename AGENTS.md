@@ -12,6 +12,7 @@ A utility Nix library (`sundry.*`), assembled from files under `src/` where the 
 - [attrs-merge.md](.agent-docs/attrs-merge.md) — attrset merge callback paths, resolver composition, and the VFS-aware `dirs` resolver.
 - [attrs-validation.md](.agent-docs/attrs-validation.md) — asymmetric attrset comparison and the template DSL used by `attrs.validate`.
 - [dependency-resolution.md](.agent-docs/dependency-resolution.md) — topological layers and lazy assembly of named transform results from declared dependencies.
+- [python-script.md](.agent-docs/python-script.md) — `script.python` contract: the source root is the wheel root, why `only-include = ["."]`, how `entrypoint` maps to a module, and which layout imports work.
 - [str-indexing.md](.agent-docs/str-indexing.md) — how `at`, `slice`, and `range` compose, the signed index-label model, and where slicing deliberately diverges from Python.
 - [module-layout.md](.agent-docs/module-layout.md) — where a file goes, how it maps to `sundry.*`, and when to split code vs. keep it together.
 - [authoring.md](.agent-docs/authoring.md) — how to build a function: compose existing primitives, keep pipe chains visible, derive related conditions from one condition, prefer the simplest model, and use few units.

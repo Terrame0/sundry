@@ -15,7 +15,7 @@ tests = {
 
 The name is a short kebab-case description of the case (`empty-input`, `throws-on-empty`, `finds-at-end`) and is what the failure report prints. It must be a valid unquoted Nix identifier — start with a letter, then letters, digits, `-` or `'` — and unique within the file. Attrsets iterate lexicographically, not in source order, so do not rely on declaration order to group related cases; the name carries that meaning.
 
-Tests are collected by [tests.nix](../tests.nix), which imports every module through [assemble.nix](../assemble.nix). The assembly strips `tests` from the module's public exports, so it never leaks into the `sundry.*` namespace.
+Tests are collected by [tests.nix](../tests.nix), which imports every module through [assembly.nix](../assembly.nix). The assembly strips `tests` from the module's public exports, so it never leaks into the `sundry.*` namespace.
 
 Every entry must be a two-element list. `tests.nix` compares `actual` with `expected` and throws on a malformed entry, so a one-element list is a hard error rather than a debug print.
 

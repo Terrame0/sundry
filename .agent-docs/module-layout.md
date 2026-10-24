@@ -4,7 +4,7 @@ How files under `src/` are organized and how that organization maps to the publi
 
 ## File path = namespace path
 
-The assembler ([assemble.nix](../assemble.nix)) walks every `.nix` file under `src/` and exposes its attributes (minus `tests`) at `sundry.<dirname>`, where `<dirname>` is the file's directory relative to `src/`. The filename itself is dropped.
+The assembler ([assembly.nix](../assembly.nix)) walks every `.nix` file under `src/` and exposes its attributes (minus `tests`) at `sundry.<dirname>`, where `<dirname>` is the file's directory relative to `src/`. The filename itself is dropped.
 
 | File | Exports at | Function ends up at |
 |---|---|---|

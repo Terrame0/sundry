@@ -19,21 +19,27 @@
       (sundry.str.join-with ".")
     ];
     dependencies = deps pkgs.python3Packages;
-    project-config = sundry.vfs.file.from-text ["pyproject.toml"] ''
-      [build-system]
-      requires = ["hatchling"]
-      build-backend = "hatchling.build"
-      [project]
-      name = "${pname}"
-      version = "${version}"
-      [project.scripts]
-      ${pname} = "${target}:${entrypoint-fn}"
-      [tool.hatch.build.targets.wheel]
-      only-include = ["."]
-    '';
+    project-config =
+      sundry.vfs.file.from-text ["pyproject.toml"]
+      # -- 'only-include' disables hatchling's 
+      # - '<pname>/__init__.py' heuristic and
+      # - packages the source tree as-is
+      # -< toml >-
+      ''
+        [build-system]
+        requires = ["hatchling"]
+        build-backend = "hatchling.build"
+        [project]
+        name = "${pname}"
+        version = "${version}"
+        [project.scripts]
+        ${pname} = "${target}:${entrypoint-fn}"
+        [tool.hatch.build.targets.wheel]
+        only-include = ["."]
+      '';
     build-tree = lib.pipe source [
       sundry.vfs.dir.from-src
-      (dir: sundry.attrs.merge.recursive.no-collision [dir project-config])
+      (sundry.vfs.dir.merge project-config)
       (sundry.vfs.dir.materialize pname)
     ];
   in
@@ -43,6 +49,7 @@
       src = build-tree.drv;
       build-system = [pkgs.python3Packages.hatchling];
     };
+    
   tests = {
     build-hello = [
       (builtins.readFile (pkgs.runCommand "python-test" {
@@ -50,6 +57,7 @@
           (python {
             pname = "hello";
             source = fixtures-dir + "/python";
+            entrypoint = "src/main.py";
             deps = py: [py.click];
           })
         ];

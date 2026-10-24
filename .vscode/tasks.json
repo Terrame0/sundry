@@ -3,11 +3,26 @@
   "tasks": 
   [
     {
-      "label": "run",
+      "label": "format",
       "type": "shell",
-      "command": 
-        "alejandra . 2>/dev/null && git add . && nu ./eval-tests.nu",
-      "group": "none",
+      "command": "alejandra",
+      "args": ["${workspaceFolder}", "2&1>/dev/null"],
+      "presentation": { "reveal": "never", "showReuseMessage": false }
+    },
+    {
+      "label": "stage",
+      "type": "process",
+      "command": "git",
+      "args": ["add", "${workspaceFolder}"],
+      "presentation": { "reveal": "never", "showReuseMessage": false }
+    },
+    {
+      "label": "run",
+      "type": "process",
+      "command": "nu",
+      "args": ["${workspaceFolder}/eval-tests.nu"],
+      "dependsOn":["format", "stage"],
+      "dependsOrder": "sequence"
     },
   ]
 }

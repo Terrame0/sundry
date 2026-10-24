@@ -50,7 +50,7 @@ Avoid it: deeply force `sundry.vfs.dir.path-strs tree` or `sundry.vfs.dir.collap
 
 Rule: convert a path to a string only with `builtins.toString`; never hand a path to another string builtin.
 
-Why: Nix's path-to-string coercion defaults to `copyToStore = true`, so several string builtins copy the file into `/nix/store` under its basename before returning. A basename that is not a legal store name then aborts evaluation — which is what a `lib.hasSuffix ".nix"` filter over `listFilesRecursive` of a path literal hits on a name such as `что?`. [assemble.nix](../assemble.nix) sidesteps it by testing `baseNameOf path`.
+Why: Nix's path-to-string coercion defaults to `copyToStore = true`, so several string builtins copy the file into `/nix/store` under its basename before returning. A basename that is not a legal store name then aborts evaluation — which is what a `lib.hasSuffix ".nix"` filter over `listFilesRecursive` of a path literal hits on a name such as `что?`. [assembly.nix](../assembly.nix) sidesteps it by testing `baseNameOf path`.
 
 | Operation | Effect on a path |
 | --- | --- |

@@ -1,7 +1,9 @@
 import click
 
+from src import hello
+
 
 @click.command()
 @click.argument("name")
 def main(name):
-    print(f"hello, {name}!")
+    hello.say_hello(name)
