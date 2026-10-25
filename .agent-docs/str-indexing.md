@@ -19,7 +19,7 @@ The same `range` is a general primitive — [permutations](../src/list/permutati
 
 `at` accepts `0..len-1` and `-len..-1`, mapping a negative label `i` to cell `len+i`. A label stays signed through the `range` walk and is resolved to a cell only in `at`. Each cell therefore has **two labels**: `k` and `k-len`.
 
-The count `range` walks is away-from-zero division of `stop-start` by `step` ([`div-away`](../src/math/div-away.nix)). When `stop` and `step` point opposite ways the count is negative and `range` clamps it with `lib.max 0`, so the slice is empty rather than an error — `slice [0 3 (-1)] "abc"` is `""`. A label outside `-len..len-1` is a catchable `throw` from `at`; there is no modular wrap, so a walk that runs past either end fails loudly.
+The count `range` walks is away-from-zero division of `stop-start` by `step` ([`div-away`](../src/math/div.nix)). When `stop` and `step` point opposite ways the count is negative and `range` clamps it with `lib.max 0`, so the slice is empty rather than an error — `slice [0 3 (-1)] "abc"` is `""`. A label outside `-len..len-1` is a catchable `throw` from `at`; there is no modular wrap, so a walk that runs past either end fails loudly.
 
 ## Divergence from Python
 

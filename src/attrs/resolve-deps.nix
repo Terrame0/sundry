@@ -10,7 +10,11 @@
           sundry.attrs.validate {
             deps = {
               default = _: [];
-              check = value: lib.isList value && lib.all lib.isString value;
+              check = value:
+                lib.all (sundry.apply [value]) [
+                  lib.isList
+                  (lib.all lib.isString)
+                ];
               desc = "must be a list of strings that represent the stage's dependencies";
             };
             transform = {

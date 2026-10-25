@@ -6,12 +6,12 @@
 }: {
   filter =
     sundry.attrs.filter-until
-    sundry.vfs.is-leaf-node;
+    sundry.vfs.node.halt;
 
   filter-within-tag = expr-fn:
     sundry.attrs.filter-matched-until
-    (path: file: sundry.boolean.expr expr-fn file.tag-list)
-    sundry.vfs.is-leaf-node;
+    (path: node: sundry.boolean.expr expr-fn node.tag-list)
+    sundry.vfs.node.halt;
 
   tests = let
     filtering-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/filtering");
@@ -22,10 +22,10 @@
   in {
     filter-by-ext-or-text = [
       (lib.pipe filtering-file-tree [
-        (sundry.vfs.dir.filter (path: file:
+        (sundry.vfs.dir.filter (path: node:
           sundry.vfs.path.get.ext path
           == "txt"
-          || file.text
+          || node.text
           == "override"))
         sundry.vfs.dir.path-strs
       ])
@@ -39,10 +39,10 @@
     ];
     tag-b1-all = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.filter-within-tag
           (e: with e; tag {b = "1";})
-          (path: file: false)
+          (path: node: false)
           tags-file-tree))
       [
         "contents of F"
@@ -54,10 +54,10 @@
     ];
     tag-b1-exclude-h = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.filter-within-tag
           (e: with e; tag {b = "1";})
-          (path: file: file.text != "contents of H")
+          (path: node: node.text != "contents of H")
           tags-file-tree))
       [
         "contents of G"
@@ -72,10 +72,10 @@
     ];
     tag-a1-all = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.filter-within-tag
           (e: with e; tag {a = "1";})
-          (path: file: false)
+          (path: node: false)
           tags-file-tree))
       [
         "contents of I"

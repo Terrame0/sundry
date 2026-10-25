@@ -6,11 +6,11 @@
 }: rec {
   load-nix-with = fn:
     sundry.vfs.dir.walk
-    (path: file: file // {expr = fn path file (import file.origin);});
+    (path: node: node // {expr = fn path node (import node.origin);});
 
   load-nix =
     load-nix-with
-    (path: file: expr: expr);
+    (_: _: expr: expr);
 
   tests = let
     nix-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/nix");
@@ -21,8 +21,8 @@
   in {
     loadable-paths = [
       (lib.pipe loadable-file-tree [
-        (load-nix-with (path: file: expr: expr path))
-        (sundry.vfs.dir.collapse (path: file: file.expr))
+        (load-nix-with (path: _: expr: expr path))
+        (sundry.vfs.dir.collapse (path: node: node.expr))
       ])
       [{a = ["A.nix"];} {b = ["B.nix"];} {c = ["C.txt"];}]
     ];

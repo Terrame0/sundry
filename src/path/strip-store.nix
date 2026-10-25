@@ -6,7 +6,7 @@
   strip-store = value: let
     path-str = toString value;
   in
-    if !(lib.isPath value || lib.isString value)
+    if !(lib.any (sundry.apply [value]) [lib.isPath lib.isString])
     then throw "strip-store: expected a path or a string, got a '${builtins.typeOf value}'"
     else if !(lib.hasPrefix builtins.storeDir path-str)
     then throw "strip-store: expected a path under '${builtins.storeDir}', got '${path-str}'"

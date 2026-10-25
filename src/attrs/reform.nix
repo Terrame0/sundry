@@ -6,8 +6,10 @@
   validate-leaf = sundry.attrs.validate {
     path = {
       check = value:
-        lib.isList value
-        && (lib.all (x: lib.isString x) value);
+        lib.all (sundry.apply [value]) [
+          lib.isList
+          (lib.all lib.isString)
+        ];
       desc = "must be a list of strings";
     };
     value = {};

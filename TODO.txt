@@ -1,0 +1,2 @@
+add an error function that forms messages based on module path
+decide what to do with the vfs node contract

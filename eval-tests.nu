@@ -9,4 +9,4 @@ in
 ^nix eval --impure --json --show-trace --expr $expr
 | from json
 | select name data
-| update data { select source value expected }
+| update data { select source expected got }

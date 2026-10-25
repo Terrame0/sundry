@@ -7,10 +7,9 @@
 }: rec {
   materialize = drv-name: dir: let
     files =
-      sundry.attrs.collapse-until
-      sundry.vfs.is-leaf-node
-      (path: attrs: let
-        text = attrs.text or null;
+      sundry.vfs.dir.collapse
+      (path: node: let
+        text = node.text or null;
       in
         if lib.isString text
         then {
@@ -34,8 +33,8 @@
     inherit drv;
     dir =
       sundry.vfs.dir.walk
-      (path: file:
-        (removeAttrs file ["text"])
+      (path: node:
+        (removeAttrs node ["text"])
         // {
           origin = sundry.vfs.path.get.str ([drv] ++ path);
         })

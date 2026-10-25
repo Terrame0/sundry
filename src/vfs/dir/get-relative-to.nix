@@ -31,13 +31,13 @@
 
     origin-under-root =
       node ? origin
-      && (lib.isPath node.origin || lib.isString node.origin)
+      && lib.any (sundry.apply [node.origin]) [lib.isPath lib.isString]
       && (let
         origin-str = toString node.origin;
       in
         origin-str == root-str || lib.hasPrefix "${root-str}/" origin-str);
   in
-    if !(lib.isPath path || lib.isString path)
+    if !(lib.any (sundry.apply [path]) [lib.isPath lib.isString])
     then throw "vfs.dir.get-relative-to: expected a path or a string, got a '${builtins.typeOf path}'"
     else if !under-root
     then throw "vfs.dir.get-relative-to: expected a path under '${root-str}', got '${path-str}'"

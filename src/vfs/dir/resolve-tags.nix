@@ -5,15 +5,14 @@
   ...
 }: rec {
   resolve-tags =
-    sundry.attrs.reform-until
-    sundry.vfs.is-leaf-node
-    (path: value:
-      if value ? tag-list
+    sundry.vfs.dir.reform
+    (path: node:
+      if node ? tag-list
       then throw "\nvfs.dir.resolve-tags: node at '/${sundry.vfs.path.get.str path}' already has 'tag-list'"
       else {
         path = sundry.vfs.path.strip-between "{" "}" path;
         value =
-          value
+          node
           // {
             tag-list = map (dir:
               lib.pipe dir [

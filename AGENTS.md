@@ -13,11 +13,12 @@ A utility Nix library (`sundry.*`), assembled from files under `src/` where the 
 - [attrs-validation.md](.agent-docs/attrs-validation.md) — asymmetric attrset comparison and the template DSL used by `attrs.validate`.
 - [dependency-resolution.md](.agent-docs/dependency-resolution.md) — topological layers and lazy assembly of named transform results from declared dependencies.
 - [python-script.md](.agent-docs/python-script.md) — `script.python` contract: the source root is the wheel root, why `only-include = ["."]`, how `entrypoint` maps to a module, and which layout imports work.
+- [vfs-model-stories.md](.agent-docs/vfs-model-stories.md) — user stories defining the intended scope of the VFS model, the capability each requires, and its current status.
 - [str-indexing.md](.agent-docs/str-indexing.md) — how `at`, `slice`, and `range` compose, the signed index-label model, and where slicing deliberately diverges from Python.
 - [module-layout.md](.agent-docs/module-layout.md) — where a file goes, how it maps to `sundry.*`, and when to split code vs. keep it together.
 - [authoring.md](.agent-docs/authoring.md) — how to build a function: compose existing primitives, keep pipe chains visible, derive related conditions from one condition, prefer the simplest model, and use few units.
 - [testing.md](.agent-docs/testing.md) — test format (`tests = { <name> = [ actual expected ]; }`) and running tests with `nu ./eval-tests.nu`.
 - [test-naming.md](.agent-docs/test-naming.md) — naming conventions for test fixtures.
-- [gotchas.md](.agent-docs/gotchas.md) — counter-intuitive lazy evaluation, empty-branch, text-forcing leaf recognition, reform-collision, collision-only directory validation, implicit path-to-store coercion, string-context propagation, per-file copy import breakage, derivation-origin leaves, already-resolved tag rejection, and signed string indices that must not be normalized.
+- [gotchas.md](.agent-docs/gotchas.md) — counter-intuitive lazy evaluation, empty-branch, text-forcing leaf recognition, reform-collision, collision-only directory validation, implicit path-to-store coercion, string-context propagation, per-file copy import breakage, uncatchable symlink reads, derivation-origin leaves, already-resolved tag rejection, and signed string indices that must not be normalized.
 
 When you add, rename, or remove a doc under `.agent-docs/`, update this index in the same change so it does not drift from what's on disk.

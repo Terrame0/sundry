@@ -4,7 +4,7 @@
   ...
 }: rec {
   dirs = resolve-next: path: acc-value: value: let
-    nodes-are-leaves = map (sundry.vfs.is-leaf-node path) [value acc-value];
+    nodes-are-leaves = map (sundry.vfs.node.halt path) [value acc-value];
   in
     # -- first we handle a leaf/leaf collision (both are leaves)
     if lib.all lib.id nodes-are-leaves

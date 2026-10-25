@@ -21,7 +21,7 @@
     dependencies = deps pkgs.python3Packages;
     project-config =
       sundry.vfs.file.from-text ["pyproject.toml"]
-      # -- 'only-include' disables hatchling's 
+      # -- 'only-include' disables hatchling's
       # - '<pname>/__init__.py' heuristic and
       # - packages the source tree as-is
       # -< toml >-
@@ -49,7 +49,7 @@
       src = build-tree.drv;
       build-system = [pkgs.python3Packages.hatchling];
     };
-    
+
   tests = {
     build-hello = [
       (builtins.readFile (pkgs.runCommand "python-test" {

@@ -13,18 +13,18 @@ in
         if lib.length test != 2
         then throw "invalid test '${name}' at '${module.path}'; a test shout be an attribute of form [ 'value' 'expected' ]"
         else let
-          value = lib.elemAt test 0;
+          got = lib.elemAt test 0;
           expected = lib.elemAt test 1;
         in
-          if value == expected
+          if got == expected
           then []
           else [
             {
               inherit name;
               data = {
                 source = lib.removePrefix (toString flake-dir + "/") (toString module.path);
-                value = pretty value;
                 expected = pretty expected;
+                got = pretty got;
               };
             }
           ]))

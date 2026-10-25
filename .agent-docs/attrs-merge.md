@@ -57,7 +57,7 @@ Every conditional resolver exported under `sundry.attrs.merge-resolvers` partici
 | leaf / leaf | delegate the complete leaf nodes to `resolve-next` |
 | directory / directory | recursively merge their children |
 | leaf / directory | throw a structural collision error |
-| invalid node / any node | throw the `is-leaf-node` validation error |
+| invalid node / any node | throw the `sundry.vfs.node.halt` validation error |
 
 Resolvers run only for collisions. A unique branch passes through unchanged, so `dirs` validates only nodes relevant to the merge rather than validating both complete input trees.
 

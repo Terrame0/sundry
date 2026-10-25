@@ -4,8 +4,7 @@
   ...
 }: rec {
   path-strs = dir:
-    sundry.attrs.collapse-until
-    sundry.vfs.is-leaf-node
+    sundry.vfs.dir.collapse
     (path: _: sundry.vfs.path.get.str path)
     dir;
   tests = {

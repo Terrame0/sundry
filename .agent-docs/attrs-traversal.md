@@ -19,7 +19,7 @@ The two checks have separate roles:
 | `halt path value` | semantic classification or validation; `true` makes the value terminal |
 | `lib.isAttrs value` | structural recursion guard; only an attrset can be traversed |
 
-A non-attrset remains a normal terminal value when `halt` returns `false`. A domain-specific `halt` may reject it instead. The VFS traversals pass [`sundry.vfs.is-leaf-node`](../src/vfs/node-cond.nix), which returns `true` for a leaf, returns `false` for a directory, and throws for every other value.
+A non-attrset remains a normal terminal value when `halt` returns `false`. A domain-specific `halt` may reject it instead. The VFS traversals pass [`sundry.vfs.node.halt`](../src/vfs/node/halt.nix), which validates the node and returns `true` for a leaf, returns `false` for a directory, and throws for every other value.
 
 Evaluation strictness differs by family:
 
@@ -87,4 +87,4 @@ collapse-until
 
 `walk-matched-until` and `collapse-until` are the two recursive implementations. `reform` rebuilds the terminal nodes emitted by `collapse-until`; `filter` specializes `reform` by converting its predicate result into the `omit` field.
 
-The VFS traversal families specialize `halt` to `sundry.vfs.is-leaf-node`. [`path-strs`](../src/vfs/dir/path-strs.nix) and [`materialize`](../src/vfs/dir/materialize.nix) also consume `collapse-until`, while [`resolve-tags`](../src/vfs/dir/resolve-tags.nix) consumes `reform-until`.
+The VFS traversal families specialize `halt` to `sundry.vfs.node.halt`. [`path-strs`](../src/vfs/dir/path-strs.nix) and [`materialize`](../src/vfs/dir/materialize.nix) also consume `collapse-until`, while [`resolve-tags`](../src/vfs/dir/resolve-tags.nix) consumes `reform-until`.

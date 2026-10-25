@@ -12,11 +12,11 @@ Avoid it: use [`sundry.does-throw`](testing.md#does-throw-does-not-catch-everyth
 
 ## Leaf recognition forces `text` unless `origin` is tested first
 
-Rule: keep the `origin` checks before the `text` check in [`is-leaf`](../src/vfs/node-cond.nix).
+Rule: keep the `origin` checks before the `text` check in [`is-leaf`](../src/vfs/node/is-leaf.nix).
 
-Why: `builtins.isString text` forces `text` to weak head normal form. When `text` is a lazily-read `builtins.readFile` thunk, testing it is what reads the file. `is-leaf-node` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix) and the [`dirs`](../src/attrs/merge-resolvers/dirs.nix) merge resolver; `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never evaluates `text`. This keeps those traversals from being a forcing point.
+Why: `builtins.isString text` forces `text` to weak head normal form. When `text` is a lazily-read `builtins.readFile` thunk, testing it is what reads the file. `sundry.vfs.node.halt` is the `halt` of every VFS traversal, including structure-only ones such as [`path-strs`](../src/vfs/dir/path-strs.nix) and the [`dirs`](../src/attrs/merge-resolvers/dirs.nix) merge resolver; `||` short-circuits, so testing `origin` first recognizes a physical leaf from its path/string/derivation literal and never evaluates `text`. This keeps those traversals from being a forcing point.
 
-Avoid it: do not reorder the disjunction to test `text` first, and do not add a construction-time type check on `text` to a builder such as [`from-text`](../src/vfs/file/from-text.nix). Any `assert lib.isString text` forces WHNF of the `readFile` thunk that [`from-src`](../src/vfs/file/from-src.nix) puts there, reading every file while the tree is assembled. The leaf type gate is [`is-leaf`](../src/vfs/node-cond.nix); leave validation to the classifier. A generated text-only leaf has no `origin`, so it still forces `text` — an in-memory literal, not file I/O.
+Avoid it: do not reorder the disjunction to test `text` first, and do not add a construction-time type check on `text` to a builder such as [`from-text`](../src/vfs/file/from-text.nix). Any `assert lib.isString text` forces WHNF of the `readFile` thunk that [`from-src`](../src/vfs/file/from-src.nix) puts there, reading every file while the tree is assembled. The leaf type gate is [`is-leaf`](../src/vfs/node/is-leaf.nix); leave validation to the classifier. A generated text-only leaf has no `origin`, so it still forces `text` — an in-memory literal, not file I/O.
 
 The trade-off: without the assert, `from-text ["A"] {}` builds `{A = {text = {};};}`, which the node model classifies as a **directory**, not a malformed leaf (see [data-model.md](data-model.md)). The classifier rejects scalar non-string `text`, but an attrset-shaped one becomes a directory.
 
@@ -80,6 +80,14 @@ Why: a string that carries store context — e.g. `"${self.outPath}/..."`, since
 
 Avoid it: iterate path values and derive names with `toString`; when the input is already a context-carrying string, discard explicitly with `builtins.unsafeDiscardStringContext`. [from-str.nix](../src/vfs/path/from-str.nix) normalizes both cases this way.
 
+## `readFile` follows symlinks and its failures are uncatchable
+
+Rule: classify an entry's type before reading it; do not treat "not a directory" as "regular file".
+
+Why: `builtins.readFile` dereferences a symlink, so a tree of links imports as a tree of regular files. When the link does not resolve, the error names the **target**, not the link (`path '/…/nowhere' does not exist`), and it is an evaluator error: neither `builtins.tryEval` nor [`sundry.does-throw`](../src/does-throw.nix) catches it. A link to a directory fails the same way. A fifo is worse — opening it blocks, so one fifo anywhere under an imported root hangs evaluation. `lib.filesystem.listFilesRecursive` discards `readDir`'s type field, which is why [from-src](../src/vfs/dir/from-src.nix) never sees the kind; `builtins.readFileType` on a dangling link still returns `"symlink"`, which is the only non-blocking probe.
+
+Avoid it: walk with `builtins.readDir` and branch on `regular`, `symlink`, `directory`, and everything else, rejecting the rest by VFS path before any read. Dereferencing a symlink is fine as a policy; failing on an unrelated file's target path, or hanging on a fifo, is not.
+
 ## Per-file store copies break relative imports
 
 Rule: never materialize a single `.nix` file with `builtins.path` / interpolation and then `import` it; copy the whole tree instead.
@@ -106,7 +114,7 @@ Avoid it: build the query from the same root you pass; use `root + "/relative/pa
 
 Rule: do not narrow the accepted `origin` types to what `sundry`'s own constructors produce; `is-leaf` must keep accepting a derivation.
 
-Why: the node contract is public, and downstream pipelines build derivation origins themselves. [`file.from-src`](../src/vfs/file/from-src.nix) emits a path or string origin, but [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, and a later [`reform`](../src/vfs/dir/reform.nix) can set `origin` to a build derivation — producing a derivation-only leaf. Dropping `lib.isDerivation origin` from [is-leaf](../src/vfs/node-cond.nix) makes such a node neither leaf nor directory, so `is-leaf-node` throws (`... is neither a leaf nor a directory`) on a tree that previously worked.
+Why: the node contract is public, and downstream pipelines build derivation origins themselves. [`file.from-src`](../src/vfs/file/from-src.nix) emits a path or string origin, but [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, and a later [`reform`](../src/vfs/dir/reform.nix) can set `origin` to a build derivation — producing a derivation-only leaf. Dropping `lib.isDerivation origin` from [is-leaf](../src/vfs/node/is-leaf.nix) makes such a node neither leaf nor directory, so `sundry.vfs.node.halt` throws (`... is neither a leaf nor a directory`) on a tree that previously worked.
 
 Avoid it: treat a node with a derivation `origin` as a leaf. When auditing which types a field may hold, check external consumers, not only the in-repo constructors; a library's field contract outlives the call sites visible here.
 

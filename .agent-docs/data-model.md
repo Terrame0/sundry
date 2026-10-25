@@ -4,13 +4,14 @@ The two shapes everything under `sundry.vfs` operates on: the **node tree** and 
 
 ## Node
 
-A valid node is an attrset — either a **leaf** (a file) or a **directory** (a subtree). Classified in [src/vfs/node-cond.nix](../src/vfs/node-cond.nix):
+A valid node is an attrset — either a **leaf** (a file) or a **directory** (a subtree). Classified under [`sundry.vfs.node`](../src/vfs/node/):
 
 | predicate | returns |
 |---|---|
-| `is-leaf path node` | `true` when the node has a string `text` or a path-, string-, or derivation-typed `origin` |
-| `is-dir path node` | `true` when the node is not a leaf and every value is an attrset (so `{}` is a directory) |
-| `is-leaf-node path node` | `true` for a leaf, `false` for a directory, **throws** for a non-attrset or malformed attrset — this is the `halt` predicate the traversals use |
+| `sundry.vfs.node.is-leaf path node` | `true` when the node has a string `text` or a path-, string-, or derivation-typed `origin` |
+| `sundry.vfs.node.is-dir path node` | `true` when the node is not a leaf and every value is an attrset (so `{}` is a directory) |
+| `sundry.vfs.node.validate path node` | `true` for a well-formed node; **throws** for a non-attrset or a node that is neither a leaf nor a directory |
+| `sundry.vfs.node.halt path node` | the traversal `halt`: validates the node, then returns `true` for a leaf and `false` for a directory |
 
 Leaf fields:
 
@@ -34,7 +35,7 @@ A directory maps a path segment to a child node:
 }
 ```
 
-Without a valid leaf discriminator, every value must itself be an attrset for the node to be a directory. Consequently `{}` is a directory, `{ text = {}; }` is a directory containing an empty child directory under the segment `text`, and `{ unexpected = 1; }` is malformed. `is-leaf-node` reports malformed nodes with their VFS path.
+Without a valid leaf discriminator, every value must itself be an attrset for the node to be a directory. Consequently `{}` is a directory, `{ text = {}; }` is a directory containing an empty child directory under the segment `text`, and `{ unexpected = 1; }` is malformed. `sundry.vfs.node.validate` reports malformed nodes with their VFS path.
 
 Field-producing transformations and their preconditions are documented in [vfs-lifecycle.md](vfs-lifecycle.md). The construction of `tag-list` is documented separately in [tag-resolution.md](tag-resolution.md), and its query semantics live in [tag-matching.md](tag-matching.md).
 
@@ -58,4 +59,4 @@ Accessors mirror as getters ([getters.nix](../src/vfs/path/getters.nix)) and set
 
 Stem/ext split on `.` with the **last** component as the ext: `archive.tar.gz` → stem `archive.tar`, ext `gz`.
 
-The tree root is always a directory container, never a leaf at `[]`. File constructors therefore require a non-empty path. VFS directory traversals specialize the generic contract from [attrs-traversal.md](attrs-traversal.md) with `is-leaf-node` as `halt`.
+The tree root is always a directory container, never a leaf at `[]`. File constructors therefore require a non-empty path. VFS directory traversals specialize the generic contract from [attrs-traversal.md](attrs-traversal.md) with `sundry.vfs.node.halt` as `halt`.

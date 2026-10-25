@@ -6,7 +6,7 @@
       "label": "format",
       "type": "shell",
       "command": "alejandra",
-      "args": ["${workspaceFolder}", "2&1>/dev/null"],
+      "args": ["${workspaceFolder}", ">/dev/null", "2>&1"],
       "presentation": { "reveal": "never", "showReuseMessage": false }
     },
     {

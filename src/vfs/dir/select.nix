@@ -6,7 +6,7 @@
 }: {
   select-by-tag = expr-fn:
     sundry.vfs.dir.filter
-    (path: file: sundry.boolean.expr expr-fn file.tag-list);
+    (path: node: sundry.boolean.expr expr-fn node.tag-list);
 
   tests = let
     tags-file-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
@@ -16,7 +16,7 @@
   in {
     match-tag-b = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.select-by-tag
           (e: with e; tag {b = "1";})
           tags-file-tree))
@@ -24,7 +24,7 @@
     ];
     exclude-tag-b = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.select-by-tag
           (e: with e; !(tag {b = [];}))
           tags-file-tree))
@@ -32,7 +32,7 @@
     ];
     match-or-exclude = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.select-by-tag
           (e: with e; (tag {b = "1";}) || !(tag {b = [];}))
           tags-file-tree))

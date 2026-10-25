@@ -6,12 +6,12 @@
 }: {
   walk =
     sundry.attrs.walk-until
-    sundry.vfs.is-leaf-node;
+    sundry.vfs.node.halt;
 
   walk-within-tag = expr-fn:
     sundry.attrs.walk-matched-until
-    (path: file: sundry.boolean.expr expr-fn file.tag-list)
-    sundry.vfs.is-leaf-node;
+    (path: node: sundry.boolean.expr expr-fn node.tag-list)
+    sundry.vfs.node.halt;
 
   tests = let
     fixture-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files");
@@ -21,7 +21,7 @@
     ];
   in {
     walked-tree = [
-      (sundry.vfs.dir.walk (path: file: {text = "walked ${file.text}";}) fixture-file-tree)
+      (sundry.vfs.dir.walk (path: node: {text = "walked ${node.text}";}) fixture-file-tree)
       {
         "A.txt" = {text = "walked contents of A.txt";};
         "B.txt" = {text = "walked contents of B.txt";};
@@ -30,10 +30,10 @@
     ];
     within-tag = [
       (sundry.vfs.dir.collapse
-        (path: file: file.text)
+        (path: node: node.text)
         (sundry.vfs.dir.walk-within-tag
           (e: with e; tag {b = "1";})
-          (path: file: file // {text = "walked ${file.text}";})
+          (path: node: node // {text = "walked ${node.text}";})
           tags-file-tree))
       [
         "walked contents of H"
@@ -46,6 +46,13 @@
         "contents of D"
         "contents of E"
       ]
+    ];
+    malformed-leaf = [
+      (sundry.does-throw
+        (sundry.vfs.dir.walk
+          (path: node: {text = "walked ${node.text}";})
+          {A = {junk = "abc";};}))
+      true
     ];
   };
 }

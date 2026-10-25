@@ -11,7 +11,9 @@ sundry.vfs.file.from-text ["A" "B.txt"] "contents"
 # => { A."B.txt" = { text = "contents"; }; }
 ```
 
-Both require a non-empty VFS path. `from-text` adds `text`; `from-src` adds both `text` and `origin` and defers the physical read — `text` is a lazy `builtins.readFile` thunk, so assembling a tree reads nothing. The read happens when a stage demands `text`, such as `materialize` or a callback that selects `file.text`; `origin`-only work, including the `is-leaf-node` classification that `path-strs` and merge perform, never touches it. Neither constructor type-checks `text` at assembly; [`is-leaf`](../src/vfs/node-cond.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node-cond.nix) accepts a path, string, or derivation. The derivation form matters downstream: [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, so a later stage that re-points `origin` at a build derivation produces a derivation-only leaf. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
+Both require a non-empty VFS path. `from-text` adds `text`; `from-src` adds both `text` and `origin` and defers the physical read — `text` is a lazy `builtins.readFile` thunk, so assembling a tree reads nothing. The read happens when a stage demands `text`, such as `materialize` or a callback that selects `file.text`; `origin`-only work, including the `sundry.vfs.node.halt` classification that `path-strs` and merge perform, never touches it. Neither constructor type-checks `text` at assembly; [`is-leaf`](../src/vfs/node/is-leaf.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node/is-leaf.nix) accepts a path, string, or derivation. The derivation form matters downstream: [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, so a later stage that re-points `origin` at a build derivation produces a derivation-only leaf. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
+
+Entry kind is not inspected, so a symlink imports as the regular file it points at. That is the intended policy — a materialized tree holds bytes, not pointers to mutable state — but the failure modes are poor: a dangling link, a link to a directory, and a fifo each abort or hang evaluation instead of naming the offending entry. See [gotchas.md](gotchas.md#readfile-follows-symlinks-and-its-failures-are-uncatchable) and [vfs-model-stories.md](vfs-model-stories.md#us-20--reject-non-regular-non-link-entries-by-path).
 
 ## Assemble first, interpret later
 
@@ -36,7 +38,7 @@ Run `resolve-tags` after assembly so every source follows the same logical-path 
 | operation | input requirement | leaf fields after the operation |
 |---|---|---|
 | `file.from-text` | non-empty VFS path, string contents | `text` |
-| `file.from-src` / `dir.from-src` | readable physical file or directory | `text` (lazy `readFile` thunk), `origin` |
+| `file.from-src` / `dir.from-src` | directory, or a physical file that `readFile` can open | `text` (lazy `readFile` thunk), `origin` |
 | [`dir.resolve-tags`](../src/vfs/dir/resolve-tags.nix) | valid VFS tree without `tag-list` | existing fields plus `tag-list`; logical paths are cleaned |
 | [`dir.strip-tags`](../src/vfs/dir/strip-tags.nix) | valid VFS tree | `tag-list` removed; logical paths are cleaned |
 | [`dir.load-nix`](../src/vfs/dir/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
@@ -62,6 +64,6 @@ Continue VFS transformations through `result.dir`; use `result.drv` when a build
 
 ## Traversal boundary
 
-`sundry.vfs.dir.{walk, collapse, reform, filter, path-strs}` use `sundry.vfs.is-leaf-node` as the generic traversal `halt`. They recurse through directories, expose complete leaves to callbacks, and report demanded malformed children with their path. The root attrset remains the directory container and is not passed to `halt`.
+`sundry.vfs.dir.{walk, collapse, reform, filter, path-strs}` use `sundry.vfs.node.halt` as the generic traversal `halt`. They recurse through directories, expose complete leaves to callbacks, and report demanded malformed children with their path. The root attrset remains the directory container and is not passed to `halt`.
 
 See [attrs-traversal.md](attrs-traversal.md) for callback variants and the different strictness of `walk`, `collapse`, `reform`, and `filter`. Physical empty-directory behavior and structure-only validation are covered in [gotchas.md](gotchas.md).

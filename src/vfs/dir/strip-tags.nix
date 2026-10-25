@@ -1,10 +1,9 @@
 {sundry, ...}: rec {
   strip-tags =
-    sundry.attrs.reform-until
-    sundry.vfs.is-leaf-node
-    (path: value: {
+    sundry.vfs.dir.reform
+    (path: node: {
       path = sundry.vfs.path.strip-between "{" "}" path;
-      value = removeAttrs value ["tag-list"];
+      value = removeAttrs node ["tag-list"];
     });
   tests = let
     dirty = {

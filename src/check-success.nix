@@ -6,7 +6,7 @@
     then throw "success validation attrset must have the 'error-msg' attribute"
     else if attrs.success
     then value
-    else throw "\n${attrs.error-msg}";
+    else throw "${attrs.error-msg}";
 
   tests = {
     success-returns-value = [
