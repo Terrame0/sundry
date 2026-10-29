@@ -7,7 +7,7 @@
 }: rec {
   python = {
     pname,
-    source,
+    src,
     version ? "1.0.0",
     entrypoint ? "main.py",
     entrypoint-fn ? "main",
@@ -37,14 +37,15 @@
         [tool.hatch.build.targets.wheel]
         only-include = ["."]
       '';
-    build-tree = lib.pipe source [
-      sundry.vfs.dir.from-src
-      (sundry.vfs.dir.merge project-config)
-      (sundry.vfs.dir.materialize pname)
+    build-tree = lib.pipe src [
+      sundry.vfs.tree.from-src
+      (sundry.vfs.tree.merge project-config)
+      (sundry.vfs.tree.materialize pname)
     ];
   in
     pkgs.python3Packages.buildPythonApplication {
       inherit dependencies pname version;
+      allowSubstitutes = false;
       pyproject = true;
       src = build-tree.drv;
       build-system = [pkgs.python3Packages.hatchling];
@@ -52,11 +53,11 @@
 
   tests = {
     build-hello = [
-      (builtins.readFile (pkgs.runCommand "python-test" {
+      (builtins.readFile (pkgs.runCommandLocal "python-test" {
         nativeBuildInputs = [
           (python {
             pname = "hello";
-            source = fixtures-dir + "/python";
+            src = fixtures-dir + "/python";
             entrypoint = "src/main.py";
             deps = py: [py.click];
           })

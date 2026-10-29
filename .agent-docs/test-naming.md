@@ -33,6 +33,10 @@ E
 
 Reading any fixture path is mechanical: uppercase = file, `=` = directory step, and braces = tag annotation. `=` has no VFS syntax role; it is an ordinary segment name chosen to make anonymous fixture depth visible. `/` is the actual path separator. [tag-resolution.md](tag-resolution.md) defines the annotation forms, including key-only and empty-value tags.
 
+[test-fixtures/vfs-test-dir/symlinks/](../test-fixtures/vfs-test-dir/symlinks/) holds a regular file `A` and a link `B -> A`. It is not a readable tree: ingest rejects it, and only the rejection tests point at it. Do not place it under a directory that another test ingests wholesale.
+
+[test-fixtures/vfs-test-dir/binary/](../test-fixtures/vfs-test-dir/binary/) holds `A` with a NUL byte. It exists to prove ingest classifies without reading: a deep `does-throw` on the result stays `false` only because no branch calls `readFile`.
+
 File extensions (`.txt`, `.ini`, `.scss`) are allowed when a test needs to distinguish them — see [test-fixtures/vfs-test-dir/filtering/](../test-fixtures/vfs-test-dir/filtering/), where the filter predicate keys off `.txt` vs `.ini`. File contents are out of scope: usually `contents of <NAME>`, but tests that match against a specific value (e.g. `override` in `=/=/E.ini`) deviate freely.
 
 ### Sort-order caveat

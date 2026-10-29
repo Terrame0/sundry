@@ -7,31 +7,32 @@
     text = node.text or null;
     origin = node.origin or null;
   in
-    lib.any (sundry.apply origin) (with lib; [isPath isString isDerivation])
+    lib.any (sundry.apply [origin]) (with lib; [isPath isString isDerivation])
     || lib.isString text;
 
   tests = {
-    is-leaf-text = [(is-leaf ["..."] {text = "...";}) true];
-    is-leaf-path-origin = [(is-leaf ["..."] {origin = ./is-leaf.nix;}) true];
+    text = [(is-leaf ["..."] {text = "...";}) true];
+    path-origin = [(is-leaf ["..."] {origin = ./is-leaf.nix;}) true];
+    string-origin = [(is-leaf ["..."] {origin = "...";}) true];
     # -- a materialized file drops 'text' and downstream stages may re-point
     # - 'origin' at a derivation, so a derivation-only node is still a leaf
-    is-leaf-derivation-origin = [(is-leaf ["..."] {origin = {type = "derivation";};}) true];
-    is-leaf-lazy-expr = [
+    derivation-origin = [(is-leaf ["..."] {origin = {type = "derivation";};}) true];
+    lazy-expr = [
       (is-leaf ["..."] {
         origin = "...";
         expr = throw "expr was forced";
       })
       true
     ];
-    is-leaf-lazy-text = [
+    lazy-text = [
       (is-leaf ["..."] {
         origin = "...";
         text = throw "text was forced";
       })
       true
     ];
-    is-leaf-unknown-attr = [(is-leaf ["..."] {expr = 10;}) false];
-    is-leaf-nested-dir = [(is-leaf ["..."] {file = {text = "...";};}) false];
-    is-leaf-non-string-text = [(is-leaf ["..."] {text = {};}) false];
+    unknown-attr = [(is-leaf ["..."] {expr = 10;}) false];
+    nested-dir = [(is-leaf ["..."] {file = {text = "...";};}) false];
+    non-string-text = [(is-leaf ["..."] {text = {};}) false];
   };
 }

@@ -87,4 +87,4 @@ collapse-until
 
 `walk-matched-until` and `collapse-until` are the two recursive implementations. `reform` rebuilds the terminal nodes emitted by `collapse-until`; `filter` specializes `reform` by converting its predicate result into the `omit` field.
 
-The VFS traversal families specialize `halt` to `sundry.vfs.node.halt`. [`path-strs`](../src/vfs/dir/path-strs.nix) and [`materialize`](../src/vfs/dir/materialize.nix) also consume `collapse-until`, while [`resolve-tags`](../src/vfs/dir/resolve-tags.nix) consumes `reform-until`.
+The VFS traversal families specialize `halt` to `sundry.vfs.node.halt`. [`path-strs`](../src/vfs/tree/path-strs.nix) and [`materialize`](../src/vfs/tree/materialize.nix) also consume `collapse-until`, while [`resolve-tags`](../src/vfs/tree/resolve-tags.nix) consumes `reform-until`.

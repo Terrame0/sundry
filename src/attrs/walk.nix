@@ -1,4 +1,8 @@
-{lib, ...}: rec {
+{
+  lib,
+  sundry,
+  ...
+}: rec {
   walk-matched-until = matches: halt: fn: set: let
     recurse = path:
       lib.mapAttrs (
@@ -64,7 +68,7 @@
         E = {F = "x";};
       }
     ];
-    walk-all = [
+    all = [
       (walk
         (path: value: "x")
         attrs)
@@ -74,6 +78,17 @@
         C = {D = "x";};
         E = {F = {G = "x";};};
       }
+    ];
+    halt-called-for-scalar = [
+      # -- exists to validate that 'halt' runs before the 'lib.isAttrs' guard
+      (sundry.does-throw (walk-until
+        (path: value:
+          if lib.isAttrs value
+          then false
+          else throw "halt called for a scalar at '${lib.concatStringsSep "." path}'")
+        (path: value: value)
+        {A = 0;}))
+      true
     ];
   };
 }

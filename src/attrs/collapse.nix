@@ -27,7 +27,7 @@
       E = {F = {G = 0;};};
     };
   in {
-    collapse-until-halt-at-depth = [
+    halt-at-depth = [
       (collapse-until
         (path: value: lib.length path > 1)
         (path: value: path)
@@ -39,7 +39,7 @@
         ["E" "F"]
       ]
     ];
-    collapse-all = [
+    all = [
       (collapse
         (path: value: path)
         attrs)
@@ -49,6 +49,13 @@
         ["C" "D"]
         ["E" "F" "G"]
       ]
+    ];
+    drops-empty-attrset = [
+      (collapse (path: value: path) {
+        A = {};
+        B = 1;
+      })
+      [["B"]]
     ];
     halt-called-for-scalar = [
       # -- exists to validate that 'halt' is called for non-attrset terminal values

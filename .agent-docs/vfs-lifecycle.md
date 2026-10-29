@@ -11,9 +11,15 @@ sundry.vfs.file.from-text ["A" "B.txt"] "contents"
 # => { A."B.txt" = { text = "contents"; }; }
 ```
 
-Both require a non-empty VFS path. `from-text` adds `text`; `from-src` adds both `text` and `origin` and defers the physical read — `text` is a lazy `builtins.readFile` thunk, so assembling a tree reads nothing. The read happens when a stage demands `text`, such as `materialize` or a callback that selects `file.text`; `origin`-only work, including the `sundry.vfs.node.halt` classification that `path-strs` and merge perform, never touches it. Neither constructor type-checks `text` at assembly; [`is-leaf`](../src/vfs/node/is-leaf.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one. That `origin` is the file's last physical location, tracking provenance independently of the node's key path; [is-leaf](../src/vfs/node/is-leaf.nix) accepts a path, string, or derivation. The derivation form matters downstream: [`materialize`](../src/vfs/dir/materialize.nix) drops `text`, so a later stage that re-points `origin` at a build derivation produces a derivation-only leaf. [`dir.from-src`](../src/vfs/dir/from-src.nix) imports every physical file below a directory at its relative VFS path and combines the one-file trees with `recursive.no-collision`.
+Both require a non-empty VFS path. `from-text` authors contents: it adds `text` and no `origin`. `from-src` ingests a location: it confirms with `readFileType` that the location is a regular file, then adds `origin` and **opens nothing**, so an imported leaf is opaque and its bytes stay on disk until something asks for them. `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one; [is-leaf](../src/vfs/node/is-leaf.nix) accepts a path, string, or derivation, and the derivation form matters downstream when a stage re-points `origin` at a build output.
 
-Entry kind is not inspected, so a symlink imports as the regular file it points at. That is the intended policy — a materialized tree holds bytes, not pointers to mutable state — but the failure modes are poor: a dangling link, a link to a directory, and a fifo each abort or hang evaluation instead of naming the offending entry. See [gotchas.md](gotchas.md#readfile-follows-symlinks-and-its-failures-are-uncatchable) and [vfs-model-stories.md](vfs-model-stories.md#us-20--reject-non-regular-non-link-entries-by-path).
+Neither constructor type-checks `text`; [`is-leaf`](../src/vfs/node/is-leaf.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). [`dir.from-src`](../src/vfs/tree/from-src.nix) enumerates the files below a directory, maps each to its relative VFS path through [`file.from-src`](../src/vfs/file/from-src.nix), and combines the one-file trees with `recursive.no-collision`. It owns no classification of its own: the primitive accepts only a regular file, so a link, fifo, socket, or device rejects the whole tree (US-12).
+
+Ingest is opaque by contract: it enumerates names, `lstat`s each entry to reject the ones a leaf cannot represent, and records `origin`, but calls no reader. A decoded leaf exists only when the consumer asks for one, through `sundry.vfs.file.read` — `file.text` when authored, otherwise a lazy `builtins.readFile file.origin`. That thunk is returned and never stored, so reading leaves the node opaque; the cost of decoding — chiefly a NUL abort — is paid by the caller who asked, not by everyone who assembled the tree.
+
+Entry kind is not represented in the node, but it is classified at ingest and constrained there. `readFileType` reports `regular`, `directory`, `symlink`, or `unknown` (the last covers fifo, socket, and device); the leaf primitive accepts only `regular`, and the directory combinator recurses on directories. A link cannot be handled faithfully: eval cannot see its target, dereferencing it imports state from outside the tree, and preserving it keeps the output dependent on a context. It is rejected instead, with its VFS path and reported kind. See [materialize.md](materialize.md#non-regular-entries-are-rejected-at-ingest).
+
+Opaque materialization copies one leaf at a time and needs no enclosing tree, because every ingested leaf is an independent regular file. An out-of-store `origin` is normalized through [`to-store-str`](../src/path/to-store-str.nix), which calls `builtins.path` on the single path. A store-resident `origin` becomes a string that keeps its store object alive, and the builder copies it with the builtin `cp`, which dereferences a file link and rejects a directory link. Per-file store copies break relative `.nix` imports only because `import` reads `origin` directly, not through this step (see [gotchas.md](gotchas.md#per-file-store-copies-break-relative-imports)). [materialize.md](materialize.md) describes the copy.
 
 ## Assemble first, interpret later
 
@@ -23,8 +29,8 @@ For example, the VFS-aware merge resolver described in [attrs-merge.md](attrs-me
 
 ```nix
 sundry.attrs.merge.dirs.no-collision [
-  (sundry.vfs.dir.from-src source-a)
-  (sundry.vfs.dir.from-src source-b)
+  (sundry.vfs.tree.from-src source-a)
+  (sundry.vfs.tree.from-src source-b)
   (sundry.vfs.file.from-text
     ["components{kind:partial}" "_tokens.scss"]
     generated-tokens)
@@ -37,13 +43,16 @@ Run `resolve-tags` after assembly so every source follows the same logical-path 
 
 | operation | input requirement | leaf fields after the operation |
 |---|---|---|
-| `file.from-text` | non-empty VFS path, string contents | `text` |
-| `file.from-src` / `dir.from-src` | directory, or a physical file that `readFile` can open | `text` (lazy `readFile` thunk), `origin` |
-| [`dir.resolve-tags`](../src/vfs/dir/resolve-tags.nix) | valid VFS tree without `tag-list` | existing fields plus `tag-list`; logical paths are cleaned |
-| [`dir.strip-tags`](../src/vfs/dir/strip-tags.nix) | valid VFS tree | `tag-list` removed; logical paths are cleaned |
-| [`dir.load-nix`](../src/vfs/dir/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
+| `file.from-text` | non-empty VFS path, string contents | `text` (authored, no `origin`) |
+| `file.from-src` | path to a regular file | `origin` only; nothing is read |
+| `dir.from-src` | path to a directory | `origin` only per leaf; nothing is read |
+| `sundry.vfs.file.read` | leaf with `text` or `origin` | unchanged; returns `text` or a lazy `readFile origin` thunk |
+| `sundry.vfs.file.edit fn` | leaf with `text` or `origin` | `text = fn (read file)`; `origin` kept for provenance |
+| [`dir.resolve-tags`](../src/vfs/tree/resolve-tags.nix) | valid VFS tree without `tag-list` | existing fields plus `tag-list`; logical paths are cleaned |
+| [`dir.strip-tags`](../src/vfs/tree/strip-tags.nix) | valid VFS tree | `tag-list` removed; logical paths are cleaned |
+| [`dir.load-nix`](../src/vfs/tree/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
 | `dir.load-nix-with fn` | `origin` when `fn` demands the imported value | existing fields plus `expr = fn path file imported` |
-| [`dir.materialize name`](../src/vfs/dir/materialize.nix) | string `text` on every consumed leaf | `text` removed, `origin` replaced with the new store path; other metadata preserved |
+| [`dir.materialize name`](../src/vfs/tree/materialize.nix) | every leaf has `text` or `origin` | returns `{ drv, tree }`; every leaf's `text` and other payload fields are removed, `origin` points into `drv`, and `tag-list` is kept |
 
 `resolve-tags` is explained in [tag-resolution.md](tag-resolution.md). Tag-aware selection and `*-within-tag` transformations require its `tag-list` field; they do not synthesize missing tags. `strip-tags` neutralizes annotations and `tag-list` for handing a tree to a pipeline that owns its own tag logic; unlike `resolve-tags`, it is idempotent and safe on an already-resolved tree.
 
@@ -53,17 +62,32 @@ Run `resolve-tags` after assembly so every source follows the same logical-path 
 
 ```text
 {
-  drv = derivation containing all materialized files and their parent directories;
-  dir = VFS index whose leaf origins point inside drv;
+  drv = store object containing all materialized files and their parent directories;
+  tree = VFS index whose leaf origins point inside drv and whose tag-lists are kept;
 }
 ```
 
-Returning this attrset does not yet check every leaf. Demanding `result.drv`, or a materialized leaf `origin` that refers to it, deeply forces the collected `{ path, text }` records before constructing the derivation. Other metadata such as `expr` is preserved without being part of that materialization check.
+Each leaf is materialized according to its payload state:
 
-Continue VFS transformations through `result.dir`; use `result.drv` when a build input needs the physical file tree. Materialization deliberately drops `text` so memory contents cannot drift from the materialized file. A materialized `dir` cannot be materialized again without restoring `text`.
+| state | action |
+|---|---|
+| authored (`text` present) | write `text`; `origin` is provenance only and is not read |
+| opaque (`origin` only) | copy `origin` byte-for-byte, preserving the executable bit |
+
+The branch is presence-based, so there is no "text or origin?" guess. An authored leaf always wins over its own `origin`, which is what makes `edit` reliable: changing contents never leaves a stale location that silently takes priority.
+
+Materialization always builds: eval turns the tree into a JSON plan of store paths, and a nushell builder replays it with `cp` and `mkdir`. There is no evaluation-time shortcut — a tree that needs no rewrite and no authored leaf needs no materialization at all, and the caller passes the path. [materialize.md](materialize.md) gives the tool matrix, measured costs, and why a derivation per file is not worth it.
+
+The builtin `cp` dereferences a hand-built leaf's file link, which is the caller's own input, and rejects a directory link with an error. A working-copy dangling link fails in `to-store-str`; a store-resident dangling or cyclic one is dropped with exit code `0` (see [gotchas.md](gotchas.md#nushells-builtin-cp-exits-0-when-a-link-dangles)). Ingest rejects links, so a source tree never reaches this branch.
+
+Returning this attrset checks nothing about contents. Demanding the store object walks the tree's paths and, for authored leaves, includes their `text`; opaque leaves contribute their location, not their bytes, so a large binary does not enter the derivation expression. Translation is still per tree: one change anywhere rebuilds the whole output.
+
+Continue VFS transformations through `result.tree`; use `result.drv` when a build input needs the physical file tree. Materialization deliberately drops `text` so memory contents cannot drift from the materialized file; the resulting tree is opaque, and a second materialization is a copy rather than a rewrite. `tag-list` is preserved because it describes the logical path, which materialization does not change — without it, tag selection on a materialized tree would be impossible and the tags are not recoverable from the stripped segments.
+
+The implementation copies each opaque leaf individually after normalizing its `origin` through `to-store-str`, which is the target strategy; [materialize.md](materialize.md) explains why tree-scoped and per-file strategies lose. [vfs-model-stories.md](vfs-model-stories.md) tracks what remains open.
 
 ## Traversal boundary
 
-`sundry.vfs.dir.{walk, collapse, reform, filter, path-strs}` use `sundry.vfs.node.halt` as the generic traversal `halt`. They recurse through directories, expose complete leaves to callbacks, and report demanded malformed children with their path. The root attrset remains the directory container and is not passed to `halt`.
+`sundry.vfs.tree.{walk, collapse, reform, filter, path-strs}` use `sundry.vfs.node.halt` as the generic traversal `halt`. They recurse through directories, expose complete leaves to callbacks, and report demanded malformed children with their path. The root attrset remains the directory container and is not passed to `halt`.
 
 See [attrs-traversal.md](attrs-traversal.md) for callback variants and the different strictness of `walk`, `collapse`, `reform`, and `filter`. Physical empty-directory behavior and structure-only validation are covered in [gotchas.md](gotchas.md).

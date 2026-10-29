@@ -9,10 +9,10 @@
     # -- first we handle a leaf/leaf collision (both are leaves)
     if lib.all lib.id nodes-are-leaves
     then resolve-next path acc-value value
-    # -- then we handle a leaf/dir collision (one is a leaf, one is a directory)
-    # -- with leaf/leaf handled, 'any' distinguishes a mixed collision from dir/dir
+    # -- then, with leaf/leaf handled, 'any' distinguishes a leaf/dir collision
+    # - (one is a leaf, one is a directory) from dir/dir
     else if lib.any lib.id nodes-are-leaves
-    then throw "there is a directory to leaf collision at '/${sundry.vfs.path.get.str path}'"
+    then throw "there is a directory to leaf collision at ${sundry.str.pretty path}"
     else sundry.attrs.merge-with (next-path: dirs resolve-next (path ++ next-path)) [acc-value value];
   tests = {
     dir-dir = [
@@ -104,6 +104,17 @@
         }
       ]))
       true
+    ];
+    passes-through-unique-malformed = [
+      # -- only colliding keys are inspected and a unique branch is left alone
+      (sundry.attrs.merge.dirs.override [
+        {A = {junk = 1;};}
+        {B = {text = "b";};}
+      ])
+      {
+        A = {junk = 1;};
+        B = {text = "b";};
+      }
     ];
   };
 }

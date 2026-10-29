@@ -89,7 +89,7 @@ in rec {
         attrs)
       attrs
     ];
-    reform-until = [
+    until = [
       (reform-until
         (path: value: lib.length path > 1)
         (path: value: {
@@ -104,7 +104,7 @@ in rec {
         "E.F" = "x";
       }
     ];
-    reform-all = [
+    all = [
       (reform
         (path: value: {
           path = [(sundry.str.join-with "." path)];
@@ -117,6 +117,55 @@ in rec {
         "C.D" = "x";
         "E.F.G" = "x";
       }
+    ];
+    rejects-string-path = [
+      (sundry.does-throw (reform (path: value: {
+          path = "A";
+          value = "x";
+        })
+        attrs))
+      true
+    ];
+    rejects-non-string-path = [
+      (sundry.does-throw (reform (path: value: {
+          path = [1];
+          value = "x";
+        })
+        attrs))
+      true
+    ];
+    requires-value = [
+      (sundry.does-throw (reform (path: value: {path = [(lib.last path)];}) attrs))
+      true
+    ];
+    rejects-non-bool-omit = [
+      (sundry.does-throw (reform (path: value: {
+          path = [(lib.last path)];
+          value = "x";
+          omit = "no";
+        })
+        attrs))
+      true
+    ];
+    rejects-extra-field = [
+      (sundry.does-throw (reform (path: value: {
+          path = [(lib.last path)];
+          value = "x";
+          junk = 1;
+        })
+        attrs))
+      true
+    ];
+    throws-on-collision = [
+      (sundry.does-throw (reform (path: value: {
+          path = ["A"];
+          value = "x";
+        })
+        {
+          A = 1;
+          B = 2;
+        }))
+      true
     ];
   };
 }

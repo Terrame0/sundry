@@ -15,9 +15,9 @@ in rec {
         (lib.removePrefix seq)
       ]);
   tests = {
-    trim-both = [(trim "/" "////A//") "A"];
-    trim-left = [(trim-left "/" "////A//") "A//"];
-    trim-right = [(trim-right "/" "////A//") "////A"];
+    both = [(trim "/" "////A//") "A"];
+    left = [(trim-left "/" "////A//") "A//"];
+    right = [(trim-right "/" "////A//") "////A"];
     empty-string = [(trim "/" "") ""];
     nothing-to-trim = [(trim "/" "ABC") "ABC"];
   };

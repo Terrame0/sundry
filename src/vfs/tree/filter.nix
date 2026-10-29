@@ -14,20 +14,20 @@
     sundry.vfs.node.halt;
 
   tests = let
-    filtering-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/filtering");
-    tags-file-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
-      sundry.vfs.dir.from-src
-      sundry.vfs.dir.resolve-tags
+    filtering-tree = sundry.vfs.tree.from-src (fixtures-dir + "/vfs-test-dir/filtering");
+    tags-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
+      sundry.vfs.tree.from-src
+      sundry.vfs.tree.resolve-tags
     ];
   in {
-    filter-by-ext-or-text = [
-      (lib.pipe filtering-file-tree [
-        (sundry.vfs.dir.filter (path: node:
+    by-ext-or-text = [
+      (lib.pipe filtering-tree [
+        (sundry.vfs.tree.filter (path: node:
           sundry.vfs.path.get.ext path
           == "txt"
-          || node.text
+          || sundry.vfs.file.read node
           == "override"))
-        sundry.vfs.dir.path-strs
+        sundry.vfs.tree.path-strs
       ])
       [
         "=/=/E.ini"
@@ -38,12 +38,12 @@
       ]
     ];
     tag-b1-all = [
-      (sundry.vfs.dir.collapse
-        (path: node: node.text)
-        (sundry.vfs.dir.filter-within-tag
+      (sundry.vfs.tree.collapse
+        (path: node: sundry.vfs.file.read node)
+        (sundry.vfs.tree.filter-within-tag
           (e: with e; tag {b = "1";})
           (path: node: false)
-          tags-file-tree))
+          tags-tree))
       [
         "contents of F"
         "contents of A"
@@ -53,12 +53,12 @@
       ]
     ];
     tag-b1-exclude-h = [
-      (sundry.vfs.dir.collapse
-        (path: node: node.text)
-        (sundry.vfs.dir.filter-within-tag
+      (sundry.vfs.tree.collapse
+        (path: node: sundry.vfs.file.read node)
+        (sundry.vfs.tree.filter-within-tag
           (e: with e; tag {b = "1";})
-          (path: node: node.text != "contents of H")
-          tags-file-tree))
+          (path: node: sundry.vfs.file.read node != "contents of H")
+          tags-tree))
       [
         "contents of G"
         "contents of F"
@@ -71,18 +71,23 @@
       ]
     ];
     tag-a1-all = [
-      (sundry.vfs.dir.collapse
-        (path: node: node.text)
-        (sundry.vfs.dir.filter-within-tag
+      (sundry.vfs.tree.collapse
+        (path: node: sundry.vfs.file.read node)
+        (sundry.vfs.tree.filter-within-tag
           (e: with e; tag {a = "1";})
           (path: node: false)
-          tags-file-tree))
+          tags-tree))
       [
         "contents of I"
         "contents of B"
         "contents of D"
         "contents of E"
       ]
+    ];
+    malformed-leaf = [
+      (sundry.does-throw
+        (sundry.vfs.tree.filter (path: node: true) {A = {junk = "abc";};}))
+      true
     ];
   };
 }

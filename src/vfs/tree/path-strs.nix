@@ -3,13 +3,13 @@
   fixtures-dir,
   ...
 }: rec {
-  path-strs = dir:
-    sundry.vfs.dir.collapse
+  path-strs = tree:
+    sundry.vfs.tree.collapse
     (path: _: sundry.vfs.path.get.str path)
-    dir;
+    tree;
   tests = {
     tagged-tree = [
-      (path-strs (sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files")))
+      (path-strs (sundry.vfs.tree.from-src (fixtures-dir + "/vfs-test-dir/test-files")))
       [
         "=/C.txt"
         "A.txt"
@@ -21,6 +21,15 @@
         invalid = "abc";
       }))
       true
+    ];
+    lazy-expr = [
+      (path-strs {
+        A = {
+          origin = "/A";
+          expr = throw "expr was forced";
+        };
+      })
+      ["A"]
     ];
   };
 }

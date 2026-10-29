@@ -1,2 +1,2 @@
 add an error function that forms messages based on module path
-decide what to do with the vfs node contract
+do a comment and error message audit (grep all '# --' / 'throw' entries and trim overly verbose ones)

@@ -21,7 +21,7 @@ An empty spec `{}` matches every tag-set. `key = []` is a presence wildcard, whi
 
 `tag-list` is a *list* of tag-sets (one per path level); `faceted-match` decides a single set. `boolean.expr` binds operands to whatever value its caller supplies. File-wide consumers bind the complete `file.tag-list`, while `get-tag-pos` binds one singleton `[level]` at a time. The operand then folds that supplied list to the set it tests; `faceted-match` itself stays uniform.
 
-**Membership — the [`tag`](../src/boolean/operands/tag.nix) operand** matches `faceted-match` against the **merged** set (`sundry.attrs.merge.concat tag-list`). Repeated keys are concatenated through `lib.toList`; duplicate values are preserved. Callers like [select-by-tag](../src/vfs/dir/select.nix) bind the whole `tag-list` and let the operand merge:
+**Membership — the [`tag`](../src/boolean/operands/tag.nix) operand** matches `faceted-match` against the **merged** set (`sundry.attrs.merge.concat tag-list`). Repeated keys are concatenated through `lib.toList`; duplicate values are preserved. Callers like [select-by-tag](../src/vfs/tree/select.nix) bind the whole `tag-list` and let the operand merge:
 
 ```nix
 select-by-tag (e: e.tag { b = "1"; }) dir      # file kept iff the merged set matches
@@ -39,7 +39,7 @@ The two operands agree on **presence** and differ only in **value**: a key prese
 select-by-tag (e: with e; tag { hosts = host.name; } || !(tag { hosts = []; })) dir   # this host OR untagged
 ```
 
-The same `expr-fn` is the `matches` axis of the ternary [filter-within-tag](../src/vfs/dir/filter.nix) / `walk-within-tag` / `reform-within-tag`, which restrict a transform to tag-matched leaves; unmatched leaves stay at their original paths. Rebuilding still follows the empty-branch behavior in [gotchas.md](gotchas.md#rebuilding-traversals-lose-traversable-empty-attrsets).
+The same `expr-fn` is the `matches` axis of the ternary [filter-within-tag](../src/vfs/tree/filter.nix) / `walk-within-tag` / `reform-within-tag`, which restrict a transform to tag-matched leaves; unmatched leaves stay at their original paths. Rebuilding still follows the empty-branch behavior in [gotchas.md](gotchas.md#rebuilding-traversals-lose-traversable-empty-attrsets).
 
 **Position — [get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix)** is `findFirst` per level: it binds each level as a singleton `tag-list` (`[level]`, whose merge is the level itself) and returns the zero-based index of the **first level** whose tag-set matches the expr, or `-1`. It is positional, so its match is per-level by definition.
 

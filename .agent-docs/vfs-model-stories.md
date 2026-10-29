@@ -1,6 +1,8 @@
 # VFS model user stories
 
-The VFS model was built around text documents: a leaf carries `text` in memory, and `origin` records where it came from. That covers eval-time selection and rewriting, but it is not a filesystem model. Entry kind, permissions, empty directories, opaque content, and byte-faithful names have no representation, and `origin` currently serves as both provenance and a would-be payload.
+The VFS model was built around text documents: a leaf carries `text` in memory, and `origin` records where it came from. That covers eval-time selection and rewriting, but it is not a filesystem model.
+
+The contract these stories target separates the two roles. Ingest is **opaque**: `from-src` records `origin` and opens nothing. `text` exists only when a leaf is **authored**, and is the sole producer's output: `edit`. Presence of `text` therefore means "these bytes came from Nix and outrank `origin`", which is what lets materialization branch without guessing. Reading is `sundry.vfs.file.read`, a function that returns a thunk and never stores it. Entry kind is not represented on the node; ingest rejects anything that is not a regular file or a directory.
 
 These stories state the target model from a consumer's point of view. They define scope, not implementation order.
 
@@ -29,9 +31,10 @@ These stories state the target model from a consumer's point of view. They defin
 
 - Relative paths are computed against the given root, not the store or the working directory.
 - `origin` preserves the input type: a path argument produces a path, a string produces a string.
-- Contents are read lazily; assembly lists the directory but reads no file contents.
+- Assembly lists the directory but **opens no file**: an imported leaf is opaque and holds only `origin`.
+- No content classification happens, so text, binaries, and every byte sequence short of NUL import through one code path. Entry kind is classified, but by `readFileType`, not by content.
 
-**Status: partial** — works for regular files via [from-src](../src/vfs/dir/from-src.nix). Every non-directory entry is read as a regular file, including symlinks and special files.
+**Status: works**, with two stated limits — [file.from-src](../src/vfs/file/from-src.nix) records `origin` after confirming the location is a regular file, and [dir.from-src](../src/vfs/tree/from-src.nix) enumerates files. Physical empty directories are not modelled (US-13), and every non-regular entry is rejected at ingest (US-12, US-20).
 
 ### US-03 — Query structure without reading content
 
@@ -39,9 +42,9 @@ These stories state the target model from a consumer's point of view. They defin
 
 - Building a tree from disk does not read file contents.
 - `path-strs`, merges, and path- or tag-based filters do not read physical contents.
-- Only content consumers read them: materialization and callbacks that read `file.text`.
+- Decoding happens only through an explicit `sundry.vfs.file.read` call, and the returned string is never stored in the tree.
 
-**Status: works** — the lazy read is locked by `does-throw-whnf` tests.
+**Status: works** for structure traversals — the read is lazy and never forced by `path-strs` or merge. Under the target contract it becomes unconditional instead of depending on laziness of a thunk.
 
 ### US-04 — Keep provenance
 
@@ -64,7 +67,7 @@ These stories state the target model from a consumer's point of view. They defin
 - Each leaf maps to zero or one leaf: relocation is allowed, splitting is not.
 - Collisions in the rebuilt tree throw.
 
-**Status: works** — [reform](../src/vfs/dir/reform.nix).
+**Status: works** — [reform](../src/vfs/tree/reform.nix).
 
 ### US-06 — Merge trees
 
@@ -74,7 +77,7 @@ These stories state the target model from a consumer's point of view. They defin
 - A leaf/leaf or leaf/dir collision throws with the colliding path.
 - A malformed branch unique to one input passes through: validation is collision-only.
 
-**Status: works** — [merge](../src/vfs/dir/merge.nix) and the `dirs` resolver.
+**Status: works** — [merge](../src/vfs/tree/merge.nix) and the `dirs` resolver.
 
 ### US-07 — Annotate and select by tags
 
@@ -95,59 +98,64 @@ These stories state the target model from a consumer's point of view. They defin
 - `expr` is lazy; a missing or invalid origin surfaces only when the import is forced.
 - Relative imports inside a loaded file resolve against that file's directory.
 
-**Status: works** — [load-nix](../src/vfs/dir/load-nix.nix).
+**Status: works** — [load-nix](../src/vfs/tree/load-nix.nix).
 
 ## Materializing
 
-### US-09 — Materialize a text tree
+### US-09 — Materialize a tree
 
-**As** a library user, **I want** an in-memory tree to become a store tree that a builder can consume.
+**As** a library user, **I want** a VFS tree to become a store tree that a builder can consume.
 
-- The result is `{ drv, dir }`.
-- Every materialized leaf becomes a file at the same relative path, with parent directories created.
-- `dir` leaves drop `text` and point into `drv`.
+- The result is `{ drv, tree }`.
+- Every leaf becomes a file at the same relative path, with parent directories created.
+- An authored leaf (`text`) is written; an opaque leaf (`origin` only) is copied.
+- `tree` leaves drop `text` and every payload field, keep `tag-list`, and point into `drv`, so the result is opaque and can be copied again while tag selection still works.
 
-**Status: partial** — [materialize](../src/vfs/dir/materialize.nix). Gaps: `drv` forces every leaf's `text`; a leaf without `text` throws; the whole tree is one derivation; names are interpolated into shell; NUL content cannot be represented.
+**Status: works** — [materialize](../src/vfs/tree/materialize.nix) writes authored leaves from `builtins.toFile` results, copies opaque ones per leaf, and creates the parent directories of files.
 
 ### US-10 — Materialize content that stays out of Nix memory
 
-**As** a library user, **I want** a leaf's bytes to be copied or referenced rather than loaded into the evaluator, **so that** binaries, large files, and already-built store files work.
+**As** a library user, **I want** an opaque leaf's bytes to be copied rather than loaded into the evaluator, **so that** binaries, large files, and already-built store files work.
 
-- A leaf with `origin` and no `text` materializes by copying or referencing `origin`.
+- A leaf with `origin` and no `text` is copied byte-for-byte.
 - Eval never calls `readFile` on that `origin`.
-- `origin` must be a path, a store path, or a derivation; a non-store string fails with the leaf's path in the message.
-- Asking for `text` on such a leaf throws instead of returning an empty string.
+- `origin` must be a path, a store path, or a derivation. A non-store string is either normalized through `to-store-str` or rejected with the leaf's path.
+- The copy is **per leaf**, which works because no leaf depends on a sibling: an out-of-store location is frozen by `to-store-str`/`builtins.path`, a store location is copied straight from the store object.
+- `sundry.vfs.file.read` on such a leaf still decodes; `materialize` never does.
 
-**Status: missing** — `is-leaf` accepts an origin-only leaf, but materialization rejects it. `from-src` always attaches `text`, so only external stages and post-materialization `dir` values reach this shape.
+**Status: works** — opaque leaves are copied without being read; an out-of-store `origin` is normalized through [`to-store-str`](../src/path/to-store-str.nix) first. The copy is per leaf, and that is sufficient because every leaf is an independent regular file.
 
 ### US-11 — Preserve the executable bit
 
 **As** a library user, **I want** a script in the tree to arrive executable.
 
-- A source file with any exec bit materializes as `0555`; every other file is `0444`.
+- Copying an opaque leaf preserves the source mode the store can express: `0555` for executable files, `0444` otherwise.
+- Writing an authored leaf yields a non-executable file, because a Nix string carries no mode; a script that must stay executable travels as opaque.
 - No other mode is promised, because the store canonicalizes files and directories.
 
-**Status: missing** — materialization writes through `printf >`, so every file is `0444`. The node model has no field for it, and import discards the mode.
+**Status: works** — opaque leaves are copied from their source with the builtin `cp`, so an executable source arrives executable. Authored leaves are copied from a `toFile` store object and stay `0444`; that is the documented limitation of the authored branch.
 
-### US-12 — Dereference symlinks at import
+### US-12 — Symlinks are out of scope
 
-**As** a library user, **I want** a symlink to import as the regular file it points at, **so that** the materialized tree contains concrete bytes with no live pointers.
+**As** a library user, **I want** a link in a source tree to be rejected rather than silently resolved, **so that** a tree's output depends only on the tree.
 
-- A symlink is dereferenced by `readFile`: the node is an ordinary leaf with `text` and `origin` pointing at the link path.
-- Duplicated bytes from in-tree chains (`libfoo.so -> libfoo.so.1 -> libfoo.so.1.2.3`) are accepted; the store is content-addressed, so a duplicate costs size, not correctness.
-- Links into `/nix/store` are frozen into the importing derivation rather than kept as pointers, so the result does not depend on another store object surviving garbage collection.
-- Preserving a link as a link is **out of scope**. A store copy would fix the pointer, not the referent: an in-tree relative link happens to keep working because the whole tree moves, but an absolute link to the source, or a relative link that climbs out of the root, still resolves outside the output. A materialized tree must not contain pointers to mutable state.
+- A VFS tree holds documents: bytes at a path. A link is a pointer to bytes elsewhere, and `builtins` exposes no `readlink`, so eval cannot learn where it points.
+- Dereferencing would spend the guarantee that the tree is a self-contained input. A relative link can point above the root; an absolute one names mutable host state. The same tree would then yield different bytes on different machines.
+- Preserving is not an option either: the output is a store object meant to carry bytes, and a pointer would keep it dependent on a context that may disappear.
+- A link is therefore not represented at any stage. Ingest rejects it (US-20), so `materialize` never sees one from a source tree.
 
-**Status: works by accident, wrong failure modes** — every non-directory entry is read through, so the content is right. A dangling link and a link to a directory abort evaluation with the *target* path in the message (see [gotchas.md](gotchas.md#readfile-follows-symlinks-and-its-failures-are-uncatchable)); a tree that must round-trip link identity instead of content cannot use `from-src`.
+**Status: works** — the ingest primitive, [file.from-src](../src/vfs/file/from-src.nix), accepts only an entry whose `readFileType` is `regular`, so [dir.from-src](../src/vfs/tree/from-src.nix) inherits the rejection for every leaf it enumerates. A hand-built leaf may still point at a link; `materialize` dereferences it as the caller's own input (see [materialize.md](materialize.md#links-that-remain-possible)).
 
-### US-13 — Preserve empty directories
+### US-13 — Empty directories are not part of the model
 
-**As** a library user, **I want** an empty directory in the tree to survive to the store.
+**As** a maintainer, **I want** the treatment of empty directories to be explicit, **so that** nobody chases a non-goal.
 
-- `{}` is already a directory node; import and materialization preserve it.
-- If it stays implicit, the limitation is stated instead of silently dropping the branch.
+- `{}` is a valid directory node, and structure-only operations preserve it.
+- A physical empty directory does not become a node: import discovers files, and a directory with no files has nothing to import.
+- Materialization creates only the parents of files, so an empty branch with no files is not recreated.
+- This is deliberate. A VFS tree is a tree of documents; an empty directory carries no document and no bytes.
 
-**Status: partial** — `{}` is a directory node and survives structure-only operations, but import lists files only and materialization creates only the parents of files.
+**Status: out of scope** — import and materialization are file-oriented by contract.
 
 ### US-14 — Treat names as data
 
@@ -156,26 +164,27 @@ These stories state the target model from a consumer's point of view. They defin
 - Names containing spaces, `$`, backticks, quotes, newlines, backslashes, and leading `-` arrive unchanged.
 - No name undergoes shell expansion.
 
-**Status: missing** — materialization interpolates the path into a double-quoted shell word, so `run$name.sh` becomes `run<drv-name>.sh`; only the text is escaped.
+**Status: works** — paths travel to the builder as JSON and are joined with `path join`, so `$`, backticks, quotes, newlines, backslashes, spaces, and leading `-` arrive unchanged and are never expanded. A test covers a leading `-` and a literal `$` in a file name.
 
 ### US-15 — Handle arbitrary bytes
 
 **As** a library user, **I want** binary content to work, or to fail early with a clear message.
 
-- A file containing NUL either travels the opaque path or is rejected at import with its path named.
-- Every other byte sequence round-trips.
+- Opaque content is copied byte-for-byte, so NUL and every other byte sequence round-trip.
+- Only an explicit `file.read` on such a leaf can fail, at that call and not at assembly.
 
-**Status: partial** — non-NUL bytes survive; NUL aborts evaluation with `cannot be represented as a Nix string`.
+**Status: partial** — non-NUL bytes survive a write; NUL aborts only because the current path reads every file. Opaque copying removes the limitation entirely.
 
 ### US-16 — Materialize a subset
 
 **As** a library user, **I want** to materialize only the leaves I selected.
 
 - Selection uses path or tag predicates.
-- Only selected leaves are forced or copied; unselected leaves keep their `origin` and are not read.
-- Opaque leaves in the selection pass through.
+- Authored leaves in the selection are written; unselected authored leaves are not.
+- Opaque leaves in the selection are copied, and only selected leaves are copied: dereferencing means a leaf does not drag its siblings along.
+- A selection over an ingested tree contains only regular files, so no selected leaf depends on an unselected sibling.
 
-**Status: partial** — selecting by path or tag and then materializing works for text leaves; one opaque leaf in the selection aborts.
+**Status: partial** — selecting by path or tag and then materializing works for authored leaves; one opaque leaf in the selection aborts.
 
 ### US-17 — Depend only on the tree
 
@@ -183,40 +192,41 @@ These stories state the target model from a consumer's point of view. They defin
 
 - The result is independent of working directory, `umask`, locale, uid, mtime, and builder environment variables.
 
-**Status: partial** — text trees are stable, but a name containing `$` expands from the builder environment, so it is not.
+**Status: works** for the shell surface — names and content are escaped, so builder environment variables do not leak into paths or bytes. Mode and timestamps still normalize by store rules, which is the documented contract.
 
-### US-18 — Rebuild per file
+### US-18 — Keep content out of the derivation
 
-**As** a library user, **I want** a change to one file to rebuild only that file.
+**As** a library user, **I want** the tree's store object to reference content rather than embed it, **so that** derivation size does not grow with total content size.
 
-- Content is content-addressed per file.
-- The tree derivation references those objects instead of embedding their bytes.
-- Derivation size does not grow with total content size.
+- Authored content travels through `builtins.toFile`, so the derivation expression carries store paths.
+- Opaque content is copied from its origin, so its bytes never enter the expression.
+- Per-file rebuild is **not** a goal: the tree is one store object, so a consumer of the tree rebuilds when any byte changes. Splitting it into a derivation per file costs ≈20 ms per file against ≈30 µs for copying, and buys only avoided re-copies.
 
-**Status: missing** — one `runCommand` embeds every `text`.
+**Status: works** — authored content is content-addressed by `builtins.toFile`, so the derivation carries store paths; opaque content is copied from its origin. One derivation per tree, as [materialize.md](materialize.md#why-not-one-derivation-per-file) argues.
 
 ## Contracts and safety
 
-### US-19 — One leaf type, two representations
+### US-19 — One leaf type, two payload states
 
-**As** a library author, **I want** traversals, merges, tag resolution, and path rewrites to accept decoded and opaque leaves alike.
+**As** a library author, **I want** traversals, merges, tag resolution, and path rewrites to accept opaque and authored leaves alike.
 
-- `is-leaf` recognizes both representations.
-- The representation is an explicit field, not the absence of `text`.
-- Content access on an opaque leaf throws; structure-only access never forces content.
+- Both states are leaves: `is-leaf` accepts `{ origin }` and `{ text }`.
+- The state is presence-based: `text` present means authored and outranks `origin`; absent means opaque. `sundry.vfs.node.is-opaque` exposes that test.
+- No heuristic distinguishes them, so `materialize` branches on `node ? text` and nothing else.
+- Structure-only operations never read, and `sundry.vfs.file.read` never stores what it reads.
 
-**Status: missing** — `text` presence is the implicit discriminator, and `origin` is both provenance and would-be payload.
+**Status: works** — [is-opaque](../src/vfs/node/is-opaque.nix) tests presence, ingest produces opaque leaves, and `materialize` branches on it.
 
-### US-20 — Reject non-regular, non-link entries by path
+### US-20 — Fail on unrepresentable entries with their own path
 
-**As** a library user, **I want** entries that cannot be dereferenced to fail fast with the *entry's* path, **so that** one odd file does not abort or hang an unrelated import.
+**As** a library user, **I want** an entry that cannot be represented to fail with the *entry's* path, **so that** one odd file does not abort or hang an unrelated import.
 
-- Import classifies each entry with `readDir` / `readFileType` before reading it.
-- A fifo, socket, or device is rejected with its VFS path; no reader is opened, because opening a fifo blocks the evaluator.
-- A dangling link or a link to a directory is rejected with the *link's* path, not the target's.
-- A regular file and a link that resolves to a regular file are imported.
+- `builtins.readFileType` reports four kinds: `regular`, `directory`, `symlink`, and `unknown`. `unknown` is the catch-all for fifo, socket, and device, which the evaluator cannot tell apart and does not need to.
+- The check lives in the primitive, [file.from-src](../src/vfs/file/from-src.nix), which accepts only `regular` and throws for the rest, naming the VFS path and the reported kind. [dir.from-src](../src/vfs/tree/from-src.nix) is a combinator over it, so it inherits the rejection without repeating it.
+- Classification is free: `readFileType` is `lstat`, so no file is opened and no store copy is made.
+- Reading an opaque leaf through `sundry.vfs.file.read` may still fail uncatchably, but only for the caller that asked; ingest can no longer produce the entries that hang it.
 
-**Status: missing** — every non-directory entry is handed to `readFile`. Entry type is discarded by `lib.filesystem.listFilesRecursive`, so a fifo hangs evaluation, and a dangling or dir link aborts with the target path in the message.
+**Status: works** — [file.from-src](../src/vfs/file/from-src.nix) throws `vfs.file.from-src: [ "B" ] is a 'symlink' entry; only a regular file can be ingested`.
 
 ### US-21 — Exclude unrepresentable metadata explicitly
 
@@ -235,7 +245,7 @@ These stories state the target model from a consumer's point of view. They defin
 - Whole-tree copies keep siblings together.
 - `load-nix` imports the exact `origin` value.
 
-**Status: works** — [load-nix](../src/vfs/dir/load-nix.nix).
+**Status: works** — [load-nix](../src/vfs/tree/load-nix.nix).
 
 ### US-23 — Compose and build a project
 
@@ -244,26 +254,80 @@ These stories state the target model from a consumer's point of view. They defin
 - Imported trees and generated files merge into one VFS.
 - Tags select the leaves to interpret.
 - Materialization yields the build input; the Python wrapper consumes it as an application.
+- A tree mixing authored leaves (the generated `pyproject.toml`) with opaque leaves (the imported source) materializes by writing one and copying the other.
 - The source root is the wheel root.
 
 **Status: works** — subject to the layout contract in [python-script.md](python-script.md).
 
+### US-24 — Never classify content
+
+**As** a library author, **I want** ingest to avoid deciding whether a file is text, **because** eval cannot detect it and does not need to.
+
+- Ingest records `origin` and nothing else; it has no predicate parameter and never probes bytes.
+- A consumer that wants text calls `sundry.vfs.file.read` and accepts the decode risk at that point; `edit` promotes the result to authored content.
+- No eval code branches on a failed `readFile`.
+
+Why it cannot be detection:
+
+- `readFileType` returns `regular` for an ELF binary and for a Markdown file alike; entry kind says nothing about content.
+- The only in-eval signal is the absence of NUL, and the failure is not catchable: `tryEval (stringLength (readFile elfPath))` re-throws `the contents of the file '…' cannot be represented as a Nix string`. `builtins` exposes no size, `stat`, or prefix read, so magic bytes are unreachable — `readFile` decodes the whole file before returning.
+- `hashFile` does read raw bytes of a binary, but yields only a digest.
+- A build-time probe works (a `runCommand` that compares `wc -c` with `tr -d '\0'`, read back via `readFile`) and returns `text` for an ELF-free script and `binary` for ELF, but it is IFD: a build per file during evaluation, forbidden under `--pure-eval`, and invalidated by any content change.
+- Non-UTF-8 bytes are not a signal: Nix strings are byte strings and `\xff\xfe\x01` passes. The boundary is exactly the byte `0x00`.
+
+**Status: missing** — import still calls `readFile` on every entry. The target contract removes the question instead of answering it: opaque ingest makes classification unnecessary, and `sundry.vfs.file.read` makes decoding a local, explicit choice.
+
+### US-25 — Read without authoring
+
+**As** a library user, **I want** to read a leaf's contents without turning it into an edit.
+
+```nix
+sundry.vfs.file.read :: file -> text
+```
+
+- Returns `file.text` when authored, otherwise a lazy `builtins.readFile file.origin`.
+- The returned thunk is never stored in the tree, so reading leaves the payload state unchanged.
+- A consumer that only inspects contents (filtering, templating, logging) can read a whole tree without promoting any leaf to authored.
+- The costs of decoding — chiefly a NUL abort — belong to the caller that asked.
+- It takes a leaf, not a path, so it cannot name a VFS path in an error; callers reach it through `is-leaf` or `halt`.
+
+**Status: works** — [read.nix](../src/vfs/file/read.nix). Until ingest is opaque (US-02), the opaque branch is reachable only for hand-built leaves and post-materialization `dir` values, because `from-src` still stores `text`.
+
+### US-26 — `edit` is the only content author
+
+**As** a library author, **I want** one leaf-level operation that changes contents, **so that** an authored payload can never coexist with a location that silently wins.
+
+```nix
+sundry.vfs.file.edit :: (text -> text) -> file -> file
+```
+
+- Sets `text = fn (read file)` and keeps `origin` for provenance.
+- A rewrite is local: `edit` takes a leaf, not a tree; a tree-level transformation applies it per leaf.
+- Any operation that changes contents routes through `edit`; no code writes `text` in place while leaving an `origin` that describes the old bytes.
+- Removing `text` reverts the leaf to opaque, so dropping an edit is an explicit choice.
+- Arguments are function first, file last, matching the data-last convention of the other `vfs.file` helpers.
+
+**Status: works** — [edit.nix](../src/vfs/file/edit.nix) is the only writer of `text` in library code, and no traversal writes it: `walk`, `reform`, `filter`, `collapse`, and `select` only pass leaves to a caller-supplied callback. Text rewrites inside the `walk` and `reform` test blocks are test callbacks, not library behavior.
+
 ## Model axes
 
-| axis | today | stories that require more |
+| axis | target | where it stands |
 |---|---|---|
-| leaf content | in-memory `text` | decoded text or opaque copy (US-10, US-15, US-19) |
-| entry kind | any non-directory entry read as a file | regular files and dereferenced links; reject the rest (US-12, US-20) |
-| mode | store-canonical | executable flag (US-11) |
-| directories | structural `{}` | preserved through import and materialization (US-13) |
-| names | attrset keys | byte-faithful and shell-safe (US-14, US-17) |
-| provenance | `origin` | split from payload (US-10, US-19) |
-| laziness | lazy import, eager materialization | per leaf, copy without read (US-03, US-16, US-18) |
-| granularity | one derivation per tree | per-file objects (US-18) |
+| payload state | opaque at ingest; authored only through `edit` | works (US-02, US-19, US-25, US-26) |
+| leaf content | `text` present means authored and outranks `origin` | works (US-10, US-19) |
+| entry kind | unrepresented on the node; regular files and directories only, everything else rejected at ingest | works (US-12, US-20) |
+| mode | preserved for opaque leaves; `0444` for authored | works (US-11) |
+| directories | structural `{}`; empty physical directories are not modelled | out of scope (US-13) |
+| names | byte-faithful and shell-safe | works (US-14, US-17) |
+| provenance | a location in both states, never the payload of an authored leaf | works (US-04, US-19) |
+| laziness | nothing read at ingest; `read` returns unretained thunks | works (US-03, US-25) |
+| store object | one derivation carrying store paths, not bytes | works (US-18) |
 
 ## What the stories force
 
-- `text` and `origin` cannot keep doubling. One field is decoded content, the other is a location; an opaque leaf makes the difference visible.
-- The representation belongs in `is-leaf` and in one content accessor. Traversals branch on it once; every consumer branching on `text` would spread the gap.
-- Materialization is where the physical contract is decided. Import must classify entries and reject what it cannot dereference; the exec bit and name fidelity belong to materialization, or the contract is text-only by declaration.
-- Link identity is not content. The model stores bytes; a pointer is either dereferenced at import or refused, because nothing a store keeps can make a pointer hermetic.
+- `text` is a declaration, not a cache. Presence means "these bytes came from Nix"; absence means "copy the location". One bit of state, no heuristic.
+- Reading and authoring are different operations. `sundry.vfs.file.read` returns a thunk and never stores it; `sundry.vfs.file.edit` is the only writer of `text`. A transformation that rewrites contents without `edit` is a silent bug.
+- Ingest is opaque, so eval never opens a file. The decode risk — a NUL abort — moves to the caller that explicitly asks, while an entry the store cannot carry is rejected at ingest with its VFS path.
+- Links are not content. Eval cannot see a target (`readlink` is absent), so a link cannot be collapsed faithfully: resolving one imports host state and preserving one imports a pointer. Ingest rejects it instead.
+- Copying is per leaf because every ingested leaf is an independent regular file; nothing in the tree depends on a sibling.
+- Most of the physical step is a plain copy: `cp` preserves modes, and `builtins.toFile` keeps authored content out of the derivation expression. The library's own work is path mapping and the payload branch, not reimplementing a copy.

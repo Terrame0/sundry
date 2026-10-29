@@ -14,13 +14,13 @@ A pile of small single-use `let` helpers that filter/index/diff a structure is t
 
 When a value flows through more than one call, write it as a `lib.pipe`, not nested application. Nested calls read inside-out and make the reader match parentheses; a pipe reads top-to-bottom in evaluation order. The bar is low — two nested calls, each with its own arguments, already justify it.
 
-[resolve-tags.nix](../src/vfs/dir/resolve-tags.nix), [validate.nix](../src/attrs/validate.nix), and [str/trim.nix](../src/str/trim.nix) all chain this way instead of nesting calls inside-out.
+[resolve-tags.nix](../src/vfs/tree/resolve-tags.nix), [validate.nix](../src/attrs/validate.nix), and [str/trim.nix](../src/str/trim.nix) all chain this way instead of nesting calls inside-out.
 
 ## One condition, derive the rest
 
 When two functions ask the same question in different shapes — "does it hold?" vs. "where does it hold?" — write the predicate once and derive the others from it.
 
-[src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) is `findFirst` over [boolean.expr](../src/boolean/expr.nix): the position is the index where the expr first holds, sharing the [`tag`](../src/boolean/operands/tag.nix) operand with [filter-within-tag](../src/vfs/dir/filter.nix) rather than keeping a second copy of the matching logic.
+[src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) is `findFirst` over [boolean.expr](../src/boolean/expr.nix): the position is the index where the expr first holds, sharing the [`tag`](../src/boolean/operands/tag.nix) operand with [filter-within-tag](../src/vfs/tree/filter.nix) rather than keeping a second copy of the matching logic.
 
 The codebase has a naming convention for the general/specialized split: the fully parameterized function takes a `-base` suffix (kept private in `let`) or a `-matched-until` / `-until` suffix (public, exposing the predicate and/or the stop condition), and the everyday function is that base with the common arguments pre-applied. [trim-left / trim-right](../src/str/trim.nix) are `trim-base` with the has/remove fns fixed; [compare / compare-until](../src/attrs/compare.nix) fix or expose the condition. The attrset traversal variants and their predicate contracts are documented in [attrs-traversal.md](attrs-traversal.md). Write the general function and derive its specializations by partial application or argument composition — never copy the body.
 

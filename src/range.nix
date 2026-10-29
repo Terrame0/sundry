@@ -7,7 +7,7 @@
     arg-count = lib.length args-list;
     arg-at = i: sundry.list.at i args-list;
     args = sundry.switch arg-count [
-      [0 (throw "\nnot enough arguments for 'range' (got ${toString arg-count})")]
+      [0 (throw "not enough arguments for 'range' (got ${toString arg-count})")]
       [
         [1 2 3]
         rec {
@@ -29,7 +29,7 @@
             else 1;
         }
       ]
-      (throw "\ntoo many arguments for 'range' (got ${toString arg-count})")
+      (throw "too many arguments for 'range' (got ${toString arg-count})")
     ];
   in
     lib.genList (i: args.start + i * args.step) (lib.max 0 args.count);

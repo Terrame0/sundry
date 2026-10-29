@@ -23,7 +23,7 @@
       E = {F = {G = 0;};};
     };
   in {
-    filter-matched-until = [
+    matched-until = [
       (filter-matched-until
         (path: value: value != 0)
         (path: value: lib.length path > 1)
@@ -35,7 +35,7 @@
         E = {F = {G = 0;};};
       }
     ];
-    filter-matched = [
+    matched = [
       (filter-matched
         (path: value: value != 0)
         (path: value: false)
@@ -45,7 +45,7 @@
         E = {F = {G = 0;};};
       }
     ];
-    filter-until = [
+    until = [
       (filter-until
         (path: value: lib.length path > 1)
         (path: value: value != 0)
@@ -56,7 +56,7 @@
         E = {F = {G = 0;};};
       }
     ];
-    filter = [
+    all = [
       (filter
         (path: value: value != 0)
         attrs)

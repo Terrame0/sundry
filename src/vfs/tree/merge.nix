@@ -2,8 +2,8 @@
   merge = lhs: rhs: sundry.attrs.merge.dirs.no-collision [lhs rhs];
   merge-n = sundry.attrs.merge.dirs.no-collision;
   tests = {
-    merge-disjoint = [
-      (sundry.vfs.dir.merge
+    disjoint = [
+      (sundry.vfs.tree.merge
         {
           A = {
             "B.txt" = {
@@ -39,12 +39,12 @@
         };
       }
     ];
-    merge-empty = [
-      (sundry.vfs.dir.merge {} {})
+    empty = [
+      (sundry.vfs.tree.merge {} {})
       {}
     ];
-    merge-into-empty = [
-      (sundry.vfs.dir.merge
+    into-empty = [
+      (sundry.vfs.tree.merge
         {}
         {
           "A.txt" = {
@@ -58,7 +58,7 @@
       }
     ];
     throws-on-file-collision = [
-      (sundry.does-throw (sundry.vfs.dir.merge
+      (sundry.does-throw (sundry.vfs.tree.merge
         {
           "A.txt" = {
             text = "a";
@@ -72,7 +72,7 @@
       true
     ];
     throws-on-file-dir-collision = [
-      (sundry.does-throw (sundry.vfs.dir.merge
+      (sundry.does-throw (sundry.vfs.tree.merge
         {
           A = {
             text = "a";

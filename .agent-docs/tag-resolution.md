@@ -1,6 +1,6 @@
 # Tag resolution
 
-[`sundry.vfs.dir.resolve-tags`](../src/vfs/dir/resolve-tags.nix) converts annotations embedded in every original VFS path segment into a cleaned logical path and a `tag-list` on each leaf.
+[`sundry.vfs.tree.resolve-tags`](../src/vfs/tree/resolve-tags.nix) converts annotations embedded in every original VFS path segment into a cleaned logical path and a `tag-list` on each leaf.
 
 ## Segment syntax
 
@@ -33,7 +33,7 @@ All annotation blocks are removed from each logical path segment. Existing leaf 
 
 `resolve-tags` owns `tag-list`: a leaf that already carries the field marks an already-resolved tree. Rather than silently overwriting it, `resolve-tags` throws per such leaf when the rebuilt fields are demanded. Call it once per assembly, before any tag query; see [gotchas.md](gotchas.md#resolve-tags-throws-on-an-already-resolved-tree).
 
-To hand a tree to a pipeline that owns its own tag logic, neutralize it first with [`sundry.vfs.dir.strip-tags`](../src/vfs/dir/strip-tags.nix). It removes annotation blocks from logical segments and drops any existing `tag-list`, and is idempotent on both dirty and resolved trees. `origin` is left untouched: it names provenance, not tags.
+To hand a tree to a pipeline that owns its own tag logic, neutralize it first with [`sundry.vfs.tree.strip-tags`](../src/vfs/tree/strip-tags.nix). It removes annotation blocks from logical segments and drops any existing `tag-list`, and is idempotent on both dirty and resolved trees. `origin` is left untouched: it names provenance, not tags.
 
 `resolve-tags` rebuilds the cleaned tree through generic `attrs.reform`, so cleaned-path overlaps use structural `recursive.no-collision` rather than the VFS-aware `dirs` resolver. Collision errors surface only when the relevant rebuilt fields are demanded. The exact overlap hazard and avoidance rule live in [gotchas.md](gotchas.md#reform-collision-handling-is-structural-not-vfs-aware).
 

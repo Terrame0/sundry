@@ -1,6 +1,6 @@
 {sundry, ...}: rec {
   strip-tags =
-    sundry.vfs.dir.reform
+    sundry.vfs.tree.reform
     (path: node: {
       path = sundry.vfs.path.strip-between "{" "}" path;
       value = removeAttrs node ["tag-list"];

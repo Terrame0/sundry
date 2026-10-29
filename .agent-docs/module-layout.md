@@ -8,10 +8,10 @@ The assembler ([assembly.nix](../assembly.nix)) walks every `.nix` file under `s
 
 | File | Exports at | Function ends up at |
 |---|---|---|
-| [src/vfs/dir/reform.nix](../src/vfs/dir/reform.nix) | `sundry.vfs.dir` | `sundry.vfs.dir.reform` |
-| [src/vfs/dir/filter.nix](../src/vfs/dir/filter.nix) | `sundry.vfs.dir` | `sundry.vfs.dir.filter`, `sundry.vfs.dir.filter-within-tag` |
-| [src/vfs/dir/load-nix.nix](../src/vfs/dir/load-nix.nix) | `sundry.vfs.dir` | `sundry.vfs.dir.load-nix`, `sundry.vfs.dir.load-nix-with` |
-| [src/vfs/dir/select.nix](../src/vfs/dir/select.nix) | `sundry.vfs.dir` | `sundry.vfs.dir.select-by-tag` |
+| [src/vfs/tree/reform.nix](../src/vfs/tree/reform.nix) | `sundry.vfs.tree` | `sundry.vfs.tree.reform` |
+| [src/vfs/tree/filter.nix](../src/vfs/tree/filter.nix) | `sundry.vfs.tree` | `sundry.vfs.tree.filter`, `sundry.vfs.tree.filter-within-tag` |
+| [src/vfs/tree/load-nix.nix](../src/vfs/tree/load-nix.nix) | `sundry.vfs.tree` | `sundry.vfs.tree.load-nix`, `sundry.vfs.tree.load-nix-with` |
+| [src/vfs/tree/select.nix](../src/vfs/tree/select.nix) | `sundry.vfs.tree` | `sundry.vfs.tree.select-by-tag` |
 | [src/vfs/file/get-tag-pos.nix](../src/vfs/file/get-tag-pos.nix) | `sundry.vfs.file` | `sundry.vfs.file.get-tag-pos` |
 | [src/boolean/operands/tag.nix](../src/boolean/operands/tag.nix) | `sundry.boolean.operands` | `sundry.boolean.operands.tag`, `sundry.boolean.operands.deepest-tag` |
 | [src/vfs/tag/faceted-match.nix](../src/vfs/tag/faceted-match.nix) | `sundry.vfs.tag` | `sundry.vfs.tag.faceted-match` |
@@ -34,7 +34,7 @@ Cohesive clusters that live in one file:
 - [src/str/trim.nix](../src/str/trim.nix) — `trim`, `trim-left`, `trim-right`, same shape.
 - [src/attrs/compare.nix](../src/attrs/compare.nix) — `compare` and `compare-until` (the latter is a generalization).
 
-Related operations still belong in separate files when their callback and result contracts differ. The VFS traversal specializations are split into [reform.nix](../src/vfs/dir/reform.nix), [filter.nix](../src/vfs/dir/filter.nix), [collapse.nix](../src/vfs/dir/collapse.nix), and [walk.nix](../src/vfs/dir/walk.nix); each file owns one operation family and its tests.
+Related operations still belong in separate files when their callback and result contracts differ. The VFS traversal specializations are split into [reform.nix](../src/vfs/tree/reform.nix), [filter.nix](../src/vfs/tree/filter.nix), [collapse.nix](../src/vfs/tree/collapse.nix), and [walk.nix](../src/vfs/tree/walk.nix); each file owns one operation family and its tests.
 
 The split usually pays off when the test block, not the function block, is what's making the file hard to read.
 

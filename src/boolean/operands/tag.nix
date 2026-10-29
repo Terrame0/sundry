@@ -8,11 +8,11 @@ in rec {
     tag-list = [{a = "1";} {b = ["1" "2"];}];
     override-list = [{modules = "user";} {a = "1";} {modules = "system";}];
   in {
-    tag-exact-match = [(tag tag-list {a = "1";}) true];
-    tag-list-contains = [(tag tag-list {b = "2";}) true];
-    tag-conjunction = [(tag tag-list ({a = "1";} // {b = "2";})) true];
-    tag-empty-spec = [(tag [] {}) true];
-    tag-empty-spec-miss = [(tag [] {a = "1";}) false];
+    exact-match = [(tag tag-list {a = "1";}) true];
+    list-contains = [(tag tag-list {b = "2";}) true];
+    conjunction = [(tag tag-list ({a = "1";} // {b = "2";})) true];
+    empty-spec = [(tag [] {}) true];
+    empty-spec-miss = [(tag [] {a = "1";}) false];
 
     deepest-overrides = [(deepest-tag override-list {modules = "system";}) true];
     deepest-shadowed = [(deepest-tag override-list {modules = "user";}) false];

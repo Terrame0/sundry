@@ -4,19 +4,17 @@
   ...
 }: rec {
   validate = path: node:
-    if !lib.isAttrs node
-    then throw "vfs directory node at '${sundry.vfs.path.get.str path}' is not an attribute set"
-    else if lib.any (sundry.apply [path node]) (with sundry.vfs.node; [is-leaf is-dir])
-    then true
-    else throw "vfs directory node at '${sundry.vfs.path.get.str path}' is neither a leaf nor a directory";
+    lib.seq (sundry.vfs.node.halt path node) true;
 
   tests = {
-    validate-derivation-origin = [(validate ["..."] {origin = {type = "derivation";};}) true];
-    validate-text = [(validate ["..."] {text = "...";}) true];
-    validate-directory = [(validate ["..."] {a = {};}) true];
+    derivation-origin = [(validate ["..."] {origin = {type = "derivation";};}) true];
+    text = [(validate ["..."] {text = "...";}) true];
+    directory = [(validate ["..."] {a = {};}) true];
+    empty-directory = [(validate ["..."] {}) true];
+    text-attrset-directory = [(validate ["..."] {text = {};}) true];
     throws-on-non-dir-child = [(sundry.does-throw (validate ["x" "y" "z"] {a = 10;})) true];
     throws-on-non-attrs = [(sundry.does-throw (validate ["x" "y" "z"] 10)) true];
-    validate-lazy-expr = [
+    lazy-expr = [
       (validate ["..."] {
         origin = "...";
         expr = throw "expr was forced";

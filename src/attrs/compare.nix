@@ -99,7 +99,7 @@ in rec {
         missing = {};
       }
     ];
-    compare-until-stop = [
+    stop = [
       (compare-until
         (ref-value: ref-value ? stop)
         {

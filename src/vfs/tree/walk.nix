@@ -14,14 +14,14 @@
     sundry.vfs.node.halt;
 
   tests = let
-    fixture-file-tree = sundry.vfs.dir.from-src (fixtures-dir + "/vfs-test-dir/test-files");
-    tags-file-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
-      sundry.vfs.dir.from-src
-      sundry.vfs.dir.resolve-tags
+    fixture-tree = sundry.vfs.tree.from-src (fixtures-dir + "/vfs-test-dir/test-files");
+    tags-tree = lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [
+      sundry.vfs.tree.from-src
+      sundry.vfs.tree.resolve-tags
     ];
   in {
     walked-tree = [
-      (sundry.vfs.dir.walk (path: node: {text = "walked ${node.text}";}) fixture-file-tree)
+      (sundry.vfs.tree.walk (path: node: {text = "walked ${sundry.vfs.file.read node}";}) fixture-tree)
       {
         "A.txt" = {text = "walked contents of A.txt";};
         "B.txt" = {text = "walked contents of B.txt";};
@@ -29,12 +29,12 @@
       }
     ];
     within-tag = [
-      (sundry.vfs.dir.collapse
-        (path: node: node.text)
-        (sundry.vfs.dir.walk-within-tag
+      (sundry.vfs.tree.collapse
+        (path: node: sundry.vfs.file.read node)
+        (sundry.vfs.tree.walk-within-tag
           (e: with e; tag {b = "1";})
-          (path: node: node // {text = "walked ${node.text}";})
-          tags-file-tree))
+          (path: node: node // {text = "walked ${sundry.vfs.file.read node}";})
+          tags-tree))
       [
         "walked contents of H"
         "walked contents of G"
@@ -49,10 +49,20 @@
     ];
     malformed-leaf = [
       (sundry.does-throw
-        (sundry.vfs.dir.walk
-          (path: node: {text = "walked ${node.text}";})
+        (sundry.vfs.tree.walk
+          (path: node: {text = "walked ${sundry.vfs.file.read node}";})
           {A = {junk = "abc";};}))
       true
+    ];
+    preserves-empty-directory = [
+      (sundry.vfs.tree.walk (path: node: node) {
+        A = {};
+        B = {text = "b";};
+      })
+      {
+        A = {};
+        B = {text = "b";};
+      }
     ];
   };
 }
