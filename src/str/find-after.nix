@@ -25,6 +25,7 @@
 in rec {
   find-after = find-after-base (i: i + 1);
   rfind-after = find-after-base (i: i - 1);
+
   tests = {
     finds-at-start = [(find-after 0 "A" "ABC") 0];
     finds-in-middle = [(find-after 0 "B" "ABC") 1];

@@ -6,6 +6,7 @@
   slice = args-list: str:
     lib.foldl (acc: i: acc + sundry.str.at i str)
     "" (sundry.range args-list);
+
   tests = {
     prefix-two = [(slice [2] "abc") "ab"];
     single-index = [(slice [1 2] "abc") "b"];

@@ -3,6 +3,7 @@
 in rec {
   does-throw = does-throw-base builtins.deepSeq;
   does-throw-whnf = does-throw-base builtins.seq;
+
   tests = {
     deep-throw = [(does-throw (throw "ABC")) true];
     deep-no-throw = [(does-throw "ABC") false];

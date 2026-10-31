@@ -14,6 +14,7 @@
         else value)
       (lib.head list)
       (lib.tail list);
+
   tests = {
     single-element = [(best (lhs: rhs: lhs < rhs) [4]) 4];
     ascending-list = [(best (lhs: rhs: lhs < rhs) [1 2 3 4]) 1];

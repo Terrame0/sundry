@@ -7,6 +7,7 @@
     if a <= b
     then lib.min b (lib.max a x)
     else throw "lower bound must be less than or equal to the upper bound";
+
   tests = {
     inside-range = [(clamp 1 0 2) 1];
     at-lower-bound = [(clamp 0 0 2) 0];

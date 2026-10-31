@@ -14,6 +14,7 @@
   in
     sundry.attrs.merge.recursive.no-collision
     (map path-to-file (lib.filesystem.listFilesRecursive dir-path));
+
   tests = {
     tree = [
       (from-src (fixtures-dir + "/vfs-test-dir/test-files"))

@@ -12,7 +12,7 @@ A utility Nix library (`sundry.*`), assembled from files under `src/` where the 
 - [attrs-merge.md](.agent-docs/attrs-merge.md) — attrset merge callback paths, resolver composition, and the VFS-aware `dirs` resolver.
 - [attrs-validation.md](.agent-docs/attrs-validation.md) — asymmetric attrset comparison and the template DSL used by `attrs.validate`.
 - [dependency-resolution.md](.agent-docs/dependency-resolution.md) — topological layers and lazy assembly of named transform results from declared dependencies.
-- [python-script.md](.agent-docs/python-script.md) — `script.python` contract: the source root is the wheel root, why `only-include = ["."]`, how `entrypoint` maps to a module, and which layout imports work.
+- [python-script.md](.agent-docs/python-script.md) — `script.python` contract: the source root is the wheel root, why `only-include = ["."]`, how `entrypoint` maps to a module, which layout imports work, and the `python-deps` vs. `runtime-deps` split.
 - [vfs-model-stories.md](.agent-docs/vfs-model-stories.md) — user stories defining the intended scope of the VFS model — opaque ingest, authored `text`, per-leaf copy, link collapsing — and each capability's current status.
 - [materialize.md](.agent-docs/materialize.md) — the physical step: payload branch, per-leaf copy with link collapsing, why it always builds, measured costs, why not a derivation per file, and the tool matrix.
 - [str-indexing.md](.agent-docs/str-indexing.md) — how `at`, `slice`, and `range` compose, the signed index-label model, and where slicing deliberately diverges from Python.

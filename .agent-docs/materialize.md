@@ -95,7 +95,7 @@ The fixed-output copies are not scanned for store paths, so a preserved link to 
 
 ## Non-regular entries are rejected at ingest
 
-`builtins.readFileType` reports four kinds: `regular`, `directory`, `symlink`, and `unknown`, where `unknown` is the catch-all for fifo, socket, and device. The check sits in the primitive, [file.from-src](../src/vfs/file/from-src.nix): it accepts only `regular` and throws for the rest, naming the VFS path and the kind. [dir.from-src](../src/vfs/tree/from-src.nix) is a combinator over it and inherits the rejection.
+`builtins.readFileType` reports four kinds: `regular`, `directory`, `symlink`, and `unknown`, where `unknown` is the catch-all for fifo, socket, and device. The check sits in the primitive, [file.from-src](../src/vfs/file/from-src.nix): it accepts only `regular` and throws for the rest, naming the VFS path and the kind. [tree.from-src](../src/vfs/tree/from-src.nix) is a combinator over it and inherits the rejection.
 
 A fifo, socket, or device is rejected because there is nothing to represent: the store carries regular files and directories, so such an entry has no bytes to copy and no shape to store. Deferring it is also the worst option — `cp` opens a fifo and waits forever, and `builtins.readFile` does the same.
 

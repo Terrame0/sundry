@@ -1,6 +1,7 @@
 {sundry, ...}: rec {
   max = sundry.list.best (lhs: rhs: lhs > rhs);
   min = sundry.list.best (lhs: rhs: lhs < rhs);
+
   tests = {
     min-single-element = [(min [1]) 1];
     max-single-element = [(max [1]) 1];

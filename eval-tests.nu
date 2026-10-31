@@ -10,3 +10,4 @@ in
 | from json
 | select name data
 | update data { select source expected got }
+| table --expand 

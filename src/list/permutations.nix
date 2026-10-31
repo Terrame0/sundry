@@ -18,6 +18,7 @@
     if k >= 0 && k <= list-len
     then recurse list []
     else throw "k has to be between 0 and ${toString list-len}, but k is ${toString k}";
+
   tests = {
     k-equals-length = [
       (permutations 3 [1 2 3])

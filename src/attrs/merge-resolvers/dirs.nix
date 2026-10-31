@@ -14,6 +14,7 @@
     else if lib.any lib.id nodes-are-leaves
     then throw "there is a directory to leaf collision at ${sundry.str.pretty path}"
     else sundry.attrs.merge-with (next-path: dirs resolve-next (path ++ next-path)) [acc-value value];
+
   tests = {
     dir-dir = [
       # -- both are directories

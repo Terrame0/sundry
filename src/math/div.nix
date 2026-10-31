@@ -8,6 +8,7 @@
       else -1;
   in
     (abs a + abs b - 1) / abs b * sign;
+
   tests = {
     one-over-two = [(div-away 1 2) 1];
     two-over-two = [(div-away 2 2) 1];

@@ -30,6 +30,7 @@
             path;
           };
       });
+
   tests = {
     tagged-tree = [
       (lib.pipe (fixtures-dir + "/vfs-test-dir/tags") [

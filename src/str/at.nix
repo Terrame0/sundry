@@ -11,6 +11,7 @@
     else if i < 0 && i >= (-len)
     then lib.substring (len + i) 1 str
     else throw "index '${toString i}' out of range, expected values '0..${toString (len - 1)}' or '-1..${toString (-len)}'";
+
   tests = {
     first-char = [(at 0 "abc") "a"];
     last-char = [(at 2 "abc") "c"];

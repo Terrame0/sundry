@@ -8,6 +8,7 @@
     after = lib.substring (pos + len) (sundry.str.len str) str;
   in
     before + replacement + after;
+
   tests = {
     replace-middle = [(replace-at 2 2 "..." "ABCDEF") "AB...EF"];
     insert-middle = [(replace-at 3 0 "." "ABCDEF") "ABC.DEF"];

@@ -5,6 +5,7 @@
 }: {
   base.concat = path: lhs: rhs:
     lib.toList lhs ++ lib.toList rhs;
+
   tests = {
     list-and-scalar = [
       (sundry.attrs.merge.concat [{A = [1 2];} {A = 3;}])

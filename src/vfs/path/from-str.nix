@@ -5,6 +5,7 @@
       (sundry.str.trim-left "/"
         # -- segments become attribute names that forbid store context
         (builtins.unsafeDiscardStringContext (toString path-str))));
+
   tests = {
     absolute-path = [(from-str "/A/B/C.txt") ["A" "B" "C.txt"]];
     relative-path = [(from-str "A/B") ["A" "B"]];

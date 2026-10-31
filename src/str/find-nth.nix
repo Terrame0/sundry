@@ -28,6 +28,7 @@ in rec {
     n
     seq
     str;
+
   tests = {
     find-first-char = [(find-nth 1 "A" "ABAB") 0];
     find-second-char = [(find-nth 2 "A" "ABAB") 2];

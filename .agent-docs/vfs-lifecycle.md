@@ -13,7 +13,7 @@ sundry.vfs.file.from-text ["A" "B.txt"] "contents"
 
 Both require a non-empty VFS path. `from-text` authors contents: it adds `text` and no `origin`. `from-src` ingests a location: it confirms with `readFileType` that the location is a regular file, then adds `origin` and **opens nothing**, so an imported leaf is opaque and its bytes stay on disk until something asks for them. `from-src` stores its `fs-path` argument unchanged, so a raw Nix path produces a path-typed `origin` and a string produces a string-typed one; [is-leaf](../src/vfs/node/is-leaf.nix) accepts a path, string, or derivation, and the derivation form matters downstream when a stage re-points `origin` at a build output.
 
-Neither constructor type-checks `text`; [`is-leaf`](../src/vfs/node/is-leaf.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). [`dir.from-src`](../src/vfs/tree/from-src.nix) enumerates the files below a directory, maps each to its relative VFS path through [`file.from-src`](../src/vfs/file/from-src.nix), and combines the one-file trees with `recursive.no-collision`. It owns no classification of its own: the primitive accepts only a regular file, so a link, fifo, socket, or device rejects the whole tree (US-12).
+Neither constructor type-checks `text`; [`is-leaf`](../src/vfs/node/is-leaf.nix) is the classifier that rejects a scalar non-string `text` (an attrset-shaped one is read as a directory, per [data-model.md](data-model.md)). [`tree.from-src`](../src/vfs/tree/from-src.nix) enumerates the files below a directory, maps each to its relative VFS path through [`file.from-src`](../src/vfs/file/from-src.nix), and combines the one-file trees with `recursive.no-collision`. It owns no classification of its own: the primitive accepts only a regular file, so a link, fifo, socket, or device rejects the whole tree (US-12).
 
 Ingest is opaque by contract: it enumerates names, `lstat`s each entry to reject the ones a leaf cannot represent, and records `origin`, but calls no reader. A decoded leaf exists only when the consumer asks for one, through `sundry.vfs.file.read` — `file.text` when authored, otherwise a lazy `builtins.readFile file.origin`. That thunk is returned and never stored, so reading leaves the node opaque; the cost of decoding — chiefly a NUL abort — is paid by the caller who asked, not by everyone who assembled the tree.
 
@@ -45,14 +45,14 @@ Run `resolve-tags` after assembly so every source follows the same logical-path 
 |---|---|---|
 | `file.from-text` | non-empty VFS path, string contents | `text` (authored, no `origin`) |
 | `file.from-src` | path to a regular file | `origin` only; nothing is read |
-| `dir.from-src` | path to a directory | `origin` only per leaf; nothing is read |
+| `tree.from-src` | path to a directory | `origin` only per leaf; nothing is read |
 | `sundry.vfs.file.read` | leaf with `text` or `origin` | unchanged; returns `text` or a lazy `readFile origin` thunk |
 | `sundry.vfs.file.edit fn` | leaf with `text` or `origin` | `text = fn (read file)`; `origin` kept for provenance |
-| [`dir.resolve-tags`](../src/vfs/tree/resolve-tags.nix) | valid VFS tree without `tag-list` | existing fields plus `tag-list`; logical paths are cleaned |
-| [`dir.strip-tags`](../src/vfs/tree/strip-tags.nix) | valid VFS tree | `tag-list` removed; logical paths are cleaned |
-| [`dir.load-nix`](../src/vfs/tree/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
-| `dir.load-nix-with fn` | `origin` when `fn` demands the imported value | existing fields plus `expr = fn path file imported` |
-| [`dir.materialize name`](../src/vfs/tree/materialize.nix) | every leaf has `text` or `origin` | returns `{ drv, tree }`; every leaf's `text` and other payload fields are removed, `origin` points into `drv`, and `tag-list` is kept |
+| [`tree.resolve-tags`](../src/vfs/tree/resolve-tags.nix) | valid VFS tree without `tag-list` | existing fields plus `tag-list`; logical paths are cleaned |
+| [`tree.strip-tags`](../src/vfs/tree/strip-tags.nix) | valid VFS tree | `tag-list` removed; logical paths are cleaned |
+| [`tree.load-nix`](../src/vfs/tree/load-nix.nix) | `origin` when the import is demanded | existing fields plus `expr` |
+| `tree.load-nix-with fn` | `origin` when `fn` demands the imported value | existing fields plus `expr = fn path file imported` |
+| [`tree.materialize name`](../src/vfs/tree/materialize.nix) | every leaf has `text` or `origin` | returns `{ drv, tree }`; every leaf's `text` and other payload fields are removed, `origin` points into `drv`, and `tag-list` is kept |
 
 `resolve-tags` is explained in [tag-resolution.md](tag-resolution.md). Tag-aware selection and `*-within-tag` transformations require its `tag-list` field; they do not synthesize missing tags. `strip-tags` neutralizes annotations and `tag-list` for handing a tree to a pipeline that owns its own tag logic; unlike `resolve-tags`, it is idempotent and safe on an already-resolved tree.
 

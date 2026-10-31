@@ -36,4 +36,13 @@ A `src`-directory layout with top-level imports requires collapsing the prefix, 
 
 ## Dependencies
 
-`deps` is applied to `pkgs.python3Packages`; the result becomes the derivation's `dependencies`, not `[project.dependencies]`. Write `deps = py: [py.click]`, not `deps = ["click"]`.
+Two axes, with different mechanisms:
+
+| argument | what it is | how it reaches the program |
+|---|---|---|
+| `python-deps` | Python packages the code imports | applied to `pkgs.python3Packages`, passed as `dependencies`, which nixpkgs propagates and the `wrapPython` hook turns into `site.addsitedir` entries inside `bin/.<pname>-wrapped` |
+| `runtime-deps` | executables the code runs, e.g. `cowsay` | `makeWrapperArgs = ["--prefix" "PATH" ":" (lib.makeBinPath runtime-deps)]`, which prefixes the wrapper's `PATH` |
+
+Write `python-deps = py: [py.click]`, not `python-deps = ["click"]`. `runtime-deps` takes plain packages: `runtime-deps = [pkgs.cowsay]`.
+
+`python-deps` needs no `PATH` work — an import is resolved through the `site` path baked into the wrapper, so it works even under `env -i`. A binary is different: without `runtime-deps` the program only finds what the calling environment happens to have on `PATH`, which makes the package non-hermetic. Both behaviours are locked by tests that run under `env -i`.

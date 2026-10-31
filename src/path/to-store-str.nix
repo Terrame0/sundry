@@ -23,6 +23,7 @@
       then builtins.appendContext value {"${sundry.path.store-root value}" = {path = true;};}
       else value
     else throw "path.to-store-str: expected a path, a derivation, or a store-path string, got a '${builtins.typeOf value}'";
+
   tests = let
     raw-store-string = builtins.unsafeDiscardStringContext (toString (builtins.toFile "to-store-str-fixture" "x"));
     context-store-string = "${pkgs.runCommandLocal "to-store-str-unbuilt" {} "mkdir $out"}";

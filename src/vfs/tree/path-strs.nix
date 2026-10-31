@@ -7,6 +7,7 @@
     sundry.vfs.tree.collapse
     (path: _: sundry.vfs.path.get.str path)
     tree;
+
   tests = {
     tagged-tree = [
       (path-strs (sundry.vfs.tree.from-src (fixtures-dir + "/vfs-test-dir/test-files")))

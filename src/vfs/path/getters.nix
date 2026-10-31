@@ -25,6 +25,7 @@
         (lib.tail path)
       else "";
   };
+
   tests = {
     basename = [(get.basename ["A" "B" "C.txt"]) "C.txt"];
     stem = [(get.stem ["A" "B" "C.txt"]) "C"];

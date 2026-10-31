@@ -5,6 +5,7 @@
       path = sundry.vfs.path.strip-between "{" "}" path;
       value = removeAttrs node ["tag-list"];
     });
+
   tests = let
     dirty = {
       "={a:1}" = {

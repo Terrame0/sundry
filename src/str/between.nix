@@ -10,6 +10,7 @@
       (sundry.str.delimit lsep rsep str).inside;
   in
     map (attrs: attrs.substr) insides;
+
   tests = {
     nested-delimiters = [
       (between "[" "]" "[ABC[DEF]][GHI]")

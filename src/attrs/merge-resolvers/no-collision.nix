@@ -1,6 +1,7 @@
 {sundry, ...}: rec {
   base.no-collision = path: lhs: rhs:
     throw "there is a collision in attrset merge at '${sundry.str.join-with "." path}'";
+
   tests = {
     throws-on-collision = [(sundry.does-throw (base.no-collision ["_"] {A = 1;} {A = 1;})) true];
     disjoint-keys = [

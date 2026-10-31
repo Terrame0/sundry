@@ -11,6 +11,7 @@
             ${sundry.str.pretty rhs}
       ''
     else rhs;
+
   tests = {
     throws-on-conflict = [(sundry.does-throw (base.no-conflict ["_"] {A = 1;} {A = 2;})) true];
     equal-scalars = [(base.no-conflict ["_"] 1 1) 1];

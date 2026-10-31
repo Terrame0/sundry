@@ -7,6 +7,7 @@
     if vfs-path == []
     then throw "cannot create a valid vfs node with an empty path"
     else lib.setAttrByPath vfs-path {inherit text;};
+
   tests = {
     single-level = [
       (from-text ["B.txt"] "contents of B.txt")

@@ -14,6 +14,7 @@ in rec {
         (lib.removeSuffix seq)
         (lib.removePrefix seq)
       ]);
+
   tests = {
     both = [(trim "/" "////A//") "A"];
     left = [(trim-left "/" "////A//") "A//"];

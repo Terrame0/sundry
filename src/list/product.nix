@@ -5,6 +5,7 @@
       map (rhs-entry: [lhs-entry rhs-entry])
       rhs)
     lhs);
+
   tests = {
     non-empty-lists = [
       (product [1 2 3] [4 5])

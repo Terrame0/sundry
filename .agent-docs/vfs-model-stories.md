@@ -34,7 +34,7 @@ These stories state the target model from a consumer's point of view. They defin
 - Assembly lists the directory but **opens no file**: an imported leaf is opaque and holds only `origin`.
 - No content classification happens, so text, binaries, and every byte sequence short of NUL import through one code path. Entry kind is classified, but by `readFileType`, not by content.
 
-**Status: works**, with two stated limits — [file.from-src](../src/vfs/file/from-src.nix) records `origin` after confirming the location is a regular file, and [dir.from-src](../src/vfs/tree/from-src.nix) enumerates files. Physical empty directories are not modelled (US-13), and every non-regular entry is rejected at ingest (US-12, US-20).
+**Status: works**, with two stated limits — [file.from-src](../src/vfs/file/from-src.nix) records `origin` after confirming the location is a regular file, and [tree.from-src](../src/vfs/tree/from-src.nix) enumerates files. Physical empty directories are not modelled (US-13), and every non-regular entry is rejected at ingest (US-12, US-20).
 
 ### US-03 — Query structure without reading content
 
@@ -144,7 +144,7 @@ These stories state the target model from a consumer's point of view. They defin
 - Preserving is not an option either: the output is a store object meant to carry bytes, and a pointer would keep it dependent on a context that may disappear.
 - A link is therefore not represented at any stage. Ingest rejects it (US-20), so `materialize` never sees one from a source tree.
 
-**Status: works** — the ingest primitive, [file.from-src](../src/vfs/file/from-src.nix), accepts only an entry whose `readFileType` is `regular`, so [dir.from-src](../src/vfs/tree/from-src.nix) inherits the rejection for every leaf it enumerates. A hand-built leaf may still point at a link; `materialize` dereferences it as the caller's own input (see [materialize.md](materialize.md#links-that-remain-possible)).
+**Status: works** — the ingest primitive, [file.from-src](../src/vfs/file/from-src.nix), accepts only an entry whose `readFileType` is `regular`, so [tree.from-src](../src/vfs/tree/from-src.nix) inherits the rejection for every leaf it enumerates. A hand-built leaf may still point at a link; `materialize` dereferences it as the caller's own input (see [materialize.md](materialize.md#links-that-remain-possible)).
 
 ### US-13 — Empty directories are not part of the model
 
@@ -222,7 +222,7 @@ These stories state the target model from a consumer's point of view. They defin
 **As** a library user, **I want** an entry that cannot be represented to fail with the *entry's* path, **so that** one odd file does not abort or hang an unrelated import.
 
 - `builtins.readFileType` reports four kinds: `regular`, `directory`, `symlink`, and `unknown`. `unknown` is the catch-all for fifo, socket, and device, which the evaluator cannot tell apart and does not need to.
-- The check lives in the primitive, [file.from-src](../src/vfs/file/from-src.nix), which accepts only `regular` and throws for the rest, naming the VFS path and the reported kind. [dir.from-src](../src/vfs/tree/from-src.nix) is a combinator over it, so it inherits the rejection without repeating it.
+- The check lives in the primitive, [file.from-src](../src/vfs/file/from-src.nix), which accepts only `regular` and throws for the rest, naming the VFS path and the reported kind. [tree.from-src](../src/vfs/tree/from-src.nix) is a combinator over it, so it inherits the rejection without repeating it.
 - Classification is free: `readFileType` is `lstat`, so no file is opened and no store copy is made.
 - Reading an opaque leaf through `sundry.vfs.file.read` may still fail uncatchably, but only for the caller that asked; ingest can no longer produce the entries that hang it.
 

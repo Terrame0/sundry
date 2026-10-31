@@ -17,6 +17,7 @@ in rec {
     stem = stem: path: basename (join-name stem (get.ext path)) path;
     ext = ext: path: basename (join-name (get.stem path) ext) path;
   };
+
   tests = {
     basename = [(set.basename "D.md" ["A" "B" "C.txt"]) ["A" "B" "D.md"]];
     stem = [(set.stem "C'" ["A" "B" "C.txt"]) ["A" "B" "C'.txt"]];

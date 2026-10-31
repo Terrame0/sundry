@@ -5,8 +5,8 @@
   pkgs,
   ...
 }: rec {
-  materialize = name: tree: let
-    data = lib.pipe tree [
+  materialize = name: input-tree: let
+    data = lib.pipe input-tree [
       (sundry.vfs.tree.collapse (path': node: let
         path = sundry.vfs.path.validate path';
       in {
@@ -23,39 +23,30 @@
             ];
       }))
     ];
-    script =
-      # -< nu >-
-      ''
-        let attrs = open $env.NIX_ATTRS_JSON_FILE
-        let out = $attrs.outputs.out
-        mkdir $out
-        for $entry in $attrs.data {
-          mkdir ([$out $entry.dir] | path join)
-          cp $entry.src ([$out $entry.dir $entry.file] | path join)
-        }
-      '';
-    drv = derivation {
+  in rec {
+    inherit (drv) outPath;
+    drv = sundry.builder {
       inherit name;
-      inherit (pkgs.stdenvNoCC.hostPlatform) system;
-      __structuredAttrs = true;
-      allowSubstitutes = false;
-      builder = lib.getExe pkgs.nushell;
-      inherit data;
-      args = [(builtins.toFile "materialize.nu" script)];
+      env = {inherit data;};
+      script =
+        # -< nu >-
+        ''
+          mkdir $env.out
+          for $entry in $env.data {
+            mkdir ([$env.out $entry.dir] | path join)
+            cp $entry.src ([$env.out $entry.dir $entry.file] | path join)
+          }
+        '';
     };
-  in {
-    inherit drv;
     tree =
       sundry.vfs.tree.reform
       (path: node: {
         inherit path;
         value =
           (removeAttrs node ["text" "expr"])
-          // {
-            origin = sundry.vfs.path.get.str ([drv] ++ path);
-          };
+          // {origin = sundry.vfs.path.get.str ([drv] ++ path);};
       })
-      tree;
+      input-tree;
   };
 
   tests = let
