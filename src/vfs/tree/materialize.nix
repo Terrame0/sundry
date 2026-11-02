@@ -2,7 +2,6 @@
   lib,
   sundry,
   fixtures-dir,
-  pkgs,
   ...
 }: rec {
   materialize = name: input-tree: let
@@ -14,7 +13,7 @@
         file = sundry.vfs.path.get.basename path;
         src =
           if sundry.vfs.node.is-opaque path node
-          then sundry.path.to-store-str node.origin
+          then sundry.path.to-store-sanitize node.origin
           else
             lib.pipe path [
               sundry.vfs.path.get.basename

@@ -85,8 +85,8 @@
             D = true;
           };
         };
-        src = sundry.path.to-store-str src;
-        out = sundry.path.to-store-str test-drv;
+        src = sundry.path.to-store-sanitize src;
+        out = sundry.path.to-store-sanitize test-drv;
       }
     ];
 
