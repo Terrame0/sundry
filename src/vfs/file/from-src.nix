@@ -12,7 +12,7 @@
     in
       if type == "regular"
       then lib.setAttrByPath vfs-path {origin = fs-path;}
-      else throw "vfs.file.from-src: ${sundry.str.pretty vfs-path} entry is of unsupported type '${type}'";
+      else throw "vfs.file.from-src: file '${fs-path}' is of unsupported type '${type}'";
 
   tests = {
     nested-path = [

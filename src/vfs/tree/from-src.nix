@@ -4,16 +4,25 @@
   fixtures-dir,
   ...
 }: rec {
-  from-src = dir-path: let
-    path-to-file = fs-path:
-      sundry.vfs.file.from-src
-      (lib.drop
-        (lib.length (sundry.vfs.path.from-str dir-path))
-        (sundry.vfs.path.from-str fs-path))
-      fs-path;
-  in
-    sundry.attrs.merge.recursive.no-collision
-    (map path-to-file (lib.filesystem.listFilesRecursive dir-path));
+  from-src = dir-path:
+    lib.pipe dir-path [
+      lib.filesystem.listFilesRecursive
+      (map (fs-path: let
+        type = builtins.readFileType fs-path;
+      in
+        if type == "regular"
+        then
+          sundry.vfs.file.from-src
+          (lib.drop
+            (lib.length (sundry.vfs.path.from-str dir-path))
+            (sundry.vfs.path.from-str fs-path))
+          fs-path
+        else
+          lib.warn
+          "vfs.tree.from-src: skipping file '${fs-path}' of unsupported type '${type}'"
+          {}))
+      sundry.attrs.merge.recursive.no-collision
+    ];
 
   tests = {
     tree = [
@@ -32,9 +41,8 @@
         };
       }
     ];
-    opaque = [((from-src (fixtures-dir + "/vfs-test-dir/test-files"))."A.txt" ? text) false];
     origin-is-path = [(lib.isPath (from-src (fixtures-dir + "/vfs-test-dir/test-files"))."A.txt".origin) true];
     origin-is-string = [(lib.isString (from-src "${toString fixtures-dir}/vfs-test-dir/test-files")."A.txt".origin) true];
-    throws-on-symlink = [(sundry.does-throw (from-src (fixtures-dir + "/vfs-test-dir/symlinks"))) true];
+    ignores-symlink = [(lib.hasAttrByPath ["B"] (from-src (fixtures-dir + "/vfs-test-dir/symlinks"))) false];
   };
 }

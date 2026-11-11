@@ -32,9 +32,9 @@
     ];
     derivation-unchanged = [(to-store-sanitize drv) (toString drv)];
     derivation-keeps-context = [(builtins.getContext (to-store-sanitize drv)) (builtins.getContext (toString drv))];
-    # -- store-path strings are rejected: fabricating context on them can lead to errors 
-    # - in nix implementations with lazy trees where appendContext fails on ensurePath 
-    # - because in such implementation isValidPath is false for lazily mounted paths (e.g. a flake input)
+    # -- store-path strings are rejected: fabricating context on them can lead to errors
+    # - in nix implementations with lazy trees where appendContext fails on ensurePath
+    # - because in such implementations isValidPath is false for lazily mounted paths (e.g. a flake input)
     rejects-store-string = [(sundry.does-throw (to-store-sanitize "/nix/store/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-x")) true];
     rejects-plain-string = [(sundry.does-throw (to-store-sanitize "not-a-store-path")) true];
   };
