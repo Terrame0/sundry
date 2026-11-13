@@ -18,7 +18,7 @@
       if lib.hasAttrByPath segs tree
       then sundry.attrs.get segs tree
       else throw "vfs.tree.get-relative-to: no vfs node at ${sundry.str.pretty segments}";
-    cleaned = sundry.vfs.path.strip-between "{" "}" segments;
+    cleaned = sundry.vfs.path.strip-tags segments;
     node =
       if segments == []
       then throw "vfs.tree.get-relative-to: the path must address a node, got an empty path"

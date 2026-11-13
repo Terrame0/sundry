@@ -33,7 +33,7 @@
       then throw "vfs.tree.resolve-tags: node at ${sundry.str.pretty path} already has a 'tag-list' attribute"
       else
         with config.vfs.tags; {
-          path = sundry.vfs.path.strip-between lsep rsep path;
+          path = sundry.vfs.path.strip-tags path;
           value =
             node
             // {

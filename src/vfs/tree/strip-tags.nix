@@ -2,7 +2,7 @@
   strip-tags =
     sundry.vfs.tree.reform
     (path: node: {
-      path = sundry.vfs.path.strip-between "{" "}" path;
+      path = sundry.vfs.path.strip-tags path;
       value = removeAttrs node ["tag-list"];
     });
 
