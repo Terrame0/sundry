@@ -2,34 +2,57 @@
   lib,
   sundry,
   fixtures-dir,
+  config,
   ...
 }: rec {
+  options = {
+    vfs.tags = {
+      kvsep = lib.mkOption {
+        default = ":";
+        type = lib.types.str;
+      };
+      lsep = lib.mkOption {
+        default = "{";
+        type = lib.types.str;
+      };
+      rsep = lib.mkOption {
+        default = "}";
+        type = lib.types.str;
+      };
+      listsep = lib.mkOption {
+        default = ",";
+        type = lib.types.str;
+      };
+    };
+  };
+
   resolve-tags =
     sundry.vfs.tree.reform
     (path: node:
       if node ? tag-list
-      then throw "vfs.tree.resolve-tags: node at ${sundry.str.pretty path} already has 'tag-list'"
-      else {
-        path = sundry.vfs.path.strip-between "{" "}" path;
-        value =
-          node
-          // {
-            tag-list = map (dir:
-              lib.pipe dir [
-                (sundry.str.between "{" "}")
-                (map (tag-str: let
-                  tag-parts = sundry.str.split ":" tag-str;
-                  tag-key = lib.head tag-parts;
-                  tag-value = sundry.is-null (sundry.list.excl-last tag-parts) "";
-                  tag-list = sundry.str.split "," tag-value;
-                in {
-                  ${tag-key} = sundry.list.un-singleton tag-list;
-                }))
-                sundry.attrs.merge.no-collision
-              ])
-            path;
-          };
-      });
+      then throw "vfs.tree.resolve-tags: node at ${sundry.str.pretty path} already has a 'tag-list' attribute"
+      else
+        with config.vfs.tags; {
+          path = sundry.vfs.path.strip-between lsep rsep path;
+          value =
+            node
+            // {
+              tag-list = map (dir:
+                lib.pipe dir [
+                  (sundry.str.between lsep rsep)
+                  (map (tag-str: let
+                    tag-parts = sundry.str.split kvsep tag-str;
+                    tag-key = lib.head tag-parts;
+                    tag-value = sundry.is-null (sundry.list.excl-last tag-parts) "";
+                    tag-list = sundry.str.split listsep tag-value;
+                  in {
+                    ${tag-key} = sundry.list.un-singleton tag-list;
+                  }))
+                  sundry.attrs.merge.no-collision
+                ])
+              path;
+            };
+        });
 
   tests = {
     tagged-tree = [

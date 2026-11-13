@@ -9,5 +9,6 @@ args: let
     else if args ? lib
     then args.lib
     else abort "'lib' missing; pass 'pkgs' or 'lib' to the library import statement";
+  config-override = args.config or {};
 in
-  (import ./assembly.nix {inherit pkgs lib;}).sundry
+  (import ./assembly.nix {inherit pkgs lib config-override;}).sundry

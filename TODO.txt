@@ -1,2 +1,0 @@
-add an error function that forms messages based on module path
-do a comment and error message audit (grep all '# --' / 'throw' entries and trim overly verbose ones)
